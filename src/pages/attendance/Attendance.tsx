@@ -9,6 +9,7 @@ import { AttendanceRecord } from "@/lib/types";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import BulkUpdateDialog from "./components/BulkUpdateDialog";
+import ConfirmDialog from "@/components/ConfirmDialog";
 
 const Attendance = () => {
   const { user } = useAuth();
@@ -26,6 +27,7 @@ const Attendance = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showBulkUpdate, setShowBulkUpdate] = useState(false);
+  const [showSaveConfirm, setShowSaveConfirm] = useState(false);
   
   const canEdit = user?.permissions.edit;
   
@@ -125,23 +127,23 @@ const Attendance = () => {
     setAttendanceData(newData);
   };
   
-  // Save attendance data
+  // Update the handleSave function
   const handleSave = async () => {
     if (!canEdit) {
       error("You don't have permission to edit attendance records");
       return;
     }
     
-    // Confirm save
-    if (!window.confirm("Are you sure you want to save these attendance records?")) {
-      return;
-    }
-    
+    setShowSaveConfirm(true);
+  };
+
+  const confirmSave = async () => {
     setIsSubmitting(true);
     
     try {
       await bulkSaveAttendance(attendanceData);
       success("Attendance data saved successfully");
+      setShowSaveConfirm(false);
     } catch (err) {
       error("Failed to save attendance data");
       console.error(err);
@@ -419,6 +421,15 @@ const Attendance = () => {
         open={showBulkUpdate}
         onClose={() => setShowBulkUpdate(false)}
         onConfirm={handleBulkUpdate}
+      />
+      
+      <ConfirmDialog
+        open={showSaveConfirm}
+        onOpenChange={setShowSaveConfirm}
+        onConfirm={confirmSave}
+        title="Save Attendance Records"
+        description="Are you sure you want to save these attendance records? This action cannot be undone."
+        confirmText={isSubmitting ? "Saving..." : "Save Records"}
       />
     </div>
   );
