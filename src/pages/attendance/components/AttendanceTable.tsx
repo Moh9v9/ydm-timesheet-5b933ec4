@@ -24,16 +24,16 @@ const AttendanceTable = ({
 }: AttendanceTableProps) => {
   return (
     <div className="bg-card shadow-sm rounded-lg border overflow-hidden">
-      <div className="data-table-container">
-        <table className="data-table">
-          <thead>
+      <div className="overflow-x-auto">
+        <table className="w-full">
+          <thead className="bg-muted/20">
             <tr>
-              <th>Employee</th>
-              <th>Status</th>
-              <th>Start Time</th>
-              <th>End Time</th>
-              <th>Overtime Hours</th>
-              <th>Notes</th>
+              <th className="text-left p-3 font-medium">Employee</th>
+              <th className="text-left p-3 font-medium">Status</th>
+              <th className="text-left p-3 font-medium hidden sm:table-cell">Start Time</th>
+              <th className="text-left p-3 font-medium hidden sm:table-cell">End Time</th>
+              <th className="text-left p-3 font-medium hidden md:table-cell">Overtime Hours</th>
+              <th className="text-left p-3 font-medium hidden md:table-cell">Notes</th>
             </tr>
           </thead>
           <tbody>

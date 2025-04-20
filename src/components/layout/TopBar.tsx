@@ -29,26 +29,26 @@ const TopBar = ({ toggleSidebar, isSidebarOpen }: TopBarProps) => {
 
   return (
     <header className="sticky top-0 z-30 bg-card border-b border-border">
-      <div className="flex items-center justify-between px-4 h-14">
-        <div className="flex items-center gap-3">
+      <div className="flex items-center justify-between px-3 h-14">
+        <div className="flex items-center gap-2">
           <button
             onClick={toggleSidebar}
-            className="md:hidden p-2 rounded-md hover:bg-accent transition-colors"
+            className="p-2 rounded-md hover:bg-accent transition-colors"
             aria-label={isSidebarOpen ? "Close sidebar" : "Open sidebar"}
           >
             <Menu size={20} />
           </button>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center">
             <img 
               src="https://i.ibb.co/DPfXmyDz/YDM-logo2-2.png" 
               alt="YDM Logo" 
               className="h-8 w-auto"
             />
-            <span className="text-lg font-semibold hidden sm:inline">YDM TimeSheet</span>
+            <span className="text-lg font-semibold hidden sm:inline ml-2">YDM TimeSheet</span>
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
           <button
             onClick={toggleTheme}
             className="p-2 rounded-md hover:bg-accent transition-colors"

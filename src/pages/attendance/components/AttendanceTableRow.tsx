@@ -23,21 +23,21 @@ const AttendanceTableRow = ({
   canEdit,
 }: AttendanceTableRowProps) => {
   return (
-    <tr>
-      <td>
+    <tr className="border-b border-border/30 last:border-0">
+      <td className="p-3">
         <div>
           <div className="font-medium">{employee.fullName}</div>
           <div className="text-xs text-muted-foreground">{employee.employeeId}</div>
         </div>
       </td>
 
-      <td>
+      <td className="p-3">
         <div className="flex items-center">
           <div 
             className={`relative w-12 h-6 rounded-full cursor-pointer transition-colors ${
               record.present 
-                ? "attendance-present" 
-                : "attendance-absent"
+                ? "bg-present" 
+                : "bg-absent"
             }`}
             onClick={onToggleAttendance}
           >
@@ -53,7 +53,7 @@ const AttendanceTableRow = ({
         </div>
       </td>
 
-      <td>
+      <td className="p-3 hidden sm:table-cell">
         {record.present ? (
           <input
             type="time"
@@ -67,7 +67,7 @@ const AttendanceTableRow = ({
         )}
       </td>
 
-      <td>
+      <td className="p-3 hidden sm:table-cell">
         {record.present ? (
           <input
             type="time"
@@ -81,7 +81,7 @@ const AttendanceTableRow = ({
         )}
       </td>
 
-      <td>
+      <td className="p-3 hidden md:table-cell">
         {record.present ? (
           <input
             type="number"
@@ -97,7 +97,7 @@ const AttendanceTableRow = ({
         )}
       </td>
 
-      <td>
+      <td className="p-3 hidden md:table-cell">
         <Textarea
           value={record.note || ""}
           onChange={(e) => onNoteChange(e.target.value)}

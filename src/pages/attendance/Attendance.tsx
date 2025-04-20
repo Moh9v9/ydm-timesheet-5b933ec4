@@ -161,10 +161,10 @@ const Attendance = () => {
   };
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-4 sm:space-y-6 animate-fade-in pb-20">
       <NotificationContainer />
       
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
+      <div className="flex flex-col space-y-4">
         <div>
           <h1 className="text-2xl font-bold">Daily Attendance</h1>
           <p className="text-muted-foreground">
@@ -172,13 +172,13 @@ const Attendance = () => {
           </p>
         </div>
         
-        <div className="flex gap-3 mt-4 md:mt-0">
+        <div className="flex gap-3 mt-2">
           {canEdit && (
             <>
               <button
                 onClick={handleUpdateAll}
                 disabled={isSubmitting}
-                className="px-4 py-2 bg-secondary text-secondary-foreground rounded-md flex items-center hover:bg-secondary/90 transition-colors disabled:opacity-70"
+                className="flex-1 px-4 py-2 bg-secondary text-secondary-foreground rounded-md flex items-center justify-center hover:bg-secondary/90 transition-colors disabled:opacity-70"
               >
                 <Save size={16} className="mr-2" />
                 {isSubmitting ? "Updating..." : "Update All"}
@@ -187,7 +187,7 @@ const Attendance = () => {
               <button
                 onClick={handleSave}
                 disabled={isSubmitting}
-                className="px-4 py-2 bg-primary text-white rounded-md flex items-center hover:bg-primary/90 transition-colors disabled:opacity-70"
+                className="flex-1 px-4 py-2 bg-primary text-white rounded-md flex items-center justify-center hover:bg-primary/90 transition-colors disabled:opacity-70"
               >
                 <Save size={16} className="mr-2" />
                 {isSubmitting ? "Saving..." : "Save"}

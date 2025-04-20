@@ -1,5 +1,5 @@
 
-import { ReactNode, useState } from "react";
+import { ReactNode, useState, useEffect } from "react";
 import Sidebar from "./Sidebar";
 import TopBar from "./TopBar";
 import { useAuth } from "@/contexts/AuthContext";
@@ -13,6 +13,20 @@ interface MainLayoutProps {
 const MainLayout = ({ children, requireAuth = true }: MainLayoutProps) => {
   const { user, loading } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Default closed on mobile
+  
+  // Close sidebar by default on mobile devices
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 768) {
+        setIsSidebarOpen(false);
+      }
+    };
+    
+    window.addEventListener('resize', handleResize);
+    handleResize(); // Set initial state
+    
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -39,13 +53,13 @@ const MainLayout = ({ children, requireAuth = true }: MainLayoutProps) => {
             <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
             <main 
               className={`
-                w-full min-h-0 p-4 transition-all duration-300 ease-in-out
-                sm:p-5
+                w-full min-h-0 p-3 transition-all duration-300 ease-in-out overflow-x-hidden
+                sm:p-4
                 md:p-6
                 ${isSidebarOpen ? 'md:ml-64' : 'ml-0'}
               `}
             >
-              <div className="container mx-auto max-w-7xl">
+              <div className="w-full max-w-full">
                 {children}
               </div>
             </main>
