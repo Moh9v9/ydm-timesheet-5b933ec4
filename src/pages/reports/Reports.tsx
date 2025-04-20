@@ -3,13 +3,23 @@ import { useState } from "react";
 import { useEmployees } from "@/contexts/EmployeeContext";
 import { useAttendance } from "@/contexts/AttendanceContext";
 import { useNotification } from "@/components/ui/notification";
-import { Download, FileText, FileSpreadsheet } from "lucide-react";
+import { 
+  Download, 
+  FileText, 
+  FileSpreadsheet,
+  Calendar,
+  CalendarDays,
+  Table 
+} from "lucide-react";
 import { ExportFormat, ReportType } from "@/lib/types";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import AttendanceSummaryTable from "./components/AttendanceSummaryTable";
 
 const Reports = () => {
   const [reportType, setReportType] = useState<ReportType>("daily");
   const [exportFormat, setExportFormat] = useState<ExportFormat>("csv");
   const [isGenerating, setIsGenerating] = useState(false);
+  const [viewMode, setViewMode] = useState<"daily" | "weekly" | "monthly">("daily");
   
   const { filteredEmployees } = useEmployees();
   const { attendanceRecords, currentDate } = useAttendance();
@@ -64,149 +74,206 @@ const Reports = () => {
         </p>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Export Configuration */}
-        <div className="md:col-span-2 bg-card shadow-sm rounded-lg border p-6 space-y-6">
-          <h2 className="text-xl font-medium">Generate Report</h2>
-          
-          <div className="space-y-4">
-            {/* Report Type */}
-            <div>
-              <label htmlFor="reportType" className="block text-sm font-medium mb-1">
-                Report Type
-              </label>
-              <select
-                id="reportType"
-                value={reportType}
-                onChange={(e) => setReportType(e.target.value as ReportType)}
-                className="w-full p-2 border border-input rounded-md"
-              >
-                <option value="daily">Daily Attendance</option>
-                <option value="weekly">Weekly Attendance</option>
-                <option value="monthly">Monthly Attendance</option>
-                <option value="employees">Full Employee List</option>
-              </select>
-            </div>
-            
-            {/* Export Format */}
-            <div>
-              <label htmlFor="exportFormat" className="block text-sm font-medium mb-1">
-                Export Format
-              </label>
-              <select
-                id="exportFormat"
-                value={exportFormat}
-                onChange={(e) => setExportFormat(e.target.value as ExportFormat)}
-                className="w-full p-2 border border-input rounded-md"
-              >
-                <option value="csv">CSV</option>
-                <option value="xlsx">Excel (XLSX)</option>
-                <option value="pdf">PDF</option>
-              </select>
-            </div>
-            
-            {/* Additional options based on report type */}
-            {reportType === "daily" && (
-              <div>
-                <label htmlFor="date" className="block text-sm font-medium mb-1">
-                  Date
-                </label>
-                <input
-                  type="date"
-                  id="date"
-                  value={currentDate}
-                  className="w-full p-2 border border-input rounded-md"
-                />
-              </div>
-            )}
-            
-            {reportType === "weekly" && (
-              <div>
-                <label htmlFor="week" className="block text-sm font-medium mb-1">
-                  Week
-                </label>
-                <input
-                  type="week"
-                  id="week"
-                  className="w-full p-2 border border-input rounded-md"
-                />
-              </div>
-            )}
-            
-            {reportType === "monthly" && (
-              <div>
-                <label htmlFor="month" className="block text-sm font-medium mb-1">
-                  Month
-                </label>
-                <input
-                  type="month"
-                  id="month"
-                  className="w-full p-2 border border-input rounded-md"
-                />
-              </div>
-            )}
-            
-            {/* Generate Button */}
-            <div className="pt-2">
-              <button
-                onClick={generateReport}
-                disabled={isGenerating}
-                className="px-4 py-2 bg-primary text-white rounded-md flex items-center hover:bg-primary/90 transition-colors disabled:opacity-70"
-              >
-                <Download size={16} className="mr-2" />
-                {isGenerating ? "Generating..." : "Generate Report"}
-              </button>
-            </div>
-          </div>
-        </div>
+      <Tabs defaultValue="export" className="w-full">
+        <TabsList className="mb-4">
+          <TabsTrigger value="export" className="gap-2">
+            <Download size={16} />
+            <span className="hidden sm:inline">Export Reports</span>
+          </TabsTrigger>
+          <TabsTrigger value="view" className="gap-2">
+            <Table size={16} />
+            <span className="hidden sm:inline">Views & Summaries</span>
+          </TabsTrigger>
+        </TabsList>
         
-        {/* Available Reports */}
-        <div className="bg-card shadow-sm rounded-lg border p-6">
-          <h2 className="text-xl font-medium mb-4">Available Reports</h2>
-          
-          <div className="space-y-3">
-            <div className="p-3 border rounded-md flex items-center justify-between hover:bg-accent/50 transition-colors">
-              <div className="flex items-center">
-                <FileText size={18} className="mr-3" />
-                <span>Daily Attendance</span>
+        <TabsContent value="export" className="mt-0">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Export Configuration */}
+            <div className="md:col-span-2 bg-card shadow-sm rounded-lg border p-6 space-y-6">
+              <h2 className="text-xl font-medium">Generate Report</h2>
+              
+              <div className="space-y-4">
+                {/* Report Type */}
+                <div>
+                  <label htmlFor="reportType" className="block text-sm font-medium mb-1">
+                    Report Type
+                  </label>
+                  <select
+                    id="reportType"
+                    value={reportType}
+                    onChange={(e) => setReportType(e.target.value as ReportType)}
+                    className="w-full p-2 border border-input rounded-md"
+                  >
+                    <option value="daily">Daily Attendance</option>
+                    <option value="weekly">Weekly Attendance</option>
+                    <option value="monthly">Monthly Attendance</option>
+                    <option value="employees">Full Employee List</option>
+                  </select>
+                </div>
+                
+                {/* Export Format */}
+                <div>
+                  <label htmlFor="exportFormat" className="block text-sm font-medium mb-1">
+                    Export Format
+                  </label>
+                  <select
+                    id="exportFormat"
+                    value={exportFormat}
+                    onChange={(e) => setExportFormat(e.target.value as ExportFormat)}
+                    className="w-full p-2 border border-input rounded-md"
+                  >
+                    <option value="csv">CSV</option>
+                    <option value="xlsx">Excel (XLSX)</option>
+                    <option value="pdf">PDF</option>
+                  </select>
+                </div>
+                
+                {/* Additional options based on report type */}
+                {reportType === "daily" && (
+                  <div>
+                    <label htmlFor="date" className="block text-sm font-medium mb-1">
+                      Date
+                    </label>
+                    <input
+                      type="date"
+                      id="date"
+                      value={currentDate}
+                      className="w-full p-2 border border-input rounded-md"
+                    />
+                  </div>
+                )}
+                
+                {reportType === "weekly" && (
+                  <div>
+                    <label htmlFor="week" className="block text-sm font-medium mb-1">
+                      Week
+                    </label>
+                    <input
+                      type="week"
+                      id="week"
+                      className="w-full p-2 border border-input rounded-md"
+                    />
+                  </div>
+                )}
+                
+                {reportType === "monthly" && (
+                  <div>
+                    <label htmlFor="month" className="block text-sm font-medium mb-1">
+                      Month
+                    </label>
+                    <input
+                      type="month"
+                      id="month"
+                      className="w-full p-2 border border-input rounded-md"
+                    />
+                  </div>
+                )}
+                
+                {/* Generate Button */}
+                <div className="pt-2">
+                  <button
+                    onClick={generateReport}
+                    disabled={isGenerating}
+                    className="px-4 py-2 bg-primary text-white rounded-md flex items-center hover:bg-primary/90 transition-colors disabled:opacity-70"
+                  >
+                    <Download size={16} className="mr-2" />
+                    {isGenerating ? "Generating..." : "Generate Report"}
+                  </button>
+                </div>
               </div>
-              <button className="text-primary hover:text-primary/80">
-                <Download size={16} />
-              </button>
             </div>
             
-            <div className="p-3 border rounded-md flex items-center justify-between hover:bg-accent/50 transition-colors">
-              <div className="flex items-center">
-                <FileText size={18} className="mr-3" />
-                <span>Weekly Summary</span>
+            {/* Available Reports */}
+            <div className="bg-card shadow-sm rounded-lg border p-6">
+              <h2 className="text-xl font-medium mb-4">Available Reports</h2>
+              
+              <div className="space-y-3">
+                <div className="p-3 border rounded-md flex items-center justify-between hover:bg-accent/50 transition-colors">
+                  <div className="flex items-center">
+                    <FileText size={18} className="mr-3" />
+                    <span>Daily Attendance</span>
+                  </div>
+                  <button className="text-primary hover:text-primary/80">
+                    <Download size={16} />
+                  </button>
+                </div>
+                
+                <div className="p-3 border rounded-md flex items-center justify-between hover:bg-accent/50 transition-colors">
+                  <div className="flex items-center">
+                    <FileText size={18} className="mr-3" />
+                    <span>Weekly Summary</span>
+                  </div>
+                  <button className="text-primary hover:text-primary/80">
+                    <Download size={16} />
+                  </button>
+                </div>
+                
+                <div className="p-3 border rounded-md flex items-center justify-between hover:bg-accent/50 transition-colors">
+                  <div className="flex items-center">
+                    <FileSpreadsheet size={18} className="mr-3" />
+                    <span>Monthly Report</span>
+                  </div>
+                  <button className="text-primary hover:text-primary/80">
+                    <Download size={16} />
+                  </button>
+                </div>
+                
+                <div className="p-3 border rounded-md flex items-center justify-between hover:bg-accent/50 transition-colors">
+                  <div className="flex items-center">
+                    <FileSpreadsheet size={18} className="mr-3" />
+                    <span>Employee Directory</span>
+                  </div>
+                  <button className="text-primary hover:text-primary/80">
+                    <Download size={16} />
+                  </button>
+                </div>
               </div>
-              <button className="text-primary hover:text-primary/80">
-                <Download size={16} />
-              </button>
-            </div>
-            
-            <div className="p-3 border rounded-md flex items-center justify-between hover:bg-accent/50 transition-colors">
-              <div className="flex items-center">
-                <FileSpreadsheet size={18} className="mr-3" />
-                <span>Monthly Report</span>
-              </div>
-              <button className="text-primary hover:text-primary/80">
-                <Download size={16} />
-              </button>
-            </div>
-            
-            <div className="p-3 border rounded-md flex items-center justify-between hover:bg-accent/50 transition-colors">
-              <div className="flex items-center">
-                <FileSpreadsheet size={18} className="mr-3" />
-                <span>Employee Directory</span>
-              </div>
-              <button className="text-primary hover:text-primary/80">
-                <Download size={16} />
-              </button>
             </div>
           </div>
-        </div>
-      </div>
+        </TabsContent>
+        
+        <TabsContent value="view" className="mt-0">
+          <div className="bg-card shadow-sm rounded-lg border p-6">
+            <div className="mb-6">
+              <h2 className="text-xl font-medium">Attendance Summaries</h2>
+              <p className="text-muted-foreground">
+                View and export attendance records by different time periods
+              </p>
+            </div>
+            
+            <div className="mb-6">
+              <TabsList>
+                <TabsTrigger 
+                  value="daily" 
+                  onClick={() => setViewMode("daily")}
+                  className={viewMode === "daily" ? "bg-primary text-primary-foreground" : ""}
+                >
+                  <Calendar size={16} className="mr-2" />
+                  Daily
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="weekly" 
+                  onClick={() => setViewMode("weekly")}
+                  className={viewMode === "weekly" ? "bg-primary text-primary-foreground" : ""}
+                >
+                  <FileSpreadsheet size={16} className="mr-2" />
+                  Weekly
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="monthly" 
+                  onClick={() => setViewMode("monthly")}
+                  className={viewMode === "monthly" ? "bg-primary text-primary-foreground" : ""}
+                >
+                  <CalendarDays size={16} className="mr-2" />
+                  Monthly
+                </TabsTrigger>
+              </TabsList>
+            </div>
+            
+            <AttendanceSummaryTable view={viewMode} currentDate={currentDate} />
+          </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
