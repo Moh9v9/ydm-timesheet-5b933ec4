@@ -42,11 +42,15 @@ const AttendanceTable = ({
   };
 
   const getSortedData = () => {
-    const sortedData = [...attendanceData];
+    // Create a new array with original indices to track position
+    const indexedData = attendanceData.map((record, index) => ({
+      record,
+      originalIndex: index
+    }));
     
-    sortedData.sort((a, b) => {
-      const employeeA = filteredEmployees.find(emp => emp.id === a.employeeId);
-      const employeeB = filteredEmployees.find(emp => emp.id === b.employeeId);
+    indexedData.sort((a, b) => {
+      const employeeA = filteredEmployees.find(emp => emp.id === a.record.employeeId);
+      const employeeB = filteredEmployees.find(emp => emp.id === b.record.employeeId);
       
       if (!employeeA || !employeeB) return 0;
 
@@ -56,21 +60,21 @@ const AttendanceTable = ({
         case "employee":
           return direction * employeeA.fullName.localeCompare(employeeB.fullName);
         case "status":
-          return direction * (Number(a.present) - Number(b.present));
+          return direction * (Number(a.record.present) - Number(b.record.present));
         case "startTime":
-          return direction * (a.startTime || "").localeCompare(b.startTime || "");
+          return direction * (a.record.startTime || "").localeCompare(b.record.startTime || "");
         case "endTime":
-          return direction * (a.endTime || "").localeCompare(b.endTime || "");
+          return direction * (a.record.endTime || "").localeCompare(b.record.endTime || "");
         case "overtimeHours":
-          return direction * ((a.overtimeHours || 0) - (b.overtimeHours || 0));
+          return direction * ((a.record.overtimeHours || 0) - (b.record.overtimeHours || 0));
         case "notes":
-          return direction * (a.note || "").localeCompare(b.note || "");
+          return direction * (a.record.note || "").localeCompare(b.record.note || "");
         default:
           return 0;
       }
     });
 
-    return sortedData;
+    return indexedData;
   };
 
   const SortIcon = ({ field }: { field: SortField }) => {
@@ -137,7 +141,7 @@ const AttendanceTable = ({
                 </td>
               </tr>
             ) : getSortedData().length > 0 ? (
-              getSortedData().map((record, index) => {
+              getSortedData().map(({ record, originalIndex }) => {
                 const employee = filteredEmployees.find(
                   emp => emp.id === record.employeeId
                 );
@@ -149,10 +153,10 @@ const AttendanceTable = ({
                     key={record.id}
                     record={record}
                     employee={employee}
-                    onToggleAttendance={() => onToggleAttendance(index)}
-                    onTimeChange={(field, value) => onTimeChange(index, field, value)}
-                    onOvertimeChange={(value) => onOvertimeChange(index, value)}
-                    onNoteChange={(value) => onNoteChange(index, value)}
+                    onToggleAttendance={() => onToggleAttendance(originalIndex)}
+                    onTimeChange={(field, value) => onTimeChange(originalIndex, field, value)}
+                    onOvertimeChange={(value) => onOvertimeChange(originalIndex, value)}
+                    onNoteChange={(value) => onNoteChange(originalIndex, value)}
                     canEdit={canEdit}
                   />
                 );
