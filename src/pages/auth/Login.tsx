@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -61,7 +62,7 @@ const Login = () => {
               className="h-16 w-auto mx-auto mb-4"
             />
             <h2 className="text-3xl font-extrabold text-foreground mb-2">
-              YDM TimeSheet
+              Sign in to YDM TimeSheet
             </h2>
             <p className="text-sm text-muted-foreground mb-8">
               Manage employee attendance and timesheets
