@@ -1,7 +1,14 @@
 
 import React from 'react';
+import { format } from "date-fns";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { ReportType } from "@/lib/types";
-import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
 
 interface DateRangeInputsProps {
   reportType: ReportType;
@@ -9,18 +16,38 @@ interface DateRangeInputsProps {
 }
 
 const DateRangeInputs = ({ reportType, currentDate }: DateRangeInputsProps) => {
+  const [date, setDate] = React.useState<Date>(new Date(currentDate));
+
+  const handleSelect = (selectedDate: Date | undefined) => {
+    if (selectedDate) {
+      setDate(selectedDate);
+    }
+  };
+
   if (reportType === "daily") {
     return (
       <div>
         <label htmlFor="date" className="block text-sm font-medium mb-1 dark:text-gray-200">
           Select Date
         </label>
-        <Input
-          type="date"
-          id="date"
-          defaultValue={currentDate}
-          className="w-full dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100 text-sm"
-        />
+        <Popover>
+          <PopoverTrigger asChild>
+            <button
+              className="w-full flex items-center px-3 py-2 text-left border rounded-md dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100 text-sm"
+            >
+              {format(date, "PPP")}
+            </button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <Calendar
+              mode="single"
+              selected={date}
+              onSelect={handleSelect}
+              initialFocus
+              className={cn("p-3 pointer-events-auto")}
+            />
+          </PopoverContent>
+        </Popover>
       </div>
     );
   }
@@ -31,11 +58,24 @@ const DateRangeInputs = ({ reportType, currentDate }: DateRangeInputsProps) => {
         <label htmlFor="week" className="block text-sm font-medium mb-1 dark:text-gray-200">
           Select Week
         </label>
-        <Input
-          type="week"
-          id="week"
-          className="w-full dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100 text-sm"
-        />
+        <Popover>
+          <PopoverTrigger asChild>
+            <button
+              className="w-full flex items-center px-3 py-2 text-left border rounded-md dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100 text-sm"
+            >
+              {format(date, "'Week of' MMM d, yyyy")}
+            </button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <Calendar
+              mode="single"
+              selected={date}
+              onSelect={handleSelect}
+              initialFocus
+              className={cn("p-3 pointer-events-auto")}
+            />
+          </PopoverContent>
+        </Popover>
       </div>
     );
   }
@@ -46,11 +86,24 @@ const DateRangeInputs = ({ reportType, currentDate }: DateRangeInputsProps) => {
         <label htmlFor="month" className="block text-sm font-medium mb-1 dark:text-gray-200">
           Select Month
         </label>
-        <Input
-          type="month"
-          id="month"
-          className="w-full dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100 text-sm"
-        />
+        <Popover>
+          <PopoverTrigger asChild>
+            <button
+              className="w-full flex items-center px-3 py-2 text-left border rounded-md dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100 text-sm"
+            >
+              {format(date, "MMMM yyyy")}
+            </button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <Calendar
+              mode="single"
+              selected={date}
+              onSelect={handleSelect}
+              initialFocus
+              className={cn("p-3 pointer-events-auto")}
+            />
+          </PopoverContent>
+        </Popover>
       </div>
     );
   }
