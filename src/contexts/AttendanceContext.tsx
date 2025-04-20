@@ -1,149 +1,29 @@
 
-import { createContext, useContext, useState, ReactNode } from "react";
-import { AttendanceRecord, AttendanceFilters } from "@/lib/types";
-
-interface AttendanceContextType {
-  attendanceRecords: AttendanceRecord[];
-  filteredRecords: AttendanceRecord[];
-  currentDate: string;
-  setCurrentDate: (date: string) => void;
-  filters: AttendanceFilters;
-  setFilters: (filters: AttendanceFilters) => void;
-  addAttendanceRecord: (record: Omit<AttendanceRecord, "id">) => Promise<AttendanceRecord>;
-  updateAttendanceRecord: (id: string, record: Partial<AttendanceRecord>) => Promise<AttendanceRecord>;
-  deleteAttendanceRecord: (id: string) => Promise<void>;
-  getAttendanceRecord: (id: string) => AttendanceRecord | undefined;
-  getRecordsByEmployeeAndDate: (employeeId: string, date: string) => AttendanceRecord | undefined;
-  bulkSaveAttendance: (records: (Omit<AttendanceRecord, "id"> | AttendanceRecord)[]) => Promise<AttendanceRecord[]>;
-  loading: boolean;
-}
+import { createContext, useContext, ReactNode } from "react";
+import { AttendanceContextType } from "./attendance/types";
+import { useAttendanceState } from "./attendance/useAttendanceState";
+import { useAttendanceOperations } from "./attendance/useAttendanceOperations";
 
 const AttendanceContext = createContext<AttendanceContextType | undefined>(undefined);
 
 export const AttendanceProvider = ({ children }: { children: ReactNode }) => {
-  const [attendanceRecords, setAttendanceRecords] = useState<AttendanceRecord[]>([]);
-  const [currentDate, setCurrentDate] = useState<string>(new Date().toISOString().split('T')[0]);
-  const [filters, setFilters] = useState<AttendanceFilters>({
-    date: currentDate
-  });
-  const [loading, setLoading] = useState(false);
+  const {
+    attendanceRecords,
+    setAttendanceRecords,
+    currentDate,
+    setCurrentDate,
+    filters,
+    setFilters,
+    loading,
+    setLoading,
+    filteredRecords,
+  } = useAttendanceState();
 
-  // Filter attendance records based on current filters
-  const filteredRecords = attendanceRecords.filter(record => {
-    if (filters.date && record.date !== filters.date) return false;
-    if (filters.employeeId && record.employeeId !== filters.employeeId) return false;
-    if (filters.present !== undefined && record.present !== filters.present) return false;
-    return true;
-  });
-
-  // Get attendance record by ID
-  const getAttendanceRecord = (id: string) => {
-    return attendanceRecords.find(record => record.id === id);
-  };
-
-  // Get attendance record by employee ID and date
-  const getRecordsByEmployeeAndDate = (employeeId: string, date: string) => {
-    return attendanceRecords.find(
-      record => record.employeeId === employeeId && record.date === date
-    );
-  };
-
-  // Add new attendance record
-  const addAttendanceRecord = async (record: Omit<AttendanceRecord, "id">): Promise<AttendanceRecord> => {
-    setLoading(true);
-    
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 600));
-    
-    // Generate new ID
-    const newRecord: AttendanceRecord = {
-      ...record,
-      id: `${Date.now()}`,
-    };
-    
-    setAttendanceRecords([...attendanceRecords, newRecord]);
-    setLoading(false);
-    return newRecord;
-  };
-
-  // Update attendance record
-  const updateAttendanceRecord = async (
-    id: string,
-    recordData: Partial<AttendanceRecord>
-  ): Promise<AttendanceRecord> => {
-    setLoading(true);
-    
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 600));
-    
-    const updatedRecords = attendanceRecords.map(record => {
-      if (record.id === id) {
-        return { ...record, ...recordData };
-      }
-      return record;
-    });
-    
-    setAttendanceRecords(updatedRecords);
-    setLoading(false);
-    
-    const updatedRecord = updatedRecords.find(record => record.id === id);
-    if (!updatedRecord) {
-      throw new Error("Attendance record not found");
-    }
-    
-    return updatedRecord;
-  };
-
-  // Delete attendance record
-  const deleteAttendanceRecord = async (id: string): Promise<void> => {
-    setLoading(true);
-    
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 600));
-    
-    setAttendanceRecords(attendanceRecords.filter(record => record.id !== id));
-    setLoading(false);
-  };
-
-  // Bulk save attendance records
-  const bulkSaveAttendance = async (
-    records: (Omit<AttendanceRecord, "id"> | AttendanceRecord)[]
-  ): Promise<AttendanceRecord[]> => {
-    setLoading(true);
-    
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 800));
-    
-    const newRecords: AttendanceRecord[] = [];
-    
-    // Process each record
-    for (const record of records) {
-      if ("id" in record) {
-        // Update existing record
-        const existingIndex = attendanceRecords.findIndex(r => r.id === record.id);
-        if (existingIndex !== -1) {
-          attendanceRecords[existingIndex] = record;
-        } else {
-          newRecords.push(record);
-        }
-      } else {
-        // Add new record
-        const newRecord: AttendanceRecord = {
-          ...record,
-          id: `new_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
-        };
-        newRecords.push(newRecord);
-      }
-    }
-    
-    // Update state with new records
-    setAttendanceRecords([...attendanceRecords.filter(r => 
-      !records.some(newR => "id" in newR && newR.id === r.id)
-    ), ...newRecords]);
-    
-    setLoading(false);
-    return newRecords;
-  };
+  const operations = useAttendanceOperations(
+    attendanceRecords,
+    setAttendanceRecords,
+    setLoading
+  );
 
   return (
     <AttendanceContext.Provider
@@ -154,13 +34,8 @@ export const AttendanceProvider = ({ children }: { children: ReactNode }) => {
         setCurrentDate,
         filters,
         setFilters,
-        addAttendanceRecord,
-        updateAttendanceRecord,
-        deleteAttendanceRecord,
-        getAttendanceRecord,
-        getRecordsByEmployeeAndDate,
-        bulkSaveAttendance,
-        loading
+        loading,
+        ...operations
       }}
     >
       {children}
