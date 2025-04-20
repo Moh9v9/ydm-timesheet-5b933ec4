@@ -6,6 +6,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 
@@ -40,17 +41,20 @@ const BulkUpdateDialog = ({ open, onClose, onConfirm }: BulkUpdateDialogProps) =
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Update All Attendance Records</DialogTitle>
+          <DialogDescription>
+            Set attendance status and times for all employees. Time settings will only apply to present employees.
+          </DialogDescription>
         </DialogHeader>
         
         <div className="grid gap-4 py-4">
           <div className="flex items-center gap-4">
-            <label className="text-right font-medium">Status:</label>
+            <label className="text-right font-medium min-w-24">Status:</label>
             <div className="flex items-center">
               <div 
                 className={`relative w-12 h-6 rounded-full cursor-pointer transition-colors ${
                   present 
-                    ? "attendance-present" 
-                    : "attendance-absent"
+                    ? "bg-primary" 
+                    : "bg-destructive"
                 }`}
                 onClick={() => setPresent(!present)}
               >
@@ -60,45 +64,53 @@ const BulkUpdateDialog = ({ open, onClose, onConfirm }: BulkUpdateDialogProps) =
                   }`} 
                 />
               </div>
-              <span className="ml-2">{present ? "Present" : "Absent"}</span>
+              <span className="ml-2 font-medium">{present ? "Present" : "Absent"}</span>
             </div>
           </div>
 
-          {present && (
-            <>
-              <div className="flex items-center gap-4">
-                <label className="text-right font-medium">Start Time:</label>
-                <Input
-                  type="time"
-                  value={startTime}
-                  onChange={(e) => setStartTime(e.target.value)}
-                  className="w-32"
-                />
-              </div>
+          <div className="space-y-4">
+            {present && (
+              <div className="space-y-4 rounded-lg bg-accent/50 p-4">
+                <div className="flex items-center gap-4">
+                  <label className="text-right font-medium min-w-24">Start Time:</label>
+                  <Input
+                    type="time"
+                    value={startTime}
+                    onChange={(e) => setStartTime(e.target.value)}
+                    className="w-32"
+                  />
+                </div>
 
-              <div className="flex items-center gap-4">
-                <label className="text-right font-medium">End Time:</label>
-                <Input
-                  type="time"
-                  value={endTime}
-                  onChange={(e) => setEndTime(e.target.value)}
-                  className="w-32"
-                />
-              </div>
+                <div className="flex items-center gap-4">
+                  <label className="text-right font-medium min-w-24">End Time:</label>
+                  <Input
+                    type="time"
+                    value={endTime}
+                    onChange={(e) => setEndTime(e.target.value)}
+                    className="w-32"
+                  />
+                </div>
 
-              <div className="flex items-center gap-4">
-                <label className="text-right font-medium">Overtime Hours:</label>
-                <Input
-                  type="number"
-                  min="0"
-                  step="0.5"
-                  value={overtimeHours}
-                  onChange={(e) => setOvertimeHours(parseFloat(e.target.value) || 0)}
-                  className="w-32"
-                />
+                <div className="flex items-center gap-4">
+                  <label className="text-right font-medium min-w-24">Overtime Hours:</label>
+                  <Input
+                    type="number"
+                    min="0"
+                    step="0.5"
+                    value={overtimeHours}
+                    onChange={(e) => setOvertimeHours(parseFloat(e.target.value) || 0)}
+                    className="w-32"
+                  />
+                </div>
               </div>
-            </>
-          )}
+            )}
+
+            {!present && (
+              <p className="text-sm text-muted-foreground italic">
+                When marking as absent, start time, end time, and overtime will be cleared.
+              </p>
+            )}
+          </div>
         </div>
 
         <DialogFooter>
