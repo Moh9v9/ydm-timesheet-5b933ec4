@@ -51,6 +51,7 @@ const Login = () => {
           </div>
           
           <div className="text-center mb-8">
+            <h3 className="text-2xl font-bold text-foreground mb-4">Sign In</h3>
             <p className="text-sm text-muted-foreground">
               Manage employee attendance and timesheets
             </p>
