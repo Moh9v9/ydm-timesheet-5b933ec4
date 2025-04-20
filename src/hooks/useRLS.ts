@@ -1,11 +1,14 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import { useState, useEffect } from "react";
+import { Database } from "@/integrations/supabase/types";
+
+type TableNames = keyof Database['public']['Tables'];
 
 /**
  * Hook to help debug Row Level Security (RLS) issues
  */
-export const useRLSDebug = (tableName: string) => {
+export const useRLSDebug = (tableName: TableNames) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
   const [data, setData] = useState<any[]>([]);
