@@ -12,17 +12,25 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { login } = useAuth();
+  const { login, user } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
 
-  // Handle successful auth - check if user is already logged in
+  // Check if user is already logged in
+  useEffect(() => {
+    if (user) {
+      console.log("User already logged in, redirecting to home");
+      navigate("/");
+    }
+  }, [user, navigate]);
+
+  // Additional check using Supabase directly
   useEffect(() => {
     const checkAuth = async () => {
       try {
         const { data } = await supabase.auth.getSession();
         if (data.session) {
-          // User is already logged in, redirect to home
+          console.log("Session found, redirecting to home");
           navigate("/");
         }
       } catch (error) {
@@ -49,8 +57,11 @@ const Login = () => {
       // Show success message
       toast.success("Login successful!");
       
-      // Force a hard redirect to ensure navigation works
-      window.location.href = "/";
+      // Give a small delay to ensure auth context is updated
+      setTimeout(() => {
+        console.log("Redirecting to home after successful login");
+        navigate("/");
+      }, 100);
       
     } catch (err) {
       const errorMessage = err instanceof Error 
