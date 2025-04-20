@@ -53,7 +53,7 @@ const UsersSettings = () => {
     setIsSubmitting(true);
     
     try {
-      await addUser({
+      const newUser = await addUser({
         fullName: "Mohamed Osman",
         email: "eng.mohamdOsman@gmail.com",
         password: "000000",
