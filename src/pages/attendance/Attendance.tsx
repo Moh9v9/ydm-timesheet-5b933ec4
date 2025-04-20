@@ -174,9 +174,14 @@ const Attendance = () => {
       <div className="flex items-center justify-between p-4 bg-card rounded-lg border">
         <button
           onClick={goToPreviousDay}
-          className="p-2 rounded-md hover:bg-accent"
+          className="p-2 rounded-md hover:bg-accent flex items-center justify-center 
+                     transition-all duration-300 
+                     bg-secondary text-secondary-foreground 
+                     hover:bg-secondary/80 
+                     focus:outline-none focus:ring-2 focus:ring-ring 
+                     shadow-md hover:shadow-lg"
         >
-          <ChevronLeft size={20} />
+          <ChevronLeft size={24} className="text-current" />
         </button>
         
         <div className="flex items-center space-x-2">
@@ -211,9 +216,14 @@ const Attendance = () => {
         
         <button
           onClick={goToNextDay}
-          className="p-2 rounded-md hover:bg-accent"
+          className="p-2 rounded-md hover:bg-accent flex items-center justify-center 
+                     transition-all duration-300 
+                     bg-secondary text-secondary-foreground 
+                     hover:bg-secondary/80 
+                     focus:outline-none focus:ring-2 focus:ring-ring 
+                     shadow-md hover:shadow-lg"
         >
-          <ChevronRight size={20} />
+          <ChevronRight size={24} className="text-current" />
         </button>
       </div>
       
