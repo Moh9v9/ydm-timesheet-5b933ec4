@@ -72,8 +72,8 @@ const ExportSection = () => {
           recordsCount: attendanceRecords.length
         });
       } catch (err) {
-        console.error(err);
         error("Failed to generate report");
+        console.error(err);
       } finally {
         setIsGenerating(false);
       }
