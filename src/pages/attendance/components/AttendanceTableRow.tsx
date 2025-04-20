@@ -1,8 +1,6 @@
-
 import { AttendanceRecord } from "@/lib/types";
 import { Employee } from "@/lib/types";
 import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
 
 interface AttendanceTableRowProps {
   record: AttendanceRecord;
@@ -34,12 +32,20 @@ const AttendanceTableRow = ({
 
       <td className="p-3">
         <div className="flex items-center">
-          <Switch
-            checked={record.present}
-            onCheckedChange={onToggleAttendance}
-            disabled={!canEdit}
-            className={record.present ? "bg-present" : "bg-absent"}
-          />
+          <div 
+            className={`relative w-12 h-6 rounded-full cursor-pointer transition-colors ${
+              record.present 
+                ? "bg-present" 
+                : "bg-absent"
+            }`}
+            onClick={onToggleAttendance}
+          >
+            <div 
+              className={`absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${
+                record.present ? "translate-x-6" : ""
+              }`} 
+            />
+          </div>
           <span className="ml-2">
             {record.present ? "Present" : "Absent"}
           </span>

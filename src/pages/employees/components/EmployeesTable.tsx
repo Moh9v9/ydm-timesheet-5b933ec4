@@ -1,7 +1,7 @@
+
 import { useAuth } from "@/contexts/AuthContext";
 import { Employee } from "@/lib/types";
-import { Edit, Trash2, ArrowUp, ArrowDown } from "lucide-react";
-import { useState } from "react";
+import { Edit, Trash2 } from "lucide-react";
 
 interface EmployeesTableProps {
   employees: Employee[];
@@ -9,9 +9,6 @@ interface EmployeesTableProps {
   onEdit: (employee: Employee) => void;
   onDelete: (id: string) => void;
 }
-
-type SortField = keyof Omit<Employee, "id">;
-type SortOrder = "asc" | "desc";
 
 export const EmployeesTable = ({ 
   employees, 
@@ -23,75 +20,26 @@ export const EmployeesTable = ({
   const canEdit = user?.permissions.employees.edit;
   const canDelete = user?.permissions.employees.delete;
 
-  const [sortField, setSortField] = useState<SortField>("fullName");
-  const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
-
-  const handleSort = (field: SortField) => {
-    if (sortField === field) {
-      // If the same column is clicked, toggle the order
-      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
-    } else {
-      // If a new column is clicked, set the sort field and default to descending
-      setSortField(field);
-      setSortOrder("desc");
-    }
-  };
-
-  const getSortedEmployees = () => {
-    return [...employees].sort((a, b) => {
-      const multiplier = sortOrder === "asc" ? 1 : -1;
-      
-      const valueA = a[sortField];
-      const valueB = b[sortField];
-      
-      if (typeof valueA === "number" && typeof valueB === "number") {
-        return multiplier * (valueA - valueB);
-      }
-      
-      return multiplier * String(valueA).localeCompare(String(valueB));
-    });
-  };
-
-  const renderSortIcon = (field: SortField) => {
-    if (sortField !== field) return null;
-    // Show the opposite icon of the current sort direction
-    return sortOrder === "asc" ? 
-      <ArrowDown className="inline-block ml-1 w-4 h-4" /> : 
-      <ArrowUp className="inline-block ml-1 w-4 h-4" />;
-  };
-
-  const renderSortableHeader = (field: SortField, label: string) => (
-    <th 
-      onClick={() => handleSort(field)}
-      className="px-4 py-2 text-left font-medium cursor-pointer hover:bg-muted/50 transition-colors"
-    >
-      <span className="flex items-center gap-1">
-        {label}
-        {renderSortIcon(field)}
-      </span>
-    </th>
-  );
-
   return (
     <div className="data-table-container">
       <table className="data-table">
         <thead>
           <tr>
-            {renderSortableHeader("fullName", "Full Name")}
-            {renderSortableHeader("employeeId", "ID")}
-            {renderSortableHeader("project", "Project")}
-            {renderSortableHeader("location", "Location")}
-            {renderSortableHeader("jobTitle", "Job Title")}
-            {renderSortableHeader("paymentType", "Payment Type")}
-            {renderSortableHeader("rateOfPayment", "Rate")}
-            {renderSortableHeader("sponsorship", "Sponsorship")}
-            {renderSortableHeader("status", "Status")}
+            <th>Full Name</th>
+            <th>ID</th>
+            <th>Project</th>
+            <th>Location</th>
+            <th>Job Title</th>
+            <th>Payment Type</th>
+            <th>Rate</th>
+            <th>Sponsorship</th>
+            <th>Status</th>
             {(canEdit || canDelete) && <th>Actions</th>}
           </tr>
         </thead>
         <tbody>
           {employees.length > 0 ? (
-            getSortedEmployees().map((employee) => (
+            employees.map((employee) => (
               <tr key={employee.id}>
                 <td>{employee.fullName}</td>
                 <td>{employee.employeeId}</td>

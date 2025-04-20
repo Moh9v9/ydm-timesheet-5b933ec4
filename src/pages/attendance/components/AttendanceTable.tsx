@@ -2,8 +2,6 @@
 import { AttendanceRecord } from "@/lib/types";
 import { Employee } from "@/lib/types";
 import AttendanceTableRow from "./AttendanceTableRow";
-import { ArrowUpAZ, ArrowDownAZ } from "lucide-react";
-import { useState } from "react";
 
 interface AttendanceTableProps {
   attendanceData: AttendanceRecord[];
@@ -16,9 +14,6 @@ interface AttendanceTableProps {
   isLoading?: boolean;
 }
 
-type SortField = "name" | "status" | "startTime" | "endTime" | "overtime" | "notes";
-type SortOrder = "asc" | "desc";
-
 const AttendanceTable = ({
   attendanceData,
   filteredEmployees,
@@ -29,93 +24,18 @@ const AttendanceTable = ({
   onNoteChange,
   isLoading = false,
 }: AttendanceTableProps) => {
-  const [sortField, setSortField] = useState<SortField>("name");
-  const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
-
-  const handleSort = (field: SortField) => {
-    if (sortField === field) {
-      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
-    } else {
-      setSortField(field);
-      setSortOrder("asc");
-    }
-  };
-
-  const getSortedData = () => {
-    return [...attendanceData].sort((a, b) => {
-      const multiplier = sortOrder === "asc" ? 1 : -1;
-      
-      switch (sortField) {
-        case "name":
-          const employeeA = filteredEmployees.find(emp => emp.id === a.employeeId);
-          const employeeB = filteredEmployees.find(emp => emp.id === b.employeeId);
-          return multiplier * (employeeA?.fullName.localeCompare(employeeB?.fullName || "") || 0);
-        case "status":
-          return multiplier * (Number(a.present) - Number(b.present));
-        case "startTime":
-          return multiplier * (a.startTime.localeCompare(b.startTime));
-        case "endTime":
-          return multiplier * (a.endTime.localeCompare(b.endTime));
-        case "overtime":
-          return multiplier * (a.overtimeHours - b.overtimeHours);
-        case "notes":
-          return multiplier * ((a.note || "").localeCompare(b.note || ""));
-        default:
-          return 0;
-      }
-    });
-  };
-
-  const renderSortIcon = (field: SortField) => {
-    if (sortField !== field) return null;
-    // Show the opposite icon of the current sort direction
-    return sortOrder === "asc" ? 
-      <ArrowDownAZ className="inline-block ml-1 w-4 h-4" /> : 
-      <ArrowUpAZ className="inline-block ml-1 w-4 h-4" />;
-  };
-
   return (
     <div className="bg-card shadow-sm rounded-lg border overflow-hidden">
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead className="bg-muted/20">
             <tr>
-              <th 
-                className="text-left p-3 font-medium cursor-pointer hover:bg-muted/30"
-                onClick={() => handleSort("name")}
-              >
-                Employee {renderSortIcon("name")}
-              </th>
-              <th 
-                className="text-left p-3 font-medium cursor-pointer hover:bg-muted/30"
-                onClick={() => handleSort("status")}
-              >
-                Status {renderSortIcon("status")}
-              </th>
-              <th 
-                className="text-left p-3 font-medium cursor-pointer hover:bg-muted/30"
-                onClick={() => handleSort("startTime")}
-              >
-                Start Time {renderSortIcon("startTime")}
-              </th>
-              <th 
-                className="text-left p-3 font-medium cursor-pointer hover:bg-muted/30"
-                onClick={() => handleSort("endTime")}
-              >
-                End Time {renderSortIcon("endTime")}
-              </th>
-              <th 
-                className="text-left p-3 font-medium cursor-pointer hover:bg-muted/30"
-                onClick={() => handleSort("overtime")}
-              >
-                Overtime Hours {renderSortIcon("overtime")}
-              </th>
-              <th 
-                className="text-left p-3 font-medium cursor-pointer hover:bg-muted/30"
-                onClick={() => handleSort("notes")}
-              >
-                Notes {renderSortIcon("notes")}
-              </th>
+              <th className="text-left p-3 font-medium">Employee</th>
+              <th className="text-left p-3 font-medium">Status</th>
+              <th className="text-left p-3 font-medium">Start Time</th>
+              <th className="text-left p-3 font-medium">End Time</th>
+              <th className="text-left p-3 font-medium">Overtime Hours</th>
+              <th className="text-left p-3 font-medium">Notes</th>
             </tr>
           </thead>
           <tbody>
@@ -128,8 +48,8 @@ const AttendanceTable = ({
                   </div>
                 </td>
               </tr>
-            ) : getSortedData().length > 0 ? (
-              getSortedData().map((record, index) => {
+            ) : attendanceData.length > 0 ? (
+              attendanceData.map((record, index) => {
                 const employee = filteredEmployees.find(
                   emp => emp.id === record.employeeId
                 );
