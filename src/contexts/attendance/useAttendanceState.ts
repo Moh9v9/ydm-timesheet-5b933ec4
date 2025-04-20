@@ -24,7 +24,7 @@ export const useAttendanceState = () => {
           query.eq('date', filters.date);
         }
         if (filters.employeeId) {
-          query.eq('employee_id', filters.employeeId);
+          query.eq('employee_uuid', filters.employeeId);
         }
         if (filters.present !== undefined) {
           query.eq('present', filters.present);
@@ -36,7 +36,7 @@ export const useAttendanceState = () => {
 
         const formattedRecords: AttendanceRecord[] = (data || []).map(record => ({
           id: record.id,
-          employeeId: record.employee_id,
+          employeeId: record.employee_uuid,
           employeeName: record.employee_name || '',
           date: record.date,
           present: record.present,

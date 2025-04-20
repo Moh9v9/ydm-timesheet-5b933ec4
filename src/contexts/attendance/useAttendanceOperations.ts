@@ -1,3 +1,4 @@
+
 import { AttendanceRecord } from "@/lib/types";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -111,7 +112,7 @@ export const useAttendanceOperations = (
 
       const updatedRecord: AttendanceRecord = {
         id: data.id,
-        employeeId: data.employee_id,
+        employeeId: data.employee_uuid,
         employeeName: data.employee_name || '',
         date: data.date,
         present: data.present,

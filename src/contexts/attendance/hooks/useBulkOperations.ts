@@ -43,7 +43,7 @@ export const useBulkOperations = (
         
         return {
           ...(recordId ? { id: recordId } : {}),
-          employee_id: record.employeeId,
+          employee_uuid: record.employeeId,
           employee_name: record.employeeName,
           date: record.date,
           present: record.present,
@@ -68,7 +68,7 @@ export const useBulkOperations = (
 
       const savedRecords: AttendanceRecord[] = data.map(record => ({
         id: record.id,
-        employeeId: record.employee_id,
+        employeeId: record.employee_uuid,
         employeeName: record.employee_name || '',
         date: record.date,
         present: record.present,

@@ -15,7 +15,7 @@ export const useAttendanceMutations = (
       const { data, error } = await supabase
         .from('attendance_records')
         .insert({
-          employee_id: record.employeeId,
+          employee_uuid: record.employeeId,
           employee_name: record.employeeName,
           date: record.date,
           present: record.present,
@@ -32,7 +32,7 @@ export const useAttendanceMutations = (
 
       const newRecord: AttendanceRecord = {
         id: data.id,
-        employeeId: data.employee_id,
+        employeeId: data.employee_uuid,
         employeeName: data.employee_name || '',
         date: data.date,
         present: data.present,
@@ -79,7 +79,7 @@ export const useAttendanceMutations = (
 
       const updatedRecord: AttendanceRecord = {
         id: data.id,
-        employeeId: data.employee_id,
+        employeeId: data.employee_uuid,
         employeeName: data.employee_name || '',
         date: data.date,
         present: data.present,

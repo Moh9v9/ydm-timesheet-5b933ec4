@@ -13,7 +13,7 @@ export const useAttendanceQueries = () => {
     const { data, error } = await supabase
       .from('attendance_records')
       .select('*')
-      .eq('employee_id', employeeId)
+      .eq('employee_uuid', employeeId)
       .eq('date', date)
       .single();
 
@@ -27,7 +27,7 @@ export const useAttendanceQueries = () => {
 
     return data ? {
       id: data.id,
-      employeeId: data.employee_id,
+      employeeId: data.employee_uuid,
       employeeName: data.employee_name || '',
       date: data.date,
       present: data.present,
