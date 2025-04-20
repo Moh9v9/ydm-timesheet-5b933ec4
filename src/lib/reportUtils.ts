@@ -74,7 +74,7 @@ const convertToPDF = (data: Record<string, any>[]): Uint8Array => {
   doc.setFontSize(16);
   doc.text("Generated Report", 14, 15);
   
-  // Format the date correctly
+  // Format the date correctly with en-US locale and correct options
   const currentDate = new Date();
   const formattedDate = currentDate.toLocaleDateString('en-US', {
     year: 'numeric',
