@@ -101,7 +101,7 @@ export const AttendanceProvider = ({ children }: { children: React.ReactNode }) 
           // Update existing record
           const index = newAttendanceRecords.findIndex(r => r.id === record.id);
           if (index !== -1) {
-            newAttendanceRecords[index] = { ...record };
+            newAttendanceRecords[index] = { ...record } as AttendanceRecord;
             savedRecords.push(newAttendanceRecords[index]);
           }
         } else {
