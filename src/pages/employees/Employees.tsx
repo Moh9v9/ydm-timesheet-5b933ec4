@@ -218,7 +218,8 @@ const Employees = () => {
                 <th>Project</th>
                 <th>Location</th>
                 <th>Job Title</th>
-                <th>Payment</th>
+                <th>Payment Type</th>
+                <th>Rate</th>
                 <th>Sponsorship</th>
                 <th>Status</th>
                 {(canEdit || canDelete) && <th>Actions</th>}
@@ -233,11 +234,8 @@ const Employees = () => {
                     <td>{employee.project}</td>
                     <td>{employee.location}</td>
                     <td>{employee.jobTitle}</td>
-                    <td>
-                      {employee.paymentType === "Monthly" 
-                        ? `${employee.rateOfPayment} / month` 
-                        : `${employee.rateOfPayment} / day`}
-                    </td>
+                    <td>{employee.paymentType}</td>
+                    <td>{employee.rateOfPayment}</td>
                     <td>{employee.sponsorship}</td>
                     <td>
                       <span className={employee.status === "Active" ? "status-active" : "status-archived"}>
@@ -268,7 +266,7 @@ const Employees = () => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={canEdit || canDelete ? 9 : 8} className="text-center py-4">
+                  <td colSpan={canEdit || canDelete ? 10 : 9} className="text-center py-4">
                     {loading ? "Loading..." : "No employees found"}
                   </td>
                 </tr>
