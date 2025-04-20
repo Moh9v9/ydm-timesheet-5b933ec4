@@ -23,8 +23,11 @@ export const useUsersOperations = (
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) throw new Error("Authentication required");
       
+      // Use the imported URL directly from a hardcoded URL that matches what's in the client
+      const supabaseUrl = "https://bkrfhlycvtmpoewlwpcc.supabase.co";
+      
       // Call the edge function to create the user
-      const response = await fetch(`${supabase.supabaseUrl}/functions/v1/create-user`, {
+      const response = await fetch(`${supabaseUrl}/functions/v1/create-user`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
