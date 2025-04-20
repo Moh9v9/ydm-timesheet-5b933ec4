@@ -13,46 +13,43 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [redirectAttempted, setRedirectAttempted] = useState(false);
-  const { login, user } = useAuth();
+  const { login, user, session } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
 
-  // Check if user is already logged in
+  // Check authentication status and redirect if needed
   useEffect(() => {
-    if (user && !redirectAttempted) {
-      console.log("User already logged in, redirecting to home");
-      setRedirectAttempted(true);
-      
-      // Use timeout to ensure state updates complete
-      setTimeout(() => {
-        window.location.href = "/";
-      }, 100);
-    }
-  }, [user, navigate, redirectAttempted]);
-
-  // Additional check using Supabase directly
-  useEffect(() => {
-    const checkAuth = async () => {
+    const checkAndRedirect = async () => {
       try {
-        if (redirectAttempted) return; // Skip if already attempted redirect
+        // Skip if already attempting redirect
+        if (redirectAttempted) return;
         
+        // Check for session directly from Supabase
         const { data } = await supabase.auth.getSession();
-        if (data.session) {
-          console.log("Session found, redirecting to home");
+        
+        if (data.session || session || user) {
+          console.log("Authentication detected, redirecting to home", { 
+            hasSupabaseSession: !!data.session,
+            hasContextSession: !!session,
+            hasUser: !!user
+          });
+          
+          // Set flag to prevent multiple redirects
           setRedirectAttempted(true);
           
-          // Use timeout to ensure state updates complete
+          // Force redirect with delay to ensure state is updated
           setTimeout(() => {
+            console.log("Executing redirect to home page");
             window.location.href = "/";
-          }, 100);
+          }, 500);
         }
       } catch (error) {
         console.error("Auth check error:", error);
       }
     };
     
-    checkAuth();
-  }, [redirectAttempted]);
+    checkAndRedirect();
+  }, [user, session, redirectAttempted]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,19 +62,32 @@ const Login = () => {
     setIsSubmitting(true);
     
     try {
-      await login(email, password);
+      // Attempt login
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      
+      if (error) throw new Error(error.message);
+      
+      if (!data.user) throw new Error("Login failed. No user returned.");
       
       // Show success message
       toast.success("Login successful!");
       
-      // Set redirect flag to prevent multiple redirects
+      console.log("Login successful, session acquired", { 
+        user: !!data.user,
+        session: !!data.session
+      });
+      
+      // Set redirect flag
       setRedirectAttempted(true);
       
-      // Force hard navigation to home page with a small delay
+      // Force navigation after successful login
       setTimeout(() => {
-        console.log("Forcing navigation to home after successful login");
+        console.log("Forcing navigation after login success");
         window.location.href = "/";
-      }, 300);
+      }, 800);
       
     } catch (err) {
       const errorMessage = err instanceof Error 
