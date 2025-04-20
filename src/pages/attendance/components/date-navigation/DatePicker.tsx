@@ -1,5 +1,6 @@
 
-import { CalendarIcon } from "lucide-react";
+import React from "react";
+import { CalendarIcon, ChevronDown } from "lucide-react";
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -23,6 +24,27 @@ const DatePicker = ({ currentDate, setCurrentDate }: DatePickerProps) => {
     }
   };
 
+  // Custom dropdown components for the calendar
+  const yearMonthCaptionLayout = {
+    components: {
+      Dropdown: ({ value, onChange, children, ...props }: any) => {
+        return (
+          <div className="relative inline-flex items-center">
+            <select
+              value={value}
+              onChange={onChange}
+              className="appearance-none bg-transparent pl-2 pr-6 py-1 outline-none cursor-pointer z-10 text-sm font-medium text-foreground dark:text-white"
+              {...props}
+            >
+              {children}
+            </select>
+            <ChevronDown className="w-3.5 h-3.5 absolute right-0.5 text-muted-foreground/70 pointer-events-none" />
+          </div>
+        );
+      },
+    },
+  };
+
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -37,6 +59,10 @@ const DatePicker = ({ currentDate, setCurrentDate }: DatePickerProps) => {
           selected={date}
           onSelect={handleSelect}
           initialFocus
+          captionLayout="dropdown-buttons"
+          fromYear={2020}
+          toYear={2030}
+          components={yearMonthCaptionLayout.components}
           className={cn("p-3 pointer-events-auto")}
         />
       </PopoverContent>

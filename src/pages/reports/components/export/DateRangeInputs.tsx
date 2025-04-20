@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { format } from "date-fns";
 import { ChevronDown } from "lucide-react";
@@ -26,9 +27,24 @@ const DateRangeInputs = ({ reportType, currentDate }: DateRangeInputsProps) => {
     }
   };
 
+  // Custom dropdown components for the calendar
   const yearMonthCaptionLayout = {
     components: {
-      Dropdown: () => <ChevronDown className="w-3.5 h-3.5 text-muted-foreground/70 hover:text-primary transition-colors" />,
+      Dropdown: ({ value, onChange, children, ...props }: any) => {
+        return (
+          <div className="relative inline-flex items-center">
+            <select
+              value={value}
+              onChange={onChange}
+              className="appearance-none bg-transparent pl-2 pr-6 py-1 outline-none cursor-pointer z-10 text-sm font-medium text-foreground dark:text-white"
+              {...props}
+            >
+              {children}
+            </select>
+            <ChevronDown className="w-3.5 h-3.5 absolute right-0.5 text-muted-foreground/70 pointer-events-none" />
+          </div>
+        );
+      },
     },
   };
 
@@ -69,7 +85,7 @@ const DateRangeInputs = ({ reportType, currentDate }: DateRangeInputsProps) => {
             initialFocus
             captionLayout="dropdown-buttons"
             fromYear={2020}
-            toYear={2025}
+            toYear={2030}
             classNames={{
               months: "space-y-4",
               month: "space-y-4",
@@ -107,6 +123,8 @@ const DateRangeInputs = ({ reportType, currentDate }: DateRangeInputsProps) => {
               day_outside: "text-muted-foreground/50",
               day_disabled: "text-muted-foreground/50",
               day_hidden: "invisible",
+              day_range_end: "day-range-end",
+              day_range_middle: "day-range-middle",
             }}
             components={yearMonthCaptionLayout.components}
             className={cn("p-4 pointer-events-auto select-none")}
