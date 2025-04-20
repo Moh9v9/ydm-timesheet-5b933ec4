@@ -10,17 +10,14 @@ import { useEffect } from "react";
 
 const Dashboard = () => {
   const { user } = useAuth();
-  const { currentDate, setCurrentDate, filteredRecords, loading } = useAttendance();
+  const { currentDate, setCurrentDate } = useAttendance();
   const stats = useStatistics(currentDate);
 
-  // Reset to current day whenever Dashboard mounts and force a reload
+  // Reset to current day whenever Dashboard mounts
   useEffect(() => {
     const today = new Date().toISOString().split('T')[0];
-    if (currentDate !== today) {
-      console.log("Setting current date to today:", today);
-      setCurrentDate(today);
-    }
-  }, [setCurrentDate, currentDate]);
+    setCurrentDate(today);
+  }, [setCurrentDate]);
 
   return (
     <div className="space-y-6 animate-fade-in">
