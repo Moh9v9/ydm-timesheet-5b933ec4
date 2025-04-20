@@ -2,6 +2,7 @@
 import { AttendanceRecord } from "@/lib/types";
 import { Employee } from "@/lib/types";
 import { Textarea } from "@/components/ui/textarea";
+import { check, x } from "lucide-react";
 
 interface AttendanceTableRowProps {
   record: AttendanceRecord;
@@ -11,6 +12,7 @@ interface AttendanceTableRowProps {
   onOvertimeChange: (value: string) => void;
   onNoteChange: (value: string) => void;
   canEdit: boolean;
+  attendanceExists?: boolean;
 }
 
 const AttendanceTableRow = ({
@@ -21,13 +23,22 @@ const AttendanceTableRow = ({
   onOvertimeChange,
   onNoteChange,
   canEdit,
+  attendanceExists,
 }: AttendanceTableRowProps) => {
+  // For the icon, present green check if attendance exists, red x if not
+  const Icon = attendanceExists ? check : x;
+  const iconColor = attendanceExists ? "#16a34a" : "#ea384c"; // green or red
+
   return (
     <tr className="border-b border-border/30 last:border-0">
       <td className="p-3">
-        <div>
-          <div className="font-medium">{employee.fullName}</div>
-          <div className="text-xs text-muted-foreground">{employee.iqamaNo || "No Iqama"}</div>
+        <div className="flex items-center gap-2">
+          {/* Attendance indicator */}
+          <Icon size={18} color={iconColor} aria-label={attendanceExists ? "Attendance Recorded" : "No Attendance"} />
+          <div>
+            <div className="font-medium">{employee.fullName}</div>
+            <div className="text-xs text-muted-foreground">{employee.iqamaNo || "No Iqama"}</div>
+          </div>
         </div>
       </td>
 
@@ -111,3 +122,4 @@ const AttendanceTableRow = ({
 };
 
 export default AttendanceTableRow;
+

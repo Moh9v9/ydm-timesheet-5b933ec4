@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { AttendanceRecord } from "@/lib/types";
 import { Employee } from "@/lib/types";
@@ -85,6 +86,12 @@ const AttendanceTable = ({
     );
   };
 
+  // Map for quick attendance record check per employee (by id)
+  const attendanceExistsMap = attendanceData.reduce<{[key: string]: boolean}>((acc, record) => {
+    acc[record.employeeId] = true;
+    return acc;
+  }, {});
+
   return (
     <div className="bg-card shadow-sm rounded-lg border overflow-hidden">
       <div className="overflow-x-auto">
@@ -147,6 +154,9 @@ const AttendanceTable = ({
 
                 if (!employee) return null;
 
+                // Check if attendance record exists for this employee
+                const attendanceExists = !!attendanceExistsMap[employee.id];
+
                 return (
                   <AttendanceTableRow
                     key={record.id}
@@ -157,6 +167,7 @@ const AttendanceTable = ({
                     onOvertimeChange={(value) => onOvertimeChange(originalIndex, value)}
                     onNoteChange={(value) => onNoteChange(originalIndex, value)}
                     canEdit={canEdit}
+                    attendanceExists={attendanceExists}
                   />
                 );
               })
@@ -175,3 +186,4 @@ const AttendanceTable = ({
 };
 
 export default AttendanceTable;
+
