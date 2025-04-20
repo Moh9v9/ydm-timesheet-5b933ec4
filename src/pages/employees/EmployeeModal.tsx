@@ -1,36 +1,32 @@
+
 import { useState, useEffect } from "react";
 import { useEmployees } from "@/contexts/EmployeeContext";
 import { useNotification } from "@/components/ui/notification";
-import { Employee, PaymentType, SponsorshipType, EmployeeStatus } from "@/lib/types";
 import { X } from "lucide-react";
-
-interface EmployeeModalProps {
-  employee: Employee | null;
-  onClose: () => void;
-}
+import { EmployeeModalProps, EmployeeFormData } from "./types/employee-form";
+import { EmployeeForm } from "./components/EmployeeForm";
 
 const EmployeeModal = ({ employee, onClose }: EmployeeModalProps) => {
   const isEditing = !!employee;
   const { addEmployee, updateEmployee } = useEmployees();
   const { success, error } = useNotification();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
-  const [formData, setFormData] = useState({
+  const [initialFormData, setInitialFormData] = useState<EmployeeFormData>({
     fullName: "",
     employeeId: "",
     project: "",
     location: "",
     jobTitle: "",
-    paymentType: "Monthly" as PaymentType,
+    paymentType: "Monthly",
     rateOfPayment: 0,
-    sponsorship: "YDM co" as SponsorshipType,
-    status: "Active" as EmployeeStatus,
+    sponsorship: "YDM co",
+    status: "Active"
   });
-  
-  const [isSubmitting, setIsSubmitting] = useState(false);
   
   useEffect(() => {
     if (employee) {
-      setFormData({
+      setInitialFormData({
         fullName: employee.fullName,
         employeeId: employee.employeeId,
         project: employee.project,
@@ -43,27 +39,8 @@ const EmployeeModal = ({ employee, onClose }: EmployeeModalProps) => {
       });
     }
   }, [employee]);
-  
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    
-    if (name === "rateOfPayment") {
-      setFormData({
-        ...formData,
-        [name]: parseFloat(value) || 0,
-      });
-    } else {
-      setFormData({
-        ...formData,
-        [name]: value,
-      });
-    }
-  };
-  
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    // Validation - only check full name
+
+  const handleSubmit = async (formData: EmployeeFormData) => {
     if (!formData.fullName) {
       error("Please fill in the full name");
       return;
@@ -103,175 +80,11 @@ const EmployeeModal = ({ employee, onClose }: EmployeeModalProps) => {
           </button>
         </div>
         
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Full Name */}
-          <div>
-            <label htmlFor="fullName" className="block text-sm font-medium mb-1">
-              Full Name *
-            </label>
-            <input
-              type="text"
-              id="fullName"
-              name="fullName"
-              value={formData.fullName}
-              onChange={handleChange}
-              className="w-full p-2 border border-input rounded-md"
-              required
-            />
-          </div>
-          
-          {/* Employee ID */}
-          <div>
-            <label htmlFor="employeeId" className="block text-sm font-medium mb-1">
-              Employee ID
-            </label>
-            <input
-              type="text"
-              id="employeeId"
-              name="employeeId"
-              value={formData.employeeId}
-              onChange={handleChange}
-              className="w-full p-2 border border-input rounded-md"
-            />
-          </div>
-          
-          {/* Project */}
-          <div>
-            <label htmlFor="project" className="block text-sm font-medium mb-1">
-              Project
-            </label>
-            <input
-              type="text"
-              id="project"
-              name="project"
-              value={formData.project}
-              onChange={handleChange}
-              className="w-full p-2 border border-input rounded-md"
-            />
-          </div>
-          
-          {/* Location */}
-          <div>
-            <label htmlFor="location" className="block text-sm font-medium mb-1">
-              Location
-            </label>
-            <input
-              type="text"
-              id="location"
-              name="location"
-              value={formData.location}
-              onChange={handleChange}
-              className="w-full p-2 border border-input rounded-md"
-            />
-          </div>
-          
-          {/* Job Title */}
-          <div>
-            <label htmlFor="jobTitle" className="block text-sm font-medium mb-1">
-              Job Title
-            </label>
-            <input
-              type="text"
-              id="jobTitle"
-              name="jobTitle"
-              value={formData.jobTitle}
-              onChange={handleChange}
-              className="w-full p-2 border border-input rounded-md"
-            />
-          </div>
-          
-          {/* Payment Type */}
-          <div>
-            <label htmlFor="paymentType" className="block text-sm font-medium mb-1">
-              Payment Type
-            </label>
-            <select
-              id="paymentType"
-              name="paymentType"
-              value={formData.paymentType}
-              onChange={handleChange}
-              className="w-full border border-input rounded-md p-2 bg-background dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:focus:ring-primary"
-            >
-              <option value="Monthly">Monthly</option>
-              <option value="Daily">Daily</option>
-            </select>
-          </div>
-          
-          {/* Rate of Payment */}
-          <div>
-            <label htmlFor="rateOfPayment" className="block text-sm font-medium mb-1">
-              Rate of Payment
-            </label>
-            <input
-              type="number"
-              id="rateOfPayment"
-              name="rateOfPayment"
-              value={formData.rateOfPayment}
-              onChange={handleChange}
-              className="w-full p-2 border border-input rounded-md"
-              min="0"
-            />
-          </div>
-          
-          {/* Sponsorship */}
-          <div>
-            <label htmlFor="sponsorship" className="block text-sm font-medium mb-1">
-              Sponsorship
-            </label>
-            <select
-              id="sponsorship"
-              name="sponsorship"
-              value={formData.sponsorship}
-              onChange={handleChange}
-              className="w-full border border-input rounded-md p-2 bg-background dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:focus:ring-primary"
-            >
-              <option value="YDM co">YDM co</option>
-              <option value="YDM est">YDM est</option>
-              <option value="Outside">Outside</option>
-            </select>
-          </div>
-          
-          {/* Status */}
-          <div>
-            <label htmlFor="status" className="block text-sm font-medium mb-1">
-              Status
-            </label>
-            <select
-              id="status"
-              name="status"
-              value={formData.status}
-              onChange={handleChange}
-              className="w-full border border-input rounded-md p-2 bg-background dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:focus:ring-primary"
-            >
-              <option value="Active">Active</option>
-              <option value="Archived">Archived</option>
-            </select>
-          </div>
-          
-          <div className="flex justify-end space-x-3 pt-4">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 border border-input rounded-md"
-              disabled={isSubmitting}
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="px-4 py-2 bg-primary text-primary-foreground rounded-md"
-              disabled={isSubmitting}
-            >
-              {isSubmitting
-                ? isEditing
-                  ? "Updating..."
-                  : "Adding..."
-                : isEditing
-                ? "Update"
-                : "Add"}
-            </button>
-          </div>
-        </form>
+        <EmployeeForm
+          initialData={initialFormData}
+          onSubmit={handleSubmit}
+          isSubmitting={isSubmitting}
+        />
       </div>
     </div>
   );
