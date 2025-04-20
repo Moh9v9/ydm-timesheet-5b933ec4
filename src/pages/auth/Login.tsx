@@ -5,6 +5,7 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { toast } from "sonner";
 import MainLayout from "@/components/layout/MainLayout";
 import { Moon, Sun } from "lucide-react";
+
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -47,7 +48,10 @@ const Login = () => {
           <div className="text-center mt-10">
             <img src="https://i.ibb.co/DPfXmyDz/YDM-logo2-2.png" alt="YDM Logo" className="h-16 w-auto mx-auto mb-4" />
             <h2 className="text-3xl font-extrabold text-foreground mb-2">YDM TimeSheet</h2>
-            <p className="text-sm text-muted-foreground mb-8">
+          </div>
+          
+          <div className="text-center mb-8">
+            <p className="text-sm text-muted-foreground">
               Manage employee attendance and timesheets
             </p>
           </div>
@@ -89,7 +93,7 @@ const Login = () => {
                   <button type="submit" disabled={isSubmitting} className="group relative w-full flex justify-center py-2 px-4 border border-transparent rounded-md 
                              text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 
                              focus:ring-primary disabled:opacity-70 disabled:cursor-not-allowed">
-                    {isSubmitting ? "Signing in..." : "Sign in"}
+                    Sign in
                   </button>
                 </div>
 
