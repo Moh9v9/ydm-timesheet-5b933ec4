@@ -148,6 +148,31 @@ const Attendance = () => {
     }
   };
 
+  // Add new function to handle bulk update
+  const handleUpdateAll = async () => {
+    if (!canEdit) {
+      error("You don't have permission to update attendance records");
+      return;
+    }
+    
+    // Confirm update
+    if (!window.confirm("Are you sure you want to update all attendance records?")) {
+      return;
+    }
+    
+    setIsSubmitting(true);
+    
+    try {
+      await bulkSaveAttendance(attendanceData);
+      success("All attendance records updated successfully");
+    } catch (err) {
+      error("Failed to update attendance records");
+      console.error(err);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <div className="space-y-6 animate-fade-in">
       <NotificationContainer />
@@ -160,18 +185,31 @@ const Attendance = () => {
           </p>
         </div>
         
-        {canEdit && (
-          <button
-            onClick={handleSave}
-            disabled={isSubmitting}
-            className="mt-4 md:mt-0 px-4 py-2 bg-primary text-white rounded-md flex items-center hover:bg-primary/90 transition-colors disabled:opacity-70"
-          >
-            <Save size={16} className="mr-2" />
-            {isSubmitting ? "Saving..." : "Save Attendance"}
-          </button>
-        )}
+        <div className="flex gap-3 mt-4 md:mt-0">
+          {canEdit && (
+            <>
+              <button
+                onClick={handleUpdateAll}
+                disabled={isSubmitting}
+                className="px-4 py-2 bg-secondary text-secondary-foreground rounded-md flex items-center hover:bg-secondary/90 transition-colors disabled:opacity-70"
+              >
+                <Save size={16} className="mr-2" />
+                {isSubmitting ? "Updating..." : "Update All"}
+              </button>
+              
+              <button
+                onClick={handleSave}
+                disabled={isSubmitting}
+                className="px-4 py-2 bg-primary text-white rounded-md flex items-center hover:bg-primary/90 transition-colors disabled:opacity-70"
+              >
+                <Save size={16} className="mr-2" />
+                {isSubmitting ? "Saving..." : "Save"}
+              </button>
+            </>
+          )}
+        </div>
       </div>
-      
+
       {/* Date Navigation */}
       <div className="flex items-center justify-center p-4 bg-card rounded-lg border space-x-4">
         <button
