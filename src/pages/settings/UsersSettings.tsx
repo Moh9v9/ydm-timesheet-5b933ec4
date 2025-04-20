@@ -63,6 +63,7 @@ const UsersSettings = () => {
           password: formData.password || undefined
         });
         toast.success("User updated successfully");
+        handleCloseModal();
       } else {
         // Create new user - with both full_name and fullName for trigger compatibility
         const userToAdd = {

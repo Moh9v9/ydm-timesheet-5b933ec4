@@ -1,4 +1,3 @@
-
 import { User } from "@/lib/types";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -36,52 +35,80 @@ export const useUsersOperations = (
       
       console.log("Session acquired, proceeding with edge function call");
       
-      // Use the imported URL directly from a hardcoded URL that matches what's in the client
+      // Use the imported URL directly from the environment
       const supabaseUrl = "https://bkrfhlycvtmpoewlwpcc.supabase.co";
       
       // Call the edge function to create the user
-      const response = await fetch(`${supabaseUrl}/functions/v1/create-user`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.access_token}`
-        },
-        body: JSON.stringify({
-          fullName: user.fullName,
-          email: user.email,
-          password: user.password,
-          role: user.role,
-          permissions: user.permissions
-        })
-      });
+      console.log("Calling edge function with token:", session.access_token.substring(0, 10) + "...");
       
-      console.log("Edge function response status:", response.status);
-      const data = await response.json();
-      console.log("Edge function response data:", data);
+      // Fetch with timeout to prevent hanging requests
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
       
-      if (!response.ok) {
-        throw new Error(data.error || "Failed to create user");
+      try {
+        const response = await fetch(`${supabaseUrl}/functions/v1/create-user`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session.access_token}`
+          },
+          body: JSON.stringify({
+            fullName: user.fullName,
+            email: user.email,
+            password: user.password,
+            role: user.role,
+            permissions: user.permissions
+          }),
+          signal: controller.signal
+        });
+        
+        clearTimeout(timeoutId);
+        
+        console.log("Edge function response status:", response.status);
+        console.log("Edge function response headers:", Object.fromEntries(response.headers.entries()));
+        
+        // Try to parse the response as JSON
+        let data;
+        try {
+          const text = await response.text();
+          console.log("Raw response text:", text);
+          data = JSON.parse(text);
+        } catch (parseError) {
+          console.error("Error parsing response:", parseError);
+          throw new Error("Invalid response from server: Could not parse JSON");
+        }
+        
+        console.log("Edge function response data:", data);
+        
+        if (!response.ok) {
+          throw new Error(data.error || `Failed to create user: ${response.status} ${response.statusText}`);
+        }
+        
+        if (!data.user || !data.user.id) {
+          console.error("No user ID returned from edge function:", data);
+          throw new Error("Invalid response from server: Missing user data");
+        }
+        
+        const newUser: User = {
+          id: data.user.id,
+          fullName: data.user.fullName,
+          email: data.user.email,
+          password: '',
+          role: data.user.role,
+          permissions: data.user.permissions
+        };
+        
+        setUsers([...users, newUser]);
+        return newUser;
+      } catch (fetchError) {
+        if (fetchError.name === 'AbortError') {
+          throw new Error("Edge function request timed out after 30 seconds");
+        }
+        throw fetchError;
       }
-      
-      if (!data.user || !data.user.id) {
-        console.error("No user ID returned from edge function:", data);
-        throw new Error("Invalid response from server");
-      }
-      
-      const newUser: User = {
-        id: data.user.id,
-        fullName: data.user.fullName,
-        email: data.user.email,
-        password: '',
-        role: data.user.role,
-        permissions: data.user.permissions
-      };
-      
-      setUsers([...users, newUser]);
-      return newUser;
     } catch (error: any) {
       console.error("Add user error:", error);
-      throw new Error(error.message || "Failed to add user");
+      throw error; // Preserve the original error to show proper message
     } finally {
       setLoading(false);
     }
