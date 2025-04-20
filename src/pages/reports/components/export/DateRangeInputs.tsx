@@ -39,11 +39,12 @@ const DateRangeInputs = ({ reportType, currentDate }: DateRangeInputsProps) => {
               className={cn(
                 "appearance-none pl-2 pr-6 py-1 outline-none cursor-pointer z-10",
                 "text-sm font-medium",
-                "text-foreground dark:text-gray-100",
-                "dark:bg-gray-800 dark:border dark:border-gray-700",
-                "hover:bg-gray-100 dark:hover:bg-gray-700",
+                "text-foreground dark:text-gray-100", 
+                "dark:bg-gray-800 dark:border dark:border-gray-700", 
+                "hover:bg-gray-100 dark:hover:bg-gray-700/80", 
                 "focus:outline-none focus:ring-2 focus:ring-primary/20 dark:focus:ring-primary/40",
-                "rounded transition-colors duration-200"
+                "rounded transition-colors duration-200",
+                "w-full" // Ensure full width for better usability
               )}
               {...props}
             >
@@ -51,7 +52,7 @@ const DateRangeInputs = ({ reportType, currentDate }: DateRangeInputsProps) => {
             </select>
             <ChevronDown 
               className={cn(
-                "w-3.5 h-3.5 absolute right-0.5", 
+                "w-3.5 h-3.5 absolute right-1", 
                 "text-muted-foreground/70 dark:text-gray-300",
                 "pointer-events-none"
               )} 
