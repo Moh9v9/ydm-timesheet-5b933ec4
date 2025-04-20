@@ -10,7 +10,7 @@ export const UsersProvider = ({ children }: { children: ReactNode }) => {
   const { users, setUsers, loading, setLoading } = useUsersState();
   const operations = useUsersOperations(users, setUsers, setLoading);
 
-  const value = {
+  const value: UsersContextType = {
     users,
     loading,
     ...operations

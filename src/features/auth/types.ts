@@ -1,6 +1,6 @@
 
-import { User, Session } from "@supabase/supabase-js";
-import { UserRole, UserPermissions } from "@/lib/types";
+import { User as SupabaseUser, Session } from "@supabase/supabase-js";
+import { UserRole, UserPermissions, User } from "@/lib/types";
 
 export interface AuthContextType {
   user: User | null;
@@ -17,6 +17,6 @@ export interface ProfileData {
   id: string;
   full_name: string;
   email: string;
-  role: UserRole;
+  role: string;
   permissions: Record<string, unknown>;
 }

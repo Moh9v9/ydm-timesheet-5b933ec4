@@ -1,7 +1,8 @@
+
 // Authentication & User Management Types
 export type UserRole = "admin" | "user";
 
-export interface User {
+export interface AppUser {
   id: string;
   fullName: string;
   email: string;
@@ -64,3 +65,6 @@ export interface AttendanceFilters {
   employeeId?: string;
   present?: boolean;
 }
+
+// Renamed from User to AppUser to avoid conflicts with Supabase User
+export type User = AppUser;

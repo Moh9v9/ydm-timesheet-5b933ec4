@@ -10,7 +10,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const { user, session, loading } = useAuthState();
   const operations = useAuthOperations();
 
-  const value = {
+  const value: AuthContextType = {
     user,
     session,
     loading,
