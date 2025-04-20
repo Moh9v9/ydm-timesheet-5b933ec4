@@ -70,9 +70,15 @@ const convertToPDF = (data: Record<string, any>[]): Uint8Array => {
     headers.map(header => String(row[header] || ''))
   );
   
-  // Add title
+  // Add app name above the report title
+  doc.setFontSize(18);
+  doc.setTextColor(40, 40, 40);
+  doc.text("YDM TimeSheet", 14, 13);
+  
+  // Add title below with smaller font size
   doc.setFontSize(16);
-  doc.text("Generated Report", 14, 15);
+  doc.setTextColor(0, 0, 0);
+  doc.text("Generated Report", 14, 20);
   
   // Format the date correctly with en-US locale and correct options
   const currentDate = new Date();
@@ -83,13 +89,13 @@ const convertToPDF = (data: Record<string, any>[]): Uint8Array => {
   });
   
   doc.setFontSize(12);
-  doc.text(`Date: ${formattedDate}`, 14, 22);
+  doc.text(`Date: ${formattedDate}`, 14, 27);
   
   // Add table with data
   autoTable(doc, {
     head: [headers],
     body: rows,
-    startY: 30,
+    startY: 35,
     styles: {
       fontSize: 9,
       cellPadding: 2,
