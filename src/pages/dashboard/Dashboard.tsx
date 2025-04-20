@@ -15,8 +15,10 @@ const Dashboard = () => {
 
   // Reset to current day whenever Dashboard mounts
   useEffect(() => {
-    const today = new Date().toISOString().split('T')[0];
-    setCurrentDate(today);
+    if (setCurrentDate) {
+      const today = new Date().toISOString().split('T')[0];
+      setCurrentDate(today);
+    }
   }, [setCurrentDate]);
 
   return (

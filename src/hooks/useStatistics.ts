@@ -37,11 +37,12 @@ export const useStatistics = (selectedDate: string) => {
   });
 
   useEffect(() => {
-    const todayRecords = getTodayAttendanceRecords(attendanceRecords, selectedDate);
+    const records = attendanceRecords || [];
+    const todayRecords = getTodayAttendanceRecords(records, selectedDate);
     const { presentCount, absentCount } = calculateAttendanceCounts(todayRecords);
 
     setStats({
-      totalEmployees: filteredEmployees.length,
+      totalEmployees: filteredEmployees?.length || 0,
       presentToday: presentCount,
       absentToday: absentCount,
     });
@@ -49,4 +50,3 @@ export const useStatistics = (selectedDate: string) => {
 
   return stats;
 };
-

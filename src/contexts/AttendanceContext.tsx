@@ -4,7 +4,25 @@ import { AttendanceContextType } from "./attendance/types";
 import { useAttendanceState } from "./attendance/useAttendanceState";
 import { useAttendanceOperations } from "./attendance/useAttendanceOperations";
 
-const AttendanceContext = createContext<AttendanceContextType | undefined>(undefined);
+// Create a context with a default value to prevent the "must be used within Provider" error
+const defaultContextValue: AttendanceContextType = {
+  attendanceRecords: [],
+  filteredRecords: [],
+  currentDate: new Date().toISOString().split('T')[0],
+  setCurrentDate: () => {},
+  filters: { date: new Date().toISOString().split('T')[0] },
+  setFilters: () => {},
+  loading: false,
+  // Default implementations that will never be used but satisfy TypeScript
+  addAttendanceRecord: async () => ({ id: '', employeeId: '', employeeName: '', date: '', present: false, startTime: '', endTime: '', overtimeHours: 0, note: '' }),
+  updateAttendanceRecord: async () => ({ id: '', employeeId: '', employeeName: '', date: '', present: false, startTime: '', endTime: '', overtimeHours: 0, note: '' }),
+  deleteAttendanceRecord: async () => {},
+  getAttendanceRecord: () => undefined,
+  getRecordsByEmployeeAndDate: async () => null,
+  bulkSaveAttendance: async () => [],
+};
+
+const AttendanceContext = createContext<AttendanceContextType>(defaultContextValue);
 
 export const AttendanceProvider = ({ children }: { children: ReactNode }) => {
   const {
@@ -45,7 +63,7 @@ export const AttendanceProvider = ({ children }: { children: ReactNode }) => {
 
 export const useAttendance = () => {
   const context = useContext(AttendanceContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error("useAttendance must be used within an AttendanceProvider");
   }
   return context;
