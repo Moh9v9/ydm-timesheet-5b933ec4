@@ -11,6 +11,14 @@ export const useAttendanceState = () => {
   });
   const [loading, setLoading] = useState(false);
 
+  // Update filters when currentDate changes
+  useEffect(() => {
+    setFilters(prevFilters => ({
+      ...prevFilters,
+      date: currentDate
+    }));
+  }, [currentDate]);
+
   // Fetch attendance records from Supabase
   useEffect(() => {
     const fetchAttendanceRecords = async () => {
