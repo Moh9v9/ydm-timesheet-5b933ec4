@@ -35,7 +35,7 @@ const Dashboard = () => {
         />
         <StatsCard
           icon={UserCheck}
-          title="Present Today"
+          title="Present"
           value={stats.presentToday}
           colorClass="bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-400"
         />
