@@ -14,6 +14,12 @@ import {
   CardDescription
 } from "@/components/ui/card";
 import AvailableReports from "./export/AvailableReports";
+import { 
+  formatEmployeesForExport, 
+  generateFileContent, 
+  downloadFile 
+} from "@/lib/reportUtils";
+import { format } from "date-fns";
 
 const EmployeeExportSection = () => {
   const [exportFormat, setExportFormat] = useState<ExportFormat>("csv");
@@ -36,6 +42,19 @@ const EmployeeExportSection = () => {
           xlsx: "Excel",
           pdf: "PDF"
         }[exportFormat];
+        
+        // Format employee data for export
+        const formattedData = formatEmployeesForExport(filteredEmployees);
+        
+        // Generate file content
+        const { content, mimeType } = generateFileContent(formattedData, exportFormat);
+        
+        // Create filename
+        const dateStr = format(new Date(), "yyyyMMdd");
+        const filename = `employee-data-${dateStr}.${exportFormat}`;
+        
+        // Download the file
+        downloadFile(content, filename, mimeType);
         
         success(`Employee data exported as ${formatName} successfully with ${filteredEmployees.length} records`);
         console.log("Export request:", {

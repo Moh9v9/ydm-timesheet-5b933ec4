@@ -15,6 +15,12 @@ import {
 } from "@/components/ui/card";
 import ReportSelectionForm from "./export/ReportSelectionForm";
 import AvailableReports from "./export/AvailableReports";
+import { 
+  formatAttendanceForExport, 
+  generateFileContent, 
+  downloadFile 
+} from "@/lib/reportUtils";
+import { format } from "date-fns";
 
 const ExportSection = () => {
   const [reportType, setReportType] = useState<ReportType>("daily");
@@ -43,6 +49,19 @@ const ExportSection = () => {
           xlsx: "Excel",
           pdf: "PDF"
         }[exportFormat];
+        
+        // Format data for export
+        const formattedData = formatAttendanceForExport(attendanceRecords, reportType, currentDate);
+        
+        // Generate file content
+        const { content, mimeType } = generateFileContent(formattedData, exportFormat);
+        
+        // Create filename based on report type and date
+        const dateStr = format(new Date(currentDate), "yyyyMMdd");
+        const filename = `${reportType}-attendance-${dateStr}.${exportFormat}`;
+        
+        // Download the file
+        downloadFile(content, filename, mimeType);
         
         success(`${reportTypeName} exported as ${formatName} successfully`);
         console.log("Export request:", {
