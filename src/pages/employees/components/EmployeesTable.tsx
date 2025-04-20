@@ -54,9 +54,10 @@ export const EmployeesTable = ({
 
   const renderSortIcon = (field: SortField) => {
     if (sortField !== field) return null;
+    // Show the opposite icon of the current sort direction
     return sortOrder === "asc" ? 
-      <ArrowUp className="inline-block ml-1 w-4 h-4" /> : 
-      <ArrowDown className="inline-block ml-1 w-4 h-4" />;
+      <ArrowDown className="inline-block ml-1 w-4 h-4" /> : 
+      <ArrowUp className="inline-block ml-1 w-4 h-4" />;
   };
 
   const renderSortableHeader = (field: SortField, label: string) => (
