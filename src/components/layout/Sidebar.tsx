@@ -1,4 +1,3 @@
-
 import { NavLink } from "react-router-dom";
 import { 
   User, 
@@ -95,20 +94,6 @@ const Sidebar = ({ isOpen, toggleSidebar }: SidebarProps) => {
             >
               <Users size={20} className={isOpen ? "mr-3" : ""} />
               {(isOpen || window.innerWidth < 768) && <span>Employees</span>}
-            </NavLink>
-
-            <NavLink
-              to="/attendance"
-              className={({ isActive }) =>
-                `flex items-center px-3 py-2 rounded-md transition-colors ${
-                  isActive
-                    ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                    : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-                } ${!isOpen && "md:justify-center"}`
-              }
-            >
-              <Calendar size={20} className={isOpen ? "mr-3" : ""} />
-              {(isOpen || window.innerWidth < 768) && <span>Attendance</span>}
             </NavLink>
 
             <NavLink
