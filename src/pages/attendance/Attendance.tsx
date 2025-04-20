@@ -46,9 +46,9 @@ const Attendance = () => {
           id: `temp_${employee.id}_${currentDate}`,
           employeeId: employee.id,
           date: currentDate,
-          present: true, // Default to present
-          startTime: "07:00", // Default start time
-          endTime: "17:00", // Default end time
+          present: true, 
+          startTime: "07:00", // Updated default start time
+          endTime: "17:00",   // Updated default end time (5 PM = 17:00)
           overtimeHours: 0
         };
       }

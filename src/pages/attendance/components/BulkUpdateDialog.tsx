@@ -26,8 +26,8 @@ interface BulkUpdateDialogProps {
 const BulkUpdateDialog = ({ open, onClose, onConfirm }: BulkUpdateDialogProps) => {
   const [updateType, setUpdateType] = useState<"presence" | "times">("presence");
   const [present, setPresent] = useState(true);
-  const [startTime, setStartTime] = useState("07:00");
-  const [endTime, setEndTime] = useState("17:00");
+  const [startTime, setStartTime] = useState("07:00");     // Updated default start time
+  const [endTime, setEndTime] = useState("17:00");         // Updated default end time (5 PM = 17:00)
   const [overtimeHours, setOvertimeHours] = useState(0);
 
   const handleConfirm = () => {
