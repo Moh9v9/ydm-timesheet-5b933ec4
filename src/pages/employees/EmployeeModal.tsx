@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useEmployees } from "@/contexts/EmployeeContext";
 import { useNotification } from "@/components/ui/notification";
@@ -196,7 +195,7 @@ const EmployeeModal = ({ employee, onClose }: EmployeeModalProps) => {
               name="paymentType"
               value={formData.paymentType}
               onChange={handleChange}
-              className="w-full p-2 border border-input rounded-md"
+              className="w-full border border-input rounded-md p-2 bg-background dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:focus:ring-primary"
               required
             >
               <option value="Monthly">Monthly</option>
@@ -231,7 +230,7 @@ const EmployeeModal = ({ employee, onClose }: EmployeeModalProps) => {
               name="sponsorship"
               value={formData.sponsorship}
               onChange={handleChange}
-              className="w-full p-2 border border-input rounded-md"
+              className="w-full border border-input rounded-md p-2 bg-background dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:focus:ring-primary"
               required
             >
               <option value="YDM co">YDM co</option>
@@ -250,7 +249,7 @@ const EmployeeModal = ({ employee, onClose }: EmployeeModalProps) => {
               name="status"
               value={formData.status}
               onChange={handleChange}
-              className="w-full p-2 border border-input rounded-md"
+              className="w-full border border-input rounded-md p-2 bg-background dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:focus:ring-primary"
               required
             >
               <option value="Active">Active</option>

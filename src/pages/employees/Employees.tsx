@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useEmployees } from "@/contexts/EmployeeContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -139,7 +138,7 @@ const Employees = () => {
                 <select
                   value={filters.project || "All"}
                   onChange={(e) => handleFilterChange("project", e.target.value)}
-                  className="w-full border border-input rounded-md p-2"
+                  className="w-full border border-input rounded-md p-2 bg-background dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:focus:ring-primary"
                 >
                   <option value="All">All Projects</option>
                   {projects.map((project) => (
@@ -154,7 +153,7 @@ const Employees = () => {
                 <select
                   value={filters.location || "All"}
                   onChange={(e) => handleFilterChange("location", e.target.value)}
-                  className="w-full border border-input rounded-md p-2"
+                  className="w-full border border-input rounded-md p-2 bg-background dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:focus:ring-primary"
                 >
                   <option value="All">All Locations</option>
                   {locations.map((location) => (
@@ -169,7 +168,7 @@ const Employees = () => {
                 <select
                   value={filters.paymentType || "All"}
                   onChange={(e) => handleFilterChange("paymentType", e.target.value)}
-                  className="w-full border border-input rounded-md p-2"
+                  className="w-full border border-input rounded-md p-2 bg-background dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:focus:ring-primary"
                 >
                   <option value="All">All Types</option>
                   {paymentTypes.map((type) => (
@@ -184,7 +183,7 @@ const Employees = () => {
                 <select
                   value={filters.sponsorship || "All"}
                   onChange={(e) => handleFilterChange("sponsorship", e.target.value)}
-                  className="w-full border border-input rounded-md p-2"
+                  className="w-full border border-input rounded-md p-2 bg-background dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:focus:ring-primary"
                 >
                   <option value="All">All Sponsorships</option>
                   {sponsorshipTypes.map((type) => (
@@ -199,7 +198,7 @@ const Employees = () => {
                 <select
                   value={filters.status || "All"}
                   onChange={(e) => handleFilterChange("status", e.target.value)}
-                  className="w-full border border-input rounded-md p-2"
+                  className="w-full border border-input rounded-md p-2 bg-background dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:focus:ring-primary"
                 >
                   <option value="Active">Active Only</option>
                   <option value="Archived">Archived Only</option>
