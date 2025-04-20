@@ -1,64 +1,11 @@
 
 import { createContext, useContext, useState, ReactNode } from "react";
 import { AttendanceRecord, AttendanceFilters } from "@/lib/types";
-import { format, parseISO } from "date-fns";
-
-// Generate today's date in ISO format
-const TODAY = new Date().toISOString().split('T')[0];
-
-// Mock data for attendance records
-const MOCK_ATTENDANCE: AttendanceRecord[] = [
-  {
-    id: "1",
-    employeeId: "1",
-    date: TODAY, // Today's date
-    present: true,
-    startTime: "07:00",
-    endTime: "17:00",
-    overtimeHours: 0
-  },
-  {
-    id: "2",
-    employeeId: "2",
-    date: TODAY,
-    present: true,
-    startTime: "07:30",
-    endTime: "17:30",
-    overtimeHours: 0.5
-  },
-  {
-    id: "3",
-    employeeId: "3",
-    date: TODAY,
-    present: false,
-    startTime: "", // Empty for absent
-    endTime: "",
-    overtimeHours: 0
-  },
-  {
-    id: "4",
-    employeeId: "4",
-    date: TODAY,
-    present: true,
-    startTime: "07:00",
-    endTime: "17:00",
-    overtimeHours: 0
-  },
-  {
-    id: "5",
-    employeeId: "5",
-    date: TODAY,
-    present: true,
-    startTime: "07:15",
-    endTime: "18:30",
-    overtimeHours: 1.5
-  }
-];
 
 interface AttendanceContextType {
   attendanceRecords: AttendanceRecord[];
   filteredRecords: AttendanceRecord[];
-  currentDate: string; // ISO date string
+  currentDate: string;
   setCurrentDate: (date: string) => void;
   filters: AttendanceFilters;
   setFilters: (filters: AttendanceFilters) => void;
@@ -74,8 +21,8 @@ interface AttendanceContextType {
 const AttendanceContext = createContext<AttendanceContextType | undefined>(undefined);
 
 export const AttendanceProvider = ({ children }: { children: ReactNode }) => {
-  const [attendanceRecords, setAttendanceRecords] = useState<AttendanceRecord[]>(MOCK_ATTENDANCE);
-  const [currentDate, setCurrentDate] = useState<string>(TODAY);
+  const [attendanceRecords, setAttendanceRecords] = useState<AttendanceRecord[]>([]);
+  const [currentDate, setCurrentDate] = useState<string>(new Date().toISOString().split('T')[0]);
   const [filters, setFilters] = useState<AttendanceFilters>({
     date: currentDate
   });

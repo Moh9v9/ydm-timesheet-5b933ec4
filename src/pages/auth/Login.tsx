@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -137,15 +136,6 @@ const Login = () => {
                   >
                     {isSubmitting ? "Signing in..." : "Sign in"}
                   </button>
-                </div>
-
-                {/* Demo account info */}
-                <div className="mt-4 p-3 bg-accent rounded-md">
-                  <h4 className="text-sm font-medium text-center mb-2">Demo Accounts</h4>
-                  <div className="text-xs text-muted-foreground space-y-1">
-                    <div>Admin: admin@ydm.com / admin123</div>
-                    <div>User: user@ydm.com / user123</div>
-                  </div>
                 </div>
               </form>
             </div>
