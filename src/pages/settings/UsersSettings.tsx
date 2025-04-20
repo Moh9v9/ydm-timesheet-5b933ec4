@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useUsers } from "@/contexts/UsersContext";
 import { useNotification } from "@/components/ui/notification";
@@ -53,22 +54,28 @@ const UsersSettings = () => {
     setIsSubmitting(true);
     
     try {
-      const newUser = await addUser({
-        fullName: "Mohamed Osman",
-        email: "eng.mohamdosman@gmail.com",
-        password: "000000",
-        role: "admin",
-        permissions: {
-          view: true,
-          edit: true,
-          delete: true
-        }
-      });
+      if (currentUser) {
+        // Update existing user
+        await updateUser(currentUser.id, {
+          ...formData,
+          password: formData.password || undefined
+        });
+        success("User updated successfully");
+      } else {
+        // Create new user
+        await addUser({
+          fullName: formData.fullName,
+          email: formData.email,
+          password: formData.password,
+          role: formData.role,
+          permissions: formData.permissions
+        });
+        success("User created successfully");
+      }
       
-      success("Admin user created successfully");
       handleCloseModal();
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Failed to create admin user";
+      const errorMessage = err instanceof Error ? err.message : "Failed to save user";
       error(errorMessage);
     } finally {
       setIsSubmitting(false);

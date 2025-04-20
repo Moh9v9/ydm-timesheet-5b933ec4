@@ -1,3 +1,4 @@
+
 import { User } from "@/lib/types";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -18,6 +19,7 @@ export const useUsersOperations = (
         throw new Error("A user with this email already exists");
       }
       
+      // Create the user with proper metadata
       const { data: authData, error: authError } = await supabase.auth.admin.createUser({
         email: user.email,
         password: user.password,
