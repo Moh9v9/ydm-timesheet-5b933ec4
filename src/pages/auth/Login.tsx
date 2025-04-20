@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -29,6 +30,7 @@ const Login = () => {
       toast.success("Login successful!");
       navigate("/");
     } catch (err) {
+      console.error("Login error:", err);
       const errorMessage = err instanceof Error ? err.message : "Login failed. Please check your credentials.";
       toast.error(errorMessage);
     } finally {
@@ -67,7 +69,6 @@ const Login = () => {
               Manage employee attendance and timesheets
             </p>
             
-            {/* New "Sign In" text */}
             <h3 className="text-2xl font-bold text-foreground mb-6">
               Sign In
             </h3>

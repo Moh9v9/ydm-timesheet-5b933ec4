@@ -1,3 +1,4 @@
+
 import { ReactNode, useState, useEffect } from "react";
 import Sidebar from "./Sidebar";
 import TopBar from "./TopBar";
@@ -31,6 +32,12 @@ const MainLayout = ({ children, requireAuth = true }: MainLayoutProps) => {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
+  // When on a non-auth required page (like login), don't show loading spinner or redirect
+  if (!requireAuth) {
+    return <div className="min-h-screen bg-background">{children}</div>;
+  }
+
+  // Only show loading spinner and redirect for auth-required pages
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
