@@ -89,11 +89,12 @@ const AttendanceSummaryTable = ({ view, currentDate }: AttendanceSummaryTablePro
           <h3 className="text-sm font-medium capitalize flex items-center">
             {view} Summary
             {view === "daily" && (
-              <span className="ml-3 flex items-center gap-1">
-                {hasAttendanceForDate 
-                  ? <Check size={16} className="text-green-600" aria-label="Attendance exists" /> 
-                  : <X size={16} className="text-red-500" aria-label="No attendance record" />
-                }
+              <span className="ml-3 flex items-center gap-2 bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded">
+                {hasAttendanceForDate ? (
+                  <Check size={16} className="text-green-600" aria-label="Attendance exists" />
+                ) : (
+                  <X size={16} className="text-red-500" aria-label="No attendance record" />
+                )}
                 <span className="text-xs text-muted-foreground">
                   {formatDate(currentDate)}
                 </span>
