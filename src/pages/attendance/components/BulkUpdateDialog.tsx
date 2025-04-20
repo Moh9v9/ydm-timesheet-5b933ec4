@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import {
   Dialog,
@@ -9,7 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Check, X } from "lucide-react";
+import { Check, X, Clock } from "lucide-react";
 
 interface BulkUpdateDialogProps {
   open: boolean;
@@ -23,6 +24,7 @@ interface BulkUpdateDialogProps {
 }
 
 const BulkUpdateDialog = ({ open, onClose, onConfirm }: BulkUpdateDialogProps) => {
+  const [updateType, setUpdateType] = useState<"presence" | "times">("presence");
   const [present, setPresent] = useState(true);
   const [startTime, setStartTime] = useState("07:00");
   const [endTime, setEndTime] = useState("17:00");
@@ -30,10 +32,10 @@ const BulkUpdateDialog = ({ open, onClose, onConfirm }: BulkUpdateDialogProps) =
 
   const handleConfirm = () => {
     onConfirm({
-      present,
-      startTime: present ? startTime : "",
-      endTime: present ? endTime : "",
-      overtimeHours: present ? overtimeHours : 0,
+      present: updateType === "presence" ? present : true,
+      startTime: updateType === "presence" ? (present ? startTime : "") : startTime,
+      endTime: updateType === "presence" ? (present ? endTime : "") : endTime,
+      overtimeHours: updateType === "presence" ? (present ? overtimeHours : 0) : overtimeHours,
     });
   };
 
@@ -43,38 +45,64 @@ const BulkUpdateDialog = ({ open, onClose, onConfirm }: BulkUpdateDialogProps) =
         <DialogHeader>
           <DialogTitle>Update All Attendance Records</DialogTitle>
           <DialogDescription>
-            Set attendance status and times for all employees. Time settings will only apply to present employees.
+            Choose whether to update attendance status or modify times for currently present employees.
           </DialogDescription>
         </DialogHeader>
         
         <div className="grid gap-4 py-4">
           <div className="flex items-center gap-4">
-            <label className="text-right font-medium min-w-24">Quick Set:</label>
+            <label className="text-right font-medium min-w-24">Update Type:</label>
             <RadioGroup
               className="flex gap-4"
-              defaultValue={present ? "present" : "absent"}
-              onValueChange={(value) => setPresent(value === "present")}
+              defaultValue="presence"
+              onValueChange={(value) => setUpdateType(value as "presence" | "times")}
             >
               <div className="flex items-center space-x-2">
-                <RadioGroupItem value="present" id="present" />
-                <label htmlFor="present" className="flex items-center text-sm font-medium gap-1 cursor-pointer">
-                  <Check className="h-4 w-4 text-primary" />
-                  All Present
+                <RadioGroupItem value="presence" id="presence" />
+                <label htmlFor="presence" className="flex items-center text-sm font-medium gap-1 cursor-pointer">
+                  Set Presence Status
                 </label>
               </div>
 
               <div className="flex items-center space-x-2">
-                <RadioGroupItem value="absent" id="absent" />
-                <label htmlFor="absent" className="flex items-center text-sm font-medium gap-1 cursor-pointer">
-                  <X className="h-4 w-4 text-destructive" />
-                  All Absent
+                <RadioGroupItem value="times" id="times" />
+                <label htmlFor="times" className="flex items-center text-sm font-medium gap-1 cursor-pointer">
+                  <Clock className="h-4 w-4 text-muted-foreground" />
+                  Update Times Only
                 </label>
               </div>
             </RadioGroup>
           </div>
 
+          {updateType === "presence" && (
+            <div className="flex items-center gap-4">
+              <label className="text-right font-medium min-w-24">Quick Set:</label>
+              <RadioGroup
+                className="flex gap-4"
+                defaultValue={present ? "present" : "absent"}
+                onValueChange={(value) => setPresent(value === "present")}
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="present" id="present" />
+                  <label htmlFor="present" className="flex items-center text-sm font-medium gap-1 cursor-pointer">
+                    <Check className="h-4 w-4 text-primary" />
+                    All Present
+                  </label>
+                </div>
+
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="absent" id="absent" />
+                  <label htmlFor="absent" className="flex items-center text-sm font-medium gap-1 cursor-pointer">
+                    <X className="h-4 w-4 text-destructive" />
+                    All Absent
+                  </label>
+                </div>
+              </RadioGroup>
+            </div>
+          )}
+
           <div className="space-y-4">
-            {present && (
+            {(updateType === "times" || (updateType === "presence" && present)) && (
               <div className="space-y-4 rounded-lg bg-accent/50 p-4">
                 <div className="flex items-center gap-4">
                   <label className="text-right font-medium min-w-24">Start Time:</label>
@@ -110,9 +138,15 @@ const BulkUpdateDialog = ({ open, onClose, onConfirm }: BulkUpdateDialogProps) =
               </div>
             )}
 
-            {!present && (
+            {updateType === "presence" && !present && (
               <p className="text-sm text-muted-foreground italic">
                 When marking as absent, start time, end time, and overtime will be cleared.
+              </p>
+            )}
+
+            {updateType === "times" && (
+              <p className="text-sm text-muted-foreground italic">
+                Time changes will only apply to employees who are currently marked as present.
               </p>
             )}
           </div>
@@ -138,3 +172,4 @@ const BulkUpdateDialog = ({ open, onClose, onConfirm }: BulkUpdateDialogProps) =
 };
 
 export default BulkUpdateDialog;
+
