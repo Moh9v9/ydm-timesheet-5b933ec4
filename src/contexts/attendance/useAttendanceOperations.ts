@@ -209,7 +209,7 @@ export const useAttendanceOperations = (
         date: record.date,
         present: record.present,
         startTime: record.start_time || '',
-        endTime: data.end_time || '',
+        endTime: record.end_time || '',  // Fixed: accessing end_time from each record, not from the data array
         overtimeHours: record.overtime_hours || 0,
         note: record.note || ''
       }));
