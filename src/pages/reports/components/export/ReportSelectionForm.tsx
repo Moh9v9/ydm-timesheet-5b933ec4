@@ -32,22 +32,24 @@ const ReportSelectionForm = ({
   ];
 
   return (
-    <div className="space-y-4">
-      <StyledSelect
-        label="Report Type"
-        value={reportType}
-        onValueChange={(value: ReportType) => setReportType(value)}
-        placeholder="Select Report Type"
-        options={reportTypeOptions}
-      />
-      
-      <StyledSelect
-        label="Export Format"
-        value={exportFormat}
-        onValueChange={(value: ExportFormat) => setExportFormat(value)}
-        placeholder="Select Export Format"
-        options={exportFormatOptions}
-      />
+    <div className="space-y-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <StyledSelect
+          label="Report Type"
+          value={reportType}
+          onValueChange={(value: ReportType) => setReportType(value)}
+          placeholder="Select Report Type"
+          options={reportTypeOptions}
+        />
+        
+        <StyledSelect
+          label="Export Format"
+          value={exportFormat}
+          onValueChange={(value: ExportFormat) => setExportFormat(value)}
+          placeholder="Select Export Format"
+          options={exportFormatOptions}
+        />
+      </div>
       
       <DateRangeInputs 
         reportType={reportType} 

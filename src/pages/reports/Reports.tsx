@@ -1,5 +1,5 @@
 
-import { Download, Table } from "lucide-react";
+import { Download, Table, FileSpreadsheet, ChartBar } from "lucide-react";
 import { useNotification } from "@/components/ui/notification";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import ExportSection from "./components/ExportSection";
@@ -12,33 +12,58 @@ const Reports = () => {
     <div className="space-y-6 animate-fade-in">
       <NotificationContainer />
       
-      <div>
-        <h1 className="text-2xl font-bold">Reports & Exports</h1>
-        <p className="text-muted-foreground">
-          Generate and download attendance and employee reports
-        </p>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-2">
+        <div>
+          <h1 className="text-2xl font-bold dark:text-gray-100">Reports & Exports</h1>
+          <p className="text-muted-foreground dark:text-gray-400">
+            Generate attendance data and employee insights
+          </p>
+        </div>
+        
+        <div className="inline-flex gap-2 self-start">
+          <button className="px-3 py-2 bg-primary/10 text-primary rounded-md flex items-center gap-2 text-sm hover:bg-primary/20 transition-colors">
+            <ChartBar size={16} />
+            <span>Analytics</span>
+          </button>
+          <button className="px-3 py-2 bg-primary text-primary-foreground rounded-md flex items-center gap-2 text-sm hover:bg-primary/90 transition-colors">
+            <FileSpreadsheet size={16} />
+            <span>Export</span>
+          </button>
+        </div>
       </div>
       
-      <Tabs defaultValue="export" className="w-full">
-        <TabsList className="mb-4">
-          <TabsTrigger value="export" className="gap-2">
-            <Download size={16} />
-            <span className="hidden sm:inline">Export Reports</span>
-          </TabsTrigger>
-          <TabsTrigger value="view" className="gap-2">
-            <Table size={16} />
-            <span className="hidden sm:inline">Views & Summaries</span>
-          </TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="export" className="mt-0">
-          <ExportSection />
-        </TabsContent>
-        
-        <TabsContent value="view" className="mt-0">
-          <ViewsSection />
-        </TabsContent>
-      </Tabs>
+      <div className="bg-card dark:bg-gray-800/50 border dark:border-gray-700 rounded-xl shadow-sm">
+        <Tabs defaultValue="export" className="w-full">
+          <div className="border-b dark:border-gray-700 px-6 pt-4">
+            <TabsList className="bg-transparent mb-0 gap-6">
+              <TabsTrigger 
+                value="export" 
+                className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-1 py-3 bg-transparent data-[state=active]:bg-transparent data-[state=active]:shadow-none gap-2"
+              >
+                <Download size={16} />
+                <span>Export Reports</span>
+              </TabsTrigger>
+              <TabsTrigger 
+                value="view" 
+                className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-1 py-3 bg-transparent data-[state=active]:bg-transparent data-[state=active]:shadow-none gap-2"
+              >
+                <Table size={16} />
+                <span>Views & Summaries</span>
+              </TabsTrigger>
+            </TabsList>
+          </div>
+          
+          <div className="p-6">
+            <TabsContent value="export" className="mt-0">
+              <ExportSection />
+            </TabsContent>
+            
+            <TabsContent value="view" className="mt-0">
+              <ViewsSection />
+            </TabsContent>
+          </div>
+        </Tabs>
+      </div>
     </div>
   );
 };

@@ -16,7 +16,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { Calendar, FileSpreadsheet, FileText } from "lucide-react";
+import { Download, Calendar, FileSpreadsheet, FileText } from "lucide-react";
 import { useAttendance } from "@/contexts/AttendanceContext";
 import { useEmployees } from "@/contexts/EmployeeContext";
 import { format } from "date-fns";
@@ -68,46 +68,51 @@ const AttendanceSummaryTable = ({ view, currentDate }: AttendanceSummaryTablePro
   const getReportTypeIcon = () => {
     switch (view) {
       case "daily":
-        return <Calendar size={16} />;
+        return <Calendar size={16} className="text-blue-500" />;
       case "weekly":
-        return <FileSpreadsheet size={16} />;
+        return <FileSpreadsheet size={16} className="text-green-500" />;
       case "monthly":
-        return <FileText size={16} />;
+        return <FileText size={16} className="text-purple-500" />;
       default:
-        return <Calendar size={16} />;
+        return <Calendar size={16} className="text-blue-500" />;
     }
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center gap-2">
-        {getReportTypeIcon()}
-        <h3 className="text-lg font-medium capitalize">{view} Attendance Summary</h3>
+    <div>
+      <div className="flex items-center justify-between px-4 py-3 border-b dark:border-gray-700">
+        <div className="flex items-center gap-2">
+          {getReportTypeIcon()}
+          <h3 className="text-sm font-medium capitalize">{view} Summary</h3>
+        </div>
+        <button className="text-primary hover:text-primary/80 p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+          <Download size={16} />
+        </button>
       </div>
       
-      <div className="rounded-md border">
+      <div>
         <Table>
           <TableHeader>
-            <TableRow>
-              <TableHead>Employee</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Hours</TableHead>
-              <TableHead>Overtime</TableHead>
+            <TableRow className="hover:bg-transparent dark:hover:bg-transparent">
+              <TableHead className="font-medium">Employee</TableHead>
+              <TableHead className="font-medium">Date</TableHead>
+              <TableHead className="font-medium">Status</TableHead>
+              <TableHead className="font-medium">Hours</TableHead>
+              <TableHead className="font-medium">Overtime</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {paginatedRecords.length > 0 ? (
               paginatedRecords.map((record) => (
-                <TableRow key={record.id}>
-                  <TableCell>{getEmployeeName(record.employeeId)}</TableCell>
+                <TableRow key={record.id} className="dark:hover:bg-gray-750/50">
+                  <TableCell className="font-medium">{getEmployeeName(record.employeeId)}</TableCell>
                   <TableCell>{formatDate(record.date)}</TableCell>
                   <TableCell>
                     <span
-                      className={`px-2 py-1 rounded-full text-xs ${
+                      className={`px-2 py-0.5 rounded-full text-xs ${
                         record.present
-                          ? "bg-green-100 text-green-800"
-                          : "bg-red-100 text-red-800"
+                          ? "bg-green-100 text-green-800 dark:bg-green-950/30 dark:text-green-300"
+                          : "bg-red-100 text-red-800 dark:bg-red-950/30 dark:text-red-300"
                       }`}
                     >
                       {record.present ? "Present" : "Absent"}
@@ -125,8 +130,8 @@ const AttendanceSummaryTable = ({ view, currentDate }: AttendanceSummaryTablePro
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={5} className="text-center py-4">
-                  No attendance records found
+                <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                  No attendance records found for this period
                 </TableCell>
               </TableRow>
             )}
@@ -135,34 +140,36 @@ const AttendanceSummaryTable = ({ view, currentDate }: AttendanceSummaryTablePro
       </div>
 
       {totalPages > 1 && (
-        <Pagination>
-          <PaginationContent>
-            <PaginationItem>
-              <PaginationPrevious
-                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
-              />
-            </PaginationItem>
-            
-            {Array.from({ length: totalPages }).map((_, i) => (
-              <PaginationItem key={i}>
-                <PaginationLink
-                  onClick={() => setCurrentPage(i + 1)}
-                  isActive={currentPage === i + 1}
-                >
-                  {i + 1}
-                </PaginationLink>
+        <div className="py-4 border-t dark:border-gray-700">
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious
+                  onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                  className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                />
               </PaginationItem>
-            ))}
-            
-            <PaginationItem>
-              <PaginationNext
-                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-                className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
-              />
-            </PaginationItem>
-          </PaginationContent>
-        </Pagination>
+              
+              {Array.from({ length: totalPages }).map((_, i) => (
+                <PaginationItem key={i}>
+                  <PaginationLink
+                    onClick={() => setCurrentPage(i + 1)}
+                    isActive={currentPage === i + 1}
+                  >
+                    {i + 1}
+                  </PaginationLink>
+                </PaginationItem>
+              ))}
+              
+              <PaginationItem>
+                <PaginationNext
+                  onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                  className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        </div>
       )}
     </div>
   );

@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useEmployees } from "@/contexts/EmployeeContext";
 import { useAttendance } from "@/contexts/AttendanceContext";
 import { useNotification } from "@/components/ui/notification";
-import { Download } from "lucide-react";
+import { Download, FileText } from "lucide-react";
 import { ExportFormat, ReportType } from "@/lib/types";
 import ReportSelectionForm from "./export/ReportSelectionForm";
 import AvailableReports from "./export/AvailableReports";
@@ -53,31 +53,40 @@ const ExportSection = () => {
   };
   
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <div className="md:col-span-2 bg-card shadow-sm rounded-lg border p-6 space-y-6">
-        <h2 className="text-xl font-medium">Generate Report</h2>
-        
-        <ReportSelectionForm
-          reportType={reportType}
-          setReportType={setReportType}
-          exportFormat={exportFormat}
-          setExportFormat={setExportFormat}
-          currentDate={currentDate}
-        />
-        
-        <div className="pt-2">
-          <button
-            onClick={generateReport}
-            disabled={isGenerating}
-            className="px-4 py-2 bg-primary text-white rounded-md flex items-center hover:bg-primary/90 transition-colors disabled:opacity-70"
-          >
-            <Download size={16} className="mr-2" />
-            {isGenerating ? "Generating..." : "Generate Report"}
-          </button>
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="lg:col-span-2">
+        <div className="bg-white dark:bg-gray-800/50 rounded-lg border dark:border-gray-700 p-5 shadow-sm">
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-xl font-medium dark:text-gray-200">Generate Report</h2>
+            <FileText className="text-gray-400 dark:text-gray-500" size={20} />
+          </div>
+          
+          <div className="border-t dark:border-gray-700 pt-4 mt-2">
+            <ReportSelectionForm
+              reportType={reportType}
+              setReportType={setReportType}
+              exportFormat={exportFormat}
+              setExportFormat={setExportFormat}
+              currentDate={currentDate}
+            />
+          </div>
+          
+          <div className="pt-6 mt-2">
+            <button
+              onClick={generateReport}
+              disabled={isGenerating}
+              className="px-4 py-2.5 bg-primary text-white rounded-md flex items-center hover:bg-primary/90 transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
+            >
+              <Download size={16} className="mr-2" />
+              {isGenerating ? "Generating..." : "Generate Report"}
+            </button>
+          </div>
         </div>
       </div>
       
-      <AvailableReports />
+      <div className="lg:col-span-1">
+        <AvailableReports />
+      </div>
     </div>
   );
 };

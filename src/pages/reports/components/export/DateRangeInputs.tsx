@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { ReportType } from "@/lib/types";
+import { Input } from "@/components/ui/input";
 
 interface DateRangeInputsProps {
   reportType: ReportType;
@@ -12,19 +13,13 @@ const DateRangeInputs = ({ reportType, currentDate }: DateRangeInputsProps) => {
     return (
       <div>
         <label htmlFor="date" className="block text-sm font-medium mb-1 dark:text-gray-200">
-          Date
+          Select Date
         </label>
-        <input
+        <Input
           type="date"
           id="date"
-          value={currentDate}
-          className="w-full p-2 border border-input rounded-md 
-            bg-white dark:bg-gray-800 
-            border-gray-300 dark:border-gray-600 
-            text-gray-900 dark:text-gray-100 
-            focus:ring-2 focus:ring-primary 
-            dark:focus:ring-offset-2 
-            dark:focus:ring-primary/70"
+          defaultValue={currentDate}
+          className="w-full dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100 text-sm"
         />
       </div>
     );
@@ -34,18 +29,12 @@ const DateRangeInputs = ({ reportType, currentDate }: DateRangeInputsProps) => {
     return (
       <div>
         <label htmlFor="week" className="block text-sm font-medium mb-1 dark:text-gray-200">
-          Week
+          Select Week
         </label>
-        <input
+        <Input
           type="week"
           id="week"
-          className="w-full p-2 border border-input rounded-md 
-            bg-white dark:bg-gray-800 
-            border-gray-300 dark:border-gray-600 
-            text-gray-900 dark:text-gray-100 
-            focus:ring-2 focus:ring-primary 
-            dark:focus:ring-offset-2 
-            dark:focus:ring-primary/70"
+          className="w-full dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100 text-sm"
         />
       </div>
     );
@@ -55,18 +44,12 @@ const DateRangeInputs = ({ reportType, currentDate }: DateRangeInputsProps) => {
     return (
       <div>
         <label htmlFor="month" className="block text-sm font-medium mb-1 dark:text-gray-200">
-          Month
+          Select Month
         </label>
-        <input
+        <Input
           type="month"
           id="month"
-          className="w-full p-2 border border-input rounded-md 
-            bg-white dark:bg-gray-800 
-            border-gray-300 dark:border-gray-600 
-            text-gray-900 dark:text-gray-100 
-            focus:ring-2 focus:ring-primary 
-            dark:focus:ring-offset-2 
-            dark:focus:ring-primary/70"
+          className="w-full dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100 text-sm"
         />
       </div>
     );
@@ -76,4 +59,3 @@ const DateRangeInputs = ({ reportType, currentDate }: DateRangeInputsProps) => {
 };
 
 export default DateRangeInputs;
-
