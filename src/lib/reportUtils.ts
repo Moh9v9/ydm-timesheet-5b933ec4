@@ -1,6 +1,8 @@
 
 import { AttendanceRecord, Employee, ExportFormat } from "./types";
 import * as XLSX from 'xlsx';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 /**
  * Convert data to CSV format
@@ -47,28 +49,49 @@ const convertToXLSX = (data: Record<string, any>[]): Uint8Array => {
 };
 
 /**
- * Convert data to PDF format (simplified - in real scenario would use a library like pdfmake)
- * This is a placeholder that generates a simple text representation
+ * Convert data to PDF format using jsPDF library
  */
-const convertToPDF = (data: Record<string, any>[]): string => {
-  // In a real app, we would use a library like pdfmake or jspdf to generate a proper PDF file
-  // For this demo, we'll create a simple text format
-  let output = '';
-  
-  // Add headers
-  if (data.length > 0) {
-    const headers = Object.keys(data[0]);
-    output += headers.join('\t') + '\n';
-    output += headers.map(() => '---').join('\t') + '\n';
-    
-    // Add data rows
-    for (const row of data) {
-      const values = headers.map(header => String(row[header]));
-      output += values.join('\t') + '\n';
-    }
+const convertToPDF = (data: Record<string, any>[]): Uint8Array => {
+  if (!data || data.length === 0) {
+    // Return an empty PDF if there's no data
+    const emptyPdf = new jsPDF();
+    emptyPdf.text("No data available", 20, 20);
+    return new Uint8Array(emptyPdf.output('arraybuffer'));
   }
   
-  return output;
+  // Create a new PDF document
+  const doc = new jsPDF();
+  
+  // Extract headers
+  const headers = Object.keys(data[0]);
+  
+  // Extract rows for jsPDF-AutoTable
+  const rows = data.map(row => 
+    headers.map(header => String(row[header] || ''))
+  );
+  
+  // Add title
+  doc.setFontSize(16);
+  doc.text("Generated Report", 14, 15);
+  doc.setFontSize(12);
+  doc.text("Date: " + new Date().toLocaleDateString(), 14, 22);
+  
+  // Add table with data
+  autoTable(doc, {
+    head: [headers],
+    body: rows,
+    startY: 30,
+    styles: {
+      fontSize: 9,
+      cellPadding: 2,
+    },
+    headStyles: {
+      fillColor: [63, 81, 181],
+    },
+  });
+  
+  // Convert to Uint8Array
+  return new Uint8Array(doc.output('arraybuffer'));
 };
 
 /**
@@ -95,6 +118,7 @@ export const generateFileContent = (
     case 'pdf':
       content = convertToPDF(data);
       mimeType = 'application/pdf';
+      isBinary = true;
       break;
     default:
       content = convertToCSV(data);
