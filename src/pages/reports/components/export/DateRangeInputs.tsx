@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { format } from "date-fns";
+import { ChevronDown } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
@@ -26,6 +27,12 @@ const DateRangeInputs = ({ reportType, currentDate }: DateRangeInputsProps) => {
     }
   };
 
+  const yearMonthCaptionLayout = {
+    components: {
+      Dropdown: () => <ChevronDown className="w-4 h-4 text-muted-foreground" />,
+    },
+  };
+
   if (reportType === "daily") {
     return (
       <div>
@@ -49,6 +56,10 @@ const DateRangeInputs = ({ reportType, currentDate }: DateRangeInputsProps) => {
               captionLayout="dropdown-buttons"
               fromYear={2020}
               toYear={2025}
+              classNames={{
+                caption_label: "flex items-center gap-2",
+              }}
+              components={yearMonthCaptionLayout.components}
               className={cn("p-3 pointer-events-auto")}
             />
           </PopoverContent>
@@ -80,6 +91,10 @@ const DateRangeInputs = ({ reportType, currentDate }: DateRangeInputsProps) => {
               captionLayout="dropdown-buttons"
               fromYear={2020}
               toYear={2025}
+              classNames={{
+                caption_label: "flex items-center gap-2",
+              }}
+              components={yearMonthCaptionLayout.components}
               className={cn("p-3 pointer-events-auto")}
             />
           </PopoverContent>
@@ -111,6 +126,10 @@ const DateRangeInputs = ({ reportType, currentDate }: DateRangeInputsProps) => {
               captionLayout="dropdown-buttons"
               fromYear={2020}
               toYear={2025}
+              classNames={{
+                caption_label: "flex items-center gap-2",
+              }}
+              components={yearMonthCaptionLayout.components}
               className={cn("p-3 pointer-events-auto")}
             />
           </PopoverContent>
@@ -123,4 +142,3 @@ const DateRangeInputs = ({ reportType, currentDate }: DateRangeInputsProps) => {
 };
 
 export default DateRangeInputs;
-
