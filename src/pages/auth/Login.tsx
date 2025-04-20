@@ -2,14 +2,17 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { useTheme } from "@/contexts/ThemeContext";
 import { toast } from "sonner";
 import MainLayout from "@/components/layout/MainLayout";
+import { Moon, Sun } from "lucide-react";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { login } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -38,6 +41,20 @@ const Login = () => {
     <MainLayout requireAuth={false}>
       <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-md w-full space-y-8">
+          <div className="absolute top-4 right-4">
+            <button 
+              onClick={toggleTheme} 
+              className="p-2 rounded-full hover:bg-accent transition-colors"
+              aria-label={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
+            >
+              {theme === 'light' ? (
+                <Moon className="h-6 w-6" />
+              ) : (
+                <Sun className="h-6 w-6" />
+              )}
+            </button>
+          </div>
+          
           <div className="text-center">
             <img 
               src="https://i.ibb.co/DPfXmyDz/YDM-logo2-2.png" 
