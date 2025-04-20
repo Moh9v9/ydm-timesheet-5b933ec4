@@ -2,6 +2,13 @@
 import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 
 interface DateNavigationProps {
   currentDate: string;
@@ -28,6 +35,12 @@ const DateNavigation = ({ currentDate, setCurrentDate }: DateNavigationProps) =>
     setCurrentDate(format(nextDay, "yyyy-MM-dd"));
   };
 
+  const handleSelect = (selectedDate: Date | undefined) => {
+    if (selectedDate) {
+      setCurrentDate(format(selectedDate, "yyyy-MM-dd"));
+    }
+  };
+
   return (
     <div className="flex flex-col space-y-2">
       <div className="flex justify-between items-center bg-card rounded-lg border p-2 sm:p-3">
@@ -51,10 +64,23 @@ const DateNavigation = ({ currentDate, setCurrentDate }: DateNavigationProps) =>
             </svg>
           </button>
           
-          <div className="px-4 py-2 flex items-center">
-            <CalendarIcon className="mr-2 h-4 w-4" />
-            <span>{format(date, "EEEE, MMMM d, yyyy")}</span>
-          </div>
+          <Popover>
+            <PopoverTrigger asChild>
+              <button className="px-4 py-2 flex items-center hover:bg-accent/50 rounded-md transition-colors">
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                <span>{format(date, "EEEE, MMMM d, yyyy")}</span>
+              </button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="single"
+                selected={date}
+                onSelect={handleSelect}
+                initialFocus
+                className={cn("p-3 pointer-events-auto")}
+              />
+            </PopoverContent>
+          </Popover>
           
           <button
             onClick={goToNextDay}
