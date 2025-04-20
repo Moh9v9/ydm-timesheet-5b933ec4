@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { useNotification } from "@/components/ui/notification";
+import { toast } from "sonner";
 import MainLayout from "@/components/layout/MainLayout";
 
 const Login = () => {
@@ -11,13 +11,12 @@ const Login = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
-  const { success, error, NotificationContainer } = useNotification();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!email || !password) {
-      error("Please enter both email and password.");
+      toast.error("Please enter both email and password.");
       return;
     }
     
@@ -25,11 +24,11 @@ const Login = () => {
     
     try {
       await login(email, password);
-      success("Login successful!");
+      toast.success("Login successful!");
       navigate("/");
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Login failed. Please check your credentials.";
-      error(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
@@ -37,7 +36,6 @@ const Login = () => {
 
   return (
     <MainLayout requireAuth={false}>
-      <NotificationContainer />
       <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-md w-full space-y-8">
           <div className="text-center">

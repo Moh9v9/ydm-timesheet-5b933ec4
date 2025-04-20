@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { useNotification } from "@/components/ui/notification";
+import { toast } from "sonner";
 import MainLayout from "@/components/layout/MainLayout";
 
 const ForgotPassword = () => {
@@ -10,13 +10,12 @@ const ForgotPassword = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const { forgotPassword } = useAuth();
-  const { success, error, NotificationContainer } = useNotification();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!email) {
-      error("Please enter your email.");
+      toast.error("Please enter your email.");
       return;
     }
     
@@ -25,10 +24,10 @@ const ForgotPassword = () => {
     try {
       await forgotPassword(email);
       setIsSubmitted(true);
-      success("Password reset instructions sent to your email.");
+      toast.success("Password reset instructions sent to your email.");
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Failed to send password reset email.";
-      error(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
@@ -36,7 +35,6 @@ const ForgotPassword = () => {
 
   return (
     <MainLayout requireAuth={false}>
-      <NotificationContainer />
       <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-md w-full space-y-8">
           <div className="text-center">
