@@ -1,6 +1,7 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AttendanceRecord, AttendanceFilters } from "@/lib/types";
+import { supabase } from "@/integrations/supabase/client";
 
 export const useAttendanceState = () => {
   const [attendanceRecords, setAttendanceRecords] = useState<AttendanceRecord[]>([]);
@@ -10,13 +11,53 @@ export const useAttendanceState = () => {
   });
   const [loading, setLoading] = useState(false);
 
+  // Fetch attendance records from Supabase
+  useEffect(() => {
+    const fetchAttendanceRecords = async () => {
+      setLoading(true);
+      try {
+        const query = supabase
+          .from('attendance_records')
+          .select('*');
+
+        if (filters.date) {
+          query.eq('date', filters.date);
+        }
+        if (filters.employeeId) {
+          query.eq('employee_id', filters.employeeId);
+        }
+        if (filters.present !== undefined) {
+          query.eq('present', filters.present);
+        }
+
+        const { data, error } = await query;
+
+        if (error) throw error;
+
+        const formattedRecords: AttendanceRecord[] = (data || []).map(record => ({
+          id: record.id,
+          employeeId: record.employee_id,
+          date: record.date,
+          present: record.present,
+          startTime: record.start_time || '',
+          endTime: record.end_time || '',
+          overtimeHours: record.overtime_hours || 0,
+          note: record.note || ''
+        }));
+
+        setAttendanceRecords(formattedRecords);
+      } catch (error) {
+        console.error('Error fetching attendance records:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAttendanceRecords();
+  }, [filters]);
+
   // Filter attendance records based on current filters
-  const filteredRecords = attendanceRecords.filter(record => {
-    if (filters.date && record.date !== filters.date) return false;
-    if (filters.employeeId && record.employeeId !== filters.employeeId) return false;
-    if (filters.present !== undefined && record.present !== filters.present) return false;
-    return true;
-  });
+  const filteredRecords = attendanceRecords;
 
   return {
     attendanceRecords,

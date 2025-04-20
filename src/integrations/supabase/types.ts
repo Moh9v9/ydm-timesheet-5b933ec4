@@ -9,6 +9,53 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      attendance_records: {
+        Row: {
+          created_at: string | null
+          date: string
+          employee_id: string | null
+          end_time: string | null
+          id: string
+          note: string | null
+          overtime_hours: number | null
+          present: boolean
+          start_time: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          date: string
+          employee_id?: string | null
+          end_time?: string | null
+          id?: string
+          note?: string | null
+          overtime_hours?: number | null
+          present?: boolean
+          start_time?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          date?: string
+          employee_id?: string | null
+          end_time?: string | null
+          id?: string
+          note?: string | null
+          overtime_hours?: number | null
+          present?: boolean
+          start_time?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "attendance_records_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       employees: {
         Row: {
           created_at: string | null

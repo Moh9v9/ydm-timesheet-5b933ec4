@@ -1,5 +1,6 @@
 
 import { AttendanceRecord } from "@/lib/types";
+import { supabase } from "@/integrations/supabase/client";
 
 export const useAttendanceOperations = (
   attendanceRecords: AttendanceRecord[],
@@ -12,64 +13,143 @@ export const useAttendanceOperations = (
   };
 
   // Get attendance record by employee ID and date
-  const getRecordsByEmployeeAndDate = (employeeId: string, date: string) => {
-    return attendanceRecords.find(
-      record => record.employeeId === employeeId && record.date === date
-    );
+  const getRecordsByEmployeeAndDate = async (employeeId: string, date: string) => {
+    const { data, error } = await supabase
+      .from('attendance_records')
+      .select('*')
+      .eq('employee_id', employeeId)
+      .eq('date', date)
+      .single();
+
+    if (error) {
+      console.error('Error fetching attendance record:', error);
+      return null;
+    }
+
+    return data ? {
+      id: data.id,
+      employeeId: data.employee_id,
+      date: data.date,
+      present: data.present,
+      startTime: data.start_time || '',
+      endTime: data.end_time || '',
+      overtimeHours: data.overtime_hours || 0,
+      note: data.note || ''
+    } : null;
   };
 
   // Add new attendance record
   const addAttendanceRecord = async (record: Omit<AttendanceRecord, "id">): Promise<AttendanceRecord> => {
     setLoading(true);
     
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 600));
-    
-    const newRecord: AttendanceRecord = {
-      ...record,
-      id: `${Date.now()}`,
-    };
-    
-    setAttendanceRecords([...attendanceRecords, newRecord]);
-    setLoading(false);
-    return newRecord;
+    try {
+      const { data, error } = await supabase
+        .from('attendance_records')
+        .insert({
+          employee_id: record.employeeId,
+          date: record.date,
+          present: record.present,
+          start_time: record.startTime || null,
+          end_time: record.endTime || null,
+          overtime_hours: record.overtimeHours || 0,
+          note: record.note || null
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      if (!data) throw new Error('No data returned from insert');
+
+      const newRecord: AttendanceRecord = {
+        id: data.id,
+        employeeId: data.employee_id,
+        date: data.date,
+        present: data.present,
+        startTime: data.start_time || '',
+        endTime: data.end_time || '',
+        overtimeHours: data.overtime_hours || 0,
+        note: data.note || ''
+      };
+
+      setAttendanceRecords([...attendanceRecords, newRecord]);
+      return newRecord;
+    } catch (err) {
+      console.error('Error adding attendance record:', err);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Update attendance record
   const updateAttendanceRecord = async (
     id: string,
-    recordData: Partial<AttendanceRecord>
+    record: Partial<AttendanceRecord>
   ): Promise<AttendanceRecord> => {
     setLoading(true);
     
-    await new Promise(resolve => setTimeout(resolve, 600));
-    
-    const updatedRecords = attendanceRecords.map(record => {
-      if (record.id === id) {
-        return { ...record, ...recordData };
-      }
-      return record;
-    });
-    
-    setAttendanceRecords(updatedRecords);
-    setLoading(false);
-    
-    const updatedRecord = updatedRecords.find(record => record.id === id);
-    if (!updatedRecord) {
-      throw new Error("Attendance record not found");
+    try {
+      const { data, error } = await supabase
+        .from('attendance_records')
+        .update({
+          present: record.present,
+          start_time: record.startTime || null,
+          end_time: record.endTime || null,
+          overtime_hours: record.overtimeHours || 0,
+          note: record.note || null
+        })
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      if (!data) throw new Error('No data returned from update');
+
+      const updatedRecord: AttendanceRecord = {
+        id: data.id,
+        employeeId: data.employee_id,
+        date: data.date,
+        present: data.present,
+        startTime: data.start_time || '',
+        endTime: data.end_time || '',
+        overtimeHours: data.overtime_hours || 0,
+        note: data.note || ''
+      };
+
+      setAttendanceRecords(
+        attendanceRecords.map(record => 
+          record.id === id ? updatedRecord : record
+        )
+      );
+      
+      return updatedRecord;
+    } catch (err) {
+      console.error('Error updating attendance record:', err);
+      throw err;
+    } finally {
+      setLoading(false);
     }
-    
-    return updatedRecord;
   };
 
   // Delete attendance record
   const deleteAttendanceRecord = async (id: string): Promise<void> => {
     setLoading(true);
     
-    await new Promise(resolve => setTimeout(resolve, 600));
-    
-    setAttendanceRecords(attendanceRecords.filter(record => record.id !== id));
-    setLoading(false);
+    try {
+      const { error } = await supabase
+        .from('attendance_records')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+      
+      setAttendanceRecords(attendanceRecords.filter(record => record.id !== id));
+    } catch (err) {
+      console.error('Error deleting attendance record:', err);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Bulk save attendance records
@@ -78,33 +158,45 @@ export const useAttendanceOperations = (
   ): Promise<AttendanceRecord[]> => {
     setLoading(true);
     
-    await new Promise(resolve => setTimeout(resolve, 800));
-    
-    const newRecords: AttendanceRecord[] = [];
-    
-    for (const record of records) {
-      if ("id" in record) {
-        const existingIndex = attendanceRecords.findIndex(r => r.id === record.id);
-        if (existingIndex !== -1) {
-          attendanceRecords[existingIndex] = record;
-        } else {
-          newRecords.push(record);
-        }
-      } else {
-        const newRecord: AttendanceRecord = {
-          ...record,
-          id: `new_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
-        };
-        newRecords.push(newRecord);
-      }
+    try {
+      const recordsToUpsert = records.map(record => ({
+        id: 'id' in record ? record.id : undefined,
+        employee_id: record.employeeId,
+        date: record.date,
+        present: record.present,
+        start_time: record.startTime || null,
+        end_time: record.endTime || null,
+        overtime_hours: record.overtimeHours || 0,
+        note: record.note || null
+      }));
+
+      const { data, error } = await supabase
+        .from('attendance_records')
+        .upsert(recordsToUpsert)
+        .select();
+
+      if (error) throw error;
+      if (!data) throw new Error('No data returned from upsert');
+
+      const savedRecords: AttendanceRecord[] = data.map(record => ({
+        id: record.id,
+        employeeId: record.employee_id,
+        date: record.date,
+        present: record.present,
+        startTime: record.start_time || '',
+        endTime: record.end_time || '',
+        overtimeHours: record.overtime_hours || 0,
+        note: record.note || ''
+      }));
+
+      setAttendanceRecords(savedRecords);
+      return savedRecords;
+    } catch (err) {
+      console.error('Error bulk saving attendance records:', err);
+      throw err;
+    } finally {
+      setLoading(false);
     }
-    
-    setAttendanceRecords([...attendanceRecords.filter(r => 
-      !records.some(newR => "id" in newR && newR.id === r.id)
-    ), ...newRecords]);
-    
-    setLoading(false);
-    return newRecords;
   };
 
   return {
