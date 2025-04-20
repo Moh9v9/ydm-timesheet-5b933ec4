@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { AttendanceRecord } from "@/lib/types";
 import { Employee } from "@/lib/types";
@@ -85,6 +86,9 @@ const AttendanceTable = ({
     );
   };
 
+  // Check if we have both attendance data AND employee data
+  const hasData = attendanceData.length > 0 && filteredEmployees.length > 0;
+
   return (
     <div className="bg-card shadow-sm rounded-lg border overflow-hidden">
       <div className="overflow-x-auto">
@@ -139,7 +143,18 @@ const AttendanceTable = ({
                   </div>
                 </td>
               </tr>
-            ) : getSortedData().length > 0 ? (
+            ) : filteredEmployees.length === 0 ? (
+              <tr>
+                <td colSpan={6} className="text-center py-4">
+                  <div className="text-muted-foreground">
+                    Loading employee data...
+                    <div className="mt-2 animate-pulse inline-block">
+                      <div className="h-1.5 w-16 bg-muted-foreground/20 rounded-full"></div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            ) : hasData && getSortedData().some(({ record }) => filteredEmployees.find(emp => emp.id === record.employeeId)) ? (
               getSortedData().map(({ record, originalIndex }) => {
                 const employee = filteredEmployees.find(
                   emp => emp.id === record.employeeId

@@ -4,15 +4,20 @@ import { useEmployees } from "@/contexts/EmployeeContext";
 import { useAttendance } from "@/contexts/AttendanceContext";
 
 export const useAttendanceData = (canEdit: boolean) => {
-  const { filteredEmployees } = useEmployees();
+  const { filteredEmployees, loading: employeesLoading } = useEmployees();
   const { currentDate, getRecordsByEmployeeAndDate } = useAttendance();
   const [attendanceData, setAttendanceData] = useState<AttendanceRecord[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [lastFetchedDate, setLastFetchedDate] = useState<string>('');
 
+  // Effect to fetch attendance data when either date changes or employees load
   useEffect(() => {
-    // Force refresh when date changes
-    if (currentDate !== lastFetchedDate) {
+    // Only fetch if we have employees and the date changed or employees just loaded
+    if ((filteredEmployees.length > 0 && currentDate !== lastFetchedDate) || 
+        (filteredEmployees.length > 0 && employeesLoading === false && attendanceData.length === 0)) {
+      
+      console.log(`Fetching attendance data: date=${currentDate}, employees=${filteredEmployees.length}, lastFetch=${lastFetchedDate}`);
+      
       const fetchAttendanceData = async () => {
         setIsLoading(true);
         const activeEmployees = filteredEmployees.filter(emp => emp.status === "Active");
@@ -39,6 +44,7 @@ export const useAttendanceData = (canEdit: boolean) => {
           });
           
           const results = await Promise.all(attendancePromises);
+          console.log(`Loaded ${results.length} attendance records for ${currentDate}`);
           setAttendanceData(results);
           setLastFetchedDate(currentDate); // Update last fetched date
         } catch (error) {
@@ -50,7 +56,7 @@ export const useAttendanceData = (canEdit: boolean) => {
       
       fetchAttendanceData();
     }
-  }, [filteredEmployees, currentDate, getRecordsByEmployeeAndDate, lastFetchedDate]);
+  }, [filteredEmployees, currentDate, getRecordsByEmployeeAndDate, lastFetchedDate, employeesLoading, attendanceData.length]);
 
   const toggleAttendance = (index: number) => {
     if (!canEdit) return;
@@ -100,7 +106,7 @@ export const useAttendanceData = (canEdit: boolean) => {
 
   return {
     attendanceData,
-    isLoading,
+    isLoading: isLoading || employeesLoading, // Consider both loading states
     toggleAttendance,
     handleTimeChange,
     handleOvertimeChange,

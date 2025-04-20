@@ -16,10 +16,11 @@ import { supabase } from "@/integrations/supabase/client";
 
 const Attendance = () => {
   const { user } = useAuth();
-  const { filteredEmployees } = useEmployees();
+  const { filteredEmployees, loading: employeesLoading } = useEmployees();
   const { currentDate, setCurrentDate } = useAttendance();
   const { NotificationContainer } = useNotification();
   const [actualRecordCount, setActualRecordCount] = useState(0);
+  const [recordsLoading, setRecordsLoading] = useState(true);
   
   const canEdit = user?.permissions.attendees.edit;
   
@@ -44,9 +45,10 @@ const Attendance = () => {
     handleBulkUpdate
   } = useAttendanceOperations(canEdit);
 
-  // This useEffect will fetch the actual count from Supabase
+  // Fetch the actual record count from Supabase
   useEffect(() => {
     const fetchActualRecordCount = async () => {
+      setRecordsLoading(true);
       try {
         // Make sure we're always using the current date from context
         console.log("Attendance - Fetching record count for date:", currentDate);
@@ -64,6 +66,8 @@ const Attendance = () => {
         setActualRecordCount(count || 0);
       } catch (err) {
         console.error('Failed to fetch attendance count:', err);
+      } finally {
+        setRecordsLoading(false);
       }
     };
 
@@ -76,6 +80,9 @@ const Attendance = () => {
     // Clean up interval on unmount
     return () => clearInterval(timerId);
   }, [currentDate]);
+
+  // Combined loading state
+  const combinedLoading = isLoading || recordsLoading || employeesLoading;
 
   return (
     <div className="space-y-4 sm:space-y-6 animate-fade-in pb-20">
@@ -101,7 +108,7 @@ const Attendance = () => {
         onTimeChange={handleTimeChange}
         onOvertimeChange={handleOvertimeChange}
         onNoteChange={handleNoteChange}
-        isLoading={isLoading}
+        isLoading={combinedLoading}
       />
 
       <BulkUpdateDialog 

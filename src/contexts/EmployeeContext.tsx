@@ -25,6 +25,7 @@ export const EmployeeProvider = ({ children }: { children: ReactNode }) => {
     setLoading
   );
 
+  // Export loading state to consumers to help with synchronization
   return (
     <EmployeeContext.Provider
       value={{
