@@ -10,10 +10,6 @@ interface DashboardStats {
   absentToday: number;
 }
 
-const getFormattedToday = (): string => {
-  return new Date().toISOString().split("T")[0];
-};
-
 const getTodayAttendanceRecords = (
   attendanceRecords: AttendanceRecord[],
   date: string
@@ -31,7 +27,7 @@ const calculateAttendanceCounts = (records: AttendanceRecord[]) => {
   };
 };
 
-export const useStatistics = () => {
+export const useStatistics = (selectedDate: string) => {
   const { filteredEmployees } = useEmployees();
   const { attendanceRecords } = useAttendance();
   const [stats, setStats] = useState<DashboardStats>({
@@ -41,8 +37,7 @@ export const useStatistics = () => {
   });
 
   useEffect(() => {
-    const today = getFormattedToday();
-    const todayRecords = getTodayAttendanceRecords(attendanceRecords, today);
+    const todayRecords = getTodayAttendanceRecords(attendanceRecords, selectedDate);
     const { presentCount, absentCount } = calculateAttendanceCounts(todayRecords);
 
     setStats({
@@ -50,7 +45,7 @@ export const useStatistics = () => {
       presentToday: presentCount,
       absentToday: absentCount,
     });
-  }, [filteredEmployees, attendanceRecords]);
+  }, [filteredEmployees, attendanceRecords, selectedDate]);
 
   return stats;
 };

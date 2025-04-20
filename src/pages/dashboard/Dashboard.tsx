@@ -1,14 +1,16 @@
 
 import { useAuth } from "@/contexts/AuthContext";
 import { format } from "date-fns";
-import { BarChart3, User, UserCheck, UserX } from "lucide-react";
+import { User, UserCheck, UserX } from "lucide-react";
 import { StatsCard } from "@/components/dashboard/StatsCard";
 import { useStatistics } from "@/hooks/useStatistics";
 import Attendance from "@/pages/attendance/Attendance";
+import { useAttendance } from "@/contexts/AttendanceContext";
 
 const Dashboard = () => {
   const { user } = useAuth();
-  const stats = useStatistics();
+  const { currentDate } = useAttendance();
+  const stats = useStatistics(currentDate);
 
   return (
     <div className="space-y-6 animate-fade-in">
