@@ -3,9 +3,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { format } from "date-fns";
 import { BarChart3, User, UserCheck, UserX } from "lucide-react";
 import { StatsCard } from "@/components/dashboard/StatsCard";
-import { RecentEmployees } from "@/components/dashboard/RecentEmployees";
-import { AttendanceChart } from "@/components/dashboard/AttendanceChart";
 import { useStatistics } from "@/hooks/useStatistics";
+import Attendance from "@/pages/attendance/Attendance";
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -52,13 +51,8 @@ const Dashboard = () => {
         />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <RecentEmployees />
-        <AttendanceChart
-          presentToday={stats.presentToday}
-          absentToday={stats.absentToday}
-          activeEmployees={stats.activeEmployees}
-        />
+      <div className="mt-6">
+        <Attendance />
       </div>
     </div>
   );
