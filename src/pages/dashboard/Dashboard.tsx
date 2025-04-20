@@ -11,15 +11,15 @@ import { useEffect } from "react";
 const Dashboard = () => {
   const { user } = useAuth();
   const { currentDate, setCurrentDate } = useAttendance();
-  const stats = useStatistics(currentDate);
+  const today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
+  const stats = useStatistics(today); // Always use today's date for statistics
 
-  // Reset to current day whenever Dashboard mounts
+  // Always set to current day when Dashboard mounts
   useEffect(() => {
     if (setCurrentDate) {
-      const today = new Date().toISOString().split('T')[0];
       setCurrentDate(today);
     }
-  }, [setCurrentDate]);
+  }, [setCurrentDate, today]);
 
   return (
     <div className="space-y-6 animate-fade-in">
