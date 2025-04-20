@@ -73,8 +73,17 @@ const convertToPDF = (data: Record<string, any>[]): Uint8Array => {
   // Add title
   doc.setFontSize(16);
   doc.text("Generated Report", 14, 15);
+  
+  // Format the date correctly
+  const currentDate = new Date();
+  const formattedDate = currentDate.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+  
   doc.setFontSize(12);
-  doc.text("Date: " + new Date().toLocaleDateString(), 14, 22);
+  doc.text(`Date: ${formattedDate}`, 14, 22);
   
   // Add table with data
   autoTable(doc, {
