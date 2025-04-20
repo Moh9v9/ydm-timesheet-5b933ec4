@@ -17,10 +17,12 @@ interface DateRangeInputsProps {
 
 const DateRangeInputs = ({ reportType, currentDate }: DateRangeInputsProps) => {
   const [date, setDate] = React.useState<Date>(new Date(currentDate));
+  const [open, setOpen] = React.useState(false);
 
   const handleSelect = (selectedDate: Date | undefined) => {
     if (selectedDate) {
       setDate(selectedDate);
+      setOpen(false); // Close the popover after selection
     }
   };
 
@@ -30,7 +32,7 @@ const DateRangeInputs = ({ reportType, currentDate }: DateRangeInputsProps) => {
         <label htmlFor="date" className="block text-sm font-medium mb-1 dark:text-gray-200">
           Select Date
         </label>
-        <Popover>
+        <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
             <button
               className="w-full flex items-center px-3 py-2 text-left border rounded-md dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100 text-sm"
@@ -58,7 +60,7 @@ const DateRangeInputs = ({ reportType, currentDate }: DateRangeInputsProps) => {
         <label htmlFor="week" className="block text-sm font-medium mb-1 dark:text-gray-200">
           Select Week
         </label>
-        <Popover>
+        <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
             <button
               className="w-full flex items-center px-3 py-2 text-left border rounded-md dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100 text-sm"
@@ -86,7 +88,7 @@ const DateRangeInputs = ({ reportType, currentDate }: DateRangeInputsProps) => {
         <label htmlFor="month" className="block text-sm font-medium mb-1 dark:text-gray-200">
           Select Month
         </label>
-        <Popover>
+        <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
             <button
               className="w-full flex items-center px-3 py-2 text-left border rounded-md dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100 text-sm"
