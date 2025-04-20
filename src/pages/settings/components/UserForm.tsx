@@ -68,25 +68,38 @@ export const UserForm = ({ currentUser, onSubmit, onCancel, isSubmitting }: User
     let newPermissions = { ...formData.permissions };
 
     if (section === 'employees') {
-      if (permission === 'view' && !formData.permissions.employees.view) {
-        newPermissions.employees.view = true;
-      } else if (permission === 'view' && formData.permissions.employees.view) {
-        newPermissions.employees = {
-          view: false,
-          edit: false,
-          delete: false,
-        };
-        newPermissions.attendees.view = false;
+      if (permission === 'view') {
+        // When toggling employee view permission
+        const newViewValue = !formData.permissions.employees.view;
+        newPermissions.employees.view = newViewValue;
+        
+        // If turning off employees view, also turn off attendees view and all dependent permissions
+        if (!newViewValue) {
+          newPermissions.employees.edit = false;
+          newPermissions.employees.delete = false;
+          newPermissions.attendees.view = false;
+          newPermissions.attendees.edit = false;
+        }
       } else {
+        // For edit and delete permissions
         newPermissions.employees = {
           ...newPermissions.employees,
           [permission]: !newPermissions.employees[permission as keyof typeof newPermissions.employees],
         };
       }
     } else if (section === 'attendees') {
-      if (permission === 'view' && !formData.permissions.attendees.view) {
-        newPermissions.employees.view = true;
-        newPermissions.attendees.view = true;
+      if (permission === 'view') {
+        const newViewValue = !formData.permissions.attendees.view;
+        
+        // You can't view attendees without viewing employees first
+        if (newViewValue) {
+          newPermissions.employees.view = true; // Ensure employee view is enabled when enabling attendee view
+          newPermissions.attendees.view = true;
+        } else {
+          // Just turn off attendee view and edit if disabling view
+          newPermissions.attendees.view = false;
+          newPermissions.attendees.edit = false;
+        }
       } else if (permission === 'edit') {
         newPermissions.attendees.edit = !newPermissions.attendees.edit;
       }
