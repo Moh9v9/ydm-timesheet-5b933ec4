@@ -1,4 +1,3 @@
-
 // Authentication & User Management Types
 export type UserRole = "admin" | "user";
 
@@ -12,9 +11,16 @@ export interface AppUser {
 }
 
 export interface UserPermissions {
-  view: boolean;
-  edit: boolean;
-  delete: boolean;
+  employees: {
+    view: boolean;
+    edit: boolean;
+    delete: boolean;
+  };
+  attendees: {
+    view: boolean;
+    edit: boolean;
+  };
+  export: boolean;
 }
 
 // Employee Types

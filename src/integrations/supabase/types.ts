@@ -51,7 +51,11 @@ export type Database = {
       [_ in never]: never
     }
     CompositeTypes: {
-      [_ in never]: never
+      permission_level: {
+        employees: Json | null
+        attendees: Json | null
+        export: boolean | null
+      }
     }
   }
 }
