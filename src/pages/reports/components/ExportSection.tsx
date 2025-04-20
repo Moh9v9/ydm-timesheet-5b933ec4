@@ -69,14 +69,14 @@ const ExportSection = () => {
             <div className="flex items-center justify-between">
               <div>
                 <CardTitle>Attendance Report</CardTitle>
-                <CardDescription>Generate attendance data for selected time period</CardDescription>
+                <CardDescription>Generate detailed attendance reports with advanced filtering options</CardDescription>
               </div>
               <Calendar className="text-gray-400 dark:text-gray-500" size={20} />
             </div>
           </CardHeader>
           
           <CardContent>
-            <div className="flex justify-between items-center mb-4">
+            <div className="flex justify-between items-start mb-4">
               <div className="flex-1">
                 <ReportSelectionForm
                   reportType={reportType}
@@ -94,7 +94,7 @@ const ExportSection = () => {
                 onClick={() => setShowFilters(!showFilters)}
               >
                 <Filter size={16} />
-                {showFilters ? "Hide Filters" : "More Filters"}
+                {showFilters ? "Hide Filters" : "Show Filters"}
               </Button>
             </div>
             
