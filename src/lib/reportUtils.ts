@@ -1,4 +1,3 @@
-
 import { AttendanceRecord, Employee, ExportFormat } from "./types";
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
@@ -75,12 +74,9 @@ const convertToPDF = (data: Record<string, any>[]): Uint8Array => {
   doc.setTextColor(40, 40, 40);
   doc.text("YDM TimeSheet", 14, 13);
   
-  // Add title below with smaller font size
-  doc.setFontSize(16);
-  doc.setTextColor(0, 0, 0);
-  doc.text("Generated Report", 14, 20);
+  // Removed "Generated Report" text from the header
   
-  // Format the date correctly with en-US locale and correct options
+  // Format the date correctly with en-US locale and options
   const currentDate = new Date();
   const formattedDate = currentDate.toLocaleDateString('en-US', {
     year: 'numeric',
