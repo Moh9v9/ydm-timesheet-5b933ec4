@@ -18,18 +18,23 @@ export const useEmployeeOperations = (
     setLoading(true);
     try {
       // Check if employeeId already exists (if it's provided)
-      if (employee.employeeId) {
+      if (employee.employeeId && employee.employeeId.trim() !== '') {
         const existingEmployee = employees.find(emp => emp.employeeId === employee.employeeId);
         if (existingEmployee) {
           throw new Error(`An employee with ID ${employee.employeeId} already exists`);
         }
       }
 
+      // Set employeeId to null if it's empty
+      const employeeId = employee.employeeId && employee.employeeId.trim() !== '' 
+        ? employee.employeeId 
+        : null;
+
       const { data, error } = await supabase
         .from('employees')
         .insert({
           full_name: employee.fullName,
-          employee_id: employee.employeeId || null, // Make it null if empty
+          employee_id: employeeId,
           project: employee.project,
           location: employee.location,
           job_title: employee.jobTitle,
@@ -47,7 +52,7 @@ export const useEmployeeOperations = (
       const newEmployee: Employee = {
         id: data.id,
         fullName: data.full_name,
-        employeeId: data.employee_id,
+        employeeId: data.employee_id || '',
         project: data.project,
         location: data.location,
         jobTitle: data.job_title,
@@ -71,11 +76,16 @@ export const useEmployeeOperations = (
   const updateEmployee = async (id: string, employeeData: Partial<Employee>): Promise<Employee> => {
     setLoading(true);
     try {
+      // Set employeeId to null if it's empty
+      const employeeId = employeeData.employeeId && employeeData.employeeId.trim() !== '' 
+        ? employeeData.employeeId 
+        : null;
+
       const { data, error } = await supabase
         .from('employees')
         .update({
           full_name: employeeData.fullName,
-          employee_id: employeeData.employeeId,
+          employee_id: employeeId,
           project: employeeData.project,
           location: employeeData.location,
           job_title: employeeData.jobTitle,
@@ -94,7 +104,7 @@ export const useEmployeeOperations = (
       const updatedEmployee: Employee = {
         id: data.id,
         fullName: data.full_name,
-        employeeId: data.employee_id,
+        employeeId: data.employee_id || '',
         project: data.project,
         location: data.location,
         jobTitle: data.job_title,

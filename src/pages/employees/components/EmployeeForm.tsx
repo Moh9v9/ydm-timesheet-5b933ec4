@@ -98,7 +98,7 @@ export const EmployeeForm = ({ initialData, onSubmit, isSubmitting, onClose }: E
       </EmployeeFormField>
 
       <EmployeeFormField 
-        label="Employee ID" 
+        label="Employee ID (Optional)" 
         name="employeeId"
         error={errors.employeeId}
       >
@@ -109,6 +109,7 @@ export const EmployeeForm = ({ initialData, onSubmit, isSubmitting, onClose }: E
           value={formData.employeeId}
           onChange={handleChange}
           className={`w-full p-2 border ${errors.employeeId ? 'border-destructive' : 'border-input'} rounded-md dark:bg-gray-800 dark:border-gray-700 dark:text-white`}
+          placeholder="Leave blank to auto-generate"
         />
       </EmployeeFormField>
 

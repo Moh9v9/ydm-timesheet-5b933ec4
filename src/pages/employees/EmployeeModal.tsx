@@ -14,7 +14,7 @@ const EmployeeModal = ({ employee, onClose }: EmployeeModalProps) => {
   // Initialize form data based on employee prop or defaults
   const initialData: EmployeeFormData = employee ? {
     fullName: employee.fullName,
-    employeeId: employee.employeeId,
+    employeeId: employee.employeeId || '',
     project: employee.project,
     location: employee.location,
     jobTitle: employee.jobTitle,
@@ -51,8 +51,7 @@ const EmployeeModal = ({ employee, onClose }: EmployeeModalProps) => {
       onClose();
     } catch (error: any) {
       console.error("Error saving employee:", error);
-      // Let the form component handle the error display
-      throw error;
+      toast.error(error.message || "Error saving employee");
     } finally {
       setIsSubmitting(false);
     }
