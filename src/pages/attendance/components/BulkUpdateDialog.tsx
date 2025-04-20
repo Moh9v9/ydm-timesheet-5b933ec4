@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import {
   Dialog,
@@ -9,6 +8,8 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Check, X } from "lucide-react";
 
 interface BulkUpdateDialogProps {
   open: boolean;
@@ -48,24 +49,28 @@ const BulkUpdateDialog = ({ open, onClose, onConfirm }: BulkUpdateDialogProps) =
         
         <div className="grid gap-4 py-4">
           <div className="flex items-center gap-4">
-            <label className="text-right font-medium min-w-24">Status:</label>
-            <div className="flex items-center">
-              <div 
-                className={`relative w-12 h-6 rounded-full cursor-pointer transition-colors ${
-                  present 
-                    ? "bg-primary" 
-                    : "bg-destructive"
-                }`}
-                onClick={() => setPresent(!present)}
-              >
-                <div 
-                  className={`absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${
-                    present ? "translate-x-6" : ""
-                  }`} 
-                />
+            <label className="text-right font-medium min-w-24">Quick Set:</label>
+            <RadioGroup
+              className="flex gap-4"
+              defaultValue={present ? "present" : "absent"}
+              onValueChange={(value) => setPresent(value === "present")}
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="present" id="present" />
+                <label htmlFor="present" className="flex items-center text-sm font-medium gap-1 cursor-pointer">
+                  <Check className="h-4 w-4 text-primary" />
+                  All Present
+                </label>
               </div>
-              <span className="ml-2 font-medium">{present ? "Present" : "Absent"}</span>
-            </div>
+
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="absent" id="absent" />
+                <label htmlFor="absent" className="flex items-center text-sm font-medium gap-1 cursor-pointer">
+                  <X className="h-4 w-4 text-destructive" />
+                  All Absent
+                </label>
+              </div>
+            </RadioGroup>
           </div>
 
           <div className="space-y-4">
