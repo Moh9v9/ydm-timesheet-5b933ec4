@@ -1,4 +1,3 @@
-
 import { AttendanceRecord } from "@/lib/types";
 import { Employee } from "@/lib/types";
 import AttendanceTableRow from "./AttendanceTableRow";
@@ -68,10 +67,10 @@ const AttendanceTable = ({
 
   const renderSortIcon = (field: SortField) => {
     if (sortField !== field) return null;
-    
+    // Show the opposite icon of the current sort direction
     return sortOrder === "asc" ? 
-      <ArrowUpAZ className="inline-block ml-1 w-4 h-4" /> : 
-      <ArrowDownAZ className="inline-block ml-1 w-4 h-4" />;
+      <ArrowDownAZ className="inline-block ml-1 w-4 h-4" /> : 
+      <ArrowUpAZ className="inline-block ml-1 w-4 h-4" />;
   };
 
   return (
