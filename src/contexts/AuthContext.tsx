@@ -16,7 +16,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     login: async (email: string, password: string) => {
       try {
         const userData = await operations.login(email, password);
-        // We'll let the auth state listener handle the session and user update
+        // Update local state immediately for faster UI feedback
+        setUser(userData);
         return userData;
       } catch (error) {
         console.error("Enhanced login error:", error);

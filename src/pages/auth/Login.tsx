@@ -6,34 +6,22 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { toast } from "sonner";
 import MainLayout from "@/components/layout/MainLayout";
 import { Moon, Sun } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [redirectAttempted, setRedirectAttempted] = useState(false);
-  const { login } = useAuth();
+  const { login, user, loading } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
 
-  // Check for existing session on mount
+  // Check if user is already authenticated
   useEffect(() => {
-    const checkSession = async () => {
-      try {
-        const { data } = await supabase.auth.getSession();
-        
-        if (data.session) {
-          console.log("Active session found, navigating to dashboard");
-          navigate("/");
-        }
-      } catch (error) {
-        console.error("Session check error:", error);
-      }
-    };
-    
-    checkSession();
-  }, [navigate]);
+    if (user && !loading) {
+      console.log("User already logged in, redirecting to dashboard");
+      navigate("/", { replace: true });
+    }
+  }, [user, loading, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

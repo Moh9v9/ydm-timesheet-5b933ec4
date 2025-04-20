@@ -3,7 +3,7 @@ import { ReactNode, useState, useEffect } from "react";
 import Sidebar from "./Sidebar";
 import TopBar from "./TopBar";
 import { useAuth } from "@/contexts/AuthContext";
-import { Navigate, useNavigate } from "react-router-dom";
+import { Navigate, useNavigate, useLocation } from "react-router-dom";
 
 interface MainLayoutProps {
   children: ReactNode;
@@ -12,8 +12,9 @@ interface MainLayoutProps {
 
 const MainLayout = ({ children, requireAuth = true }: MainLayoutProps) => {
   const { user, loading } = useAuth();
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Default closed on mobile
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   
   // Close sidebar by default on mobile devices
   useEffect(() => {
@@ -31,10 +32,21 @@ const MainLayout = ({ children, requireAuth = true }: MainLayoutProps) => {
 
   // Handle authentication state changes
   useEffect(() => {
+    console.log("MainLayout auth check - User:", !!user, "Loading:", loading, "RequireAuth:", requireAuth);
+    
     if (!loading && requireAuth && !user) {
+      console.log("No user found, redirecting to login");
       navigate("/login");
     }
   }, [loading, user, requireAuth, navigate]);
+
+  // Handle authenticated user on auth pages
+  useEffect(() => {
+    if (!loading && user && location.pathname === "/login") {
+      console.log("User already authenticated, redirecting from login to dashboard");
+      navigate("/", { replace: true });
+    }
+  }, [loading, user, location.pathname, navigate]);
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
