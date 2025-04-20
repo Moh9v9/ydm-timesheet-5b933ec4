@@ -1,22 +1,20 @@
+
 import { useState, useEffect } from "react";
 import { useEmployees } from "@/contexts/EmployeeContext";
 import { useAttendance } from "@/contexts/AttendanceContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNotification } from "@/components/ui/notification";
-import { format, parse, addDays, subDays } from "date-fns";
-import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Save } from "lucide-react";
+import { Save } from "lucide-react";
 import { AttendanceRecord } from "@/lib/types";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import DateNavigation from "./components/DateNavigation";
+import AttendanceTable from "./components/AttendanceTable";
 import BulkUpdateDialog from "./components/BulkUpdateDialog";
 import ConfirmDialog from "@/components/ConfirmDialog";
-import { Textarea } from "@/components/ui/textarea";
 
 const Attendance = () => {
   const { user } = useAuth();
   const { filteredEmployees } = useEmployees();
   const { 
-    attendanceRecords, 
     currentDate, 
     setCurrentDate, 
     bulkSaveAttendance, 
@@ -26,32 +24,27 @@ const Attendance = () => {
   
   const [attendanceData, setAttendanceData] = useState<AttendanceRecord[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showDatePicker, setShowDatePicker] = useState(false);
   const [showBulkUpdate, setShowBulkUpdate] = useState(false);
   const [showSaveConfirm, setShowSaveConfirm] = useState(false);
   
   const canEdit = user?.permissions.edit;
-  
-  // Prepare attendance data when employees or date changes
+
   useEffect(() => {
     const activeEmployees = filteredEmployees.filter(emp => emp.status === "Active");
     
-    // Initialize attendance data for each active employee
     const initialAttendanceData = activeEmployees.map(employee => {
-      // Check if existing record for the employee on this date
       const existingRecord = getRecordsByEmployeeAndDate(employee.id, currentDate);
       
       if (existingRecord) {
         return existingRecord;
       } else {
-        // Create new record with default values
         return {
           id: `temp_${employee.id}_${currentDate}`,
           employeeId: employee.id,
           date: currentDate,
-          present: true, 
-          startTime: "07:00", // Updated default start time
-          endTime: "17:00",   // Updated default end time (5 PM = 17:00)
+          present: true,
+          startTime: "07:00",
+          endTime: "17:00",
           overtimeHours: 0
         };
       }
@@ -59,54 +52,25 @@ const Attendance = () => {
     
     setAttendanceData(initialAttendanceData);
   }, [filteredEmployees, currentDate, getRecordsByEmployeeAndDate]);
-  
-  // Navigate to previous day
-  const goToPreviousDay = () => {
-    const date = parse(currentDate, "yyyy-MM-dd", new Date());
-    const prevDate = subDays(date, 1);
-    setCurrentDate(format(prevDate, "yyyy-MM-dd"));
-  };
-  
-  // Navigate to next day
-  const goToNextDay = () => {
-    const date = parse(currentDate, "yyyy-MM-dd", new Date());
-    const nextDate = addDays(date, 1);
-    setCurrentDate(format(nextDate, "yyyy-MM-dd"));
-  };
-  
-  // Set to today
-  const goToToday = () => {
-    setCurrentDate(format(new Date(), "yyyy-MM-dd"));
-  };
-  
-  // Handle date picker change
-  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setCurrentDate(e.target.value);
-    setShowDatePicker(false);
-  };
-  
-  // Toggle attendance status
+
   const toggleAttendance = (index: number) => {
     if (!canEdit) return;
     
     const newData = [...attendanceData];
     newData[index].present = !newData[index].present;
     
-    // If marked as absent, clear times
     if (!newData[index].present) {
       newData[index].startTime = "";
       newData[index].endTime = "";
       newData[index].overtimeHours = 0;
     } else {
-      // If marked as present, set default times
       newData[index].startTime = "07:00";
       newData[index].endTime = "17:00";
     }
     
     setAttendanceData(newData);
   };
-  
-  // Handle time changes
+
   const handleTimeChange = (
     index: number,
     field: "startTime" | "endTime",
@@ -118,8 +82,7 @@ const Attendance = () => {
     newData[index][field] = value;
     setAttendanceData(newData);
   };
-  
-  // Handle overtime hours change
+
   const handleOvertimeChange = (index: number, value: string) => {
     if (!canEdit) return;
     
@@ -127,14 +90,20 @@ const Attendance = () => {
     newData[index].overtimeHours = parseFloat(value) || 0;
     setAttendanceData(newData);
   };
-  
-  // Update the handleSave function
-  const handleSave = async () => {
+
+  const handleNoteChange = (index: number, value: string) => {
+    if (!canEdit) return;
+    
+    const newData = [...attendanceData];
+    newData[index].note = value;
+    setAttendanceData(newData);
+  };
+
+  const handleSave = () => {
     if (!canEdit) {
       error("You don't have permission to edit attendance records");
       return;
     }
-    
     setShowSaveConfirm(true);
   };
 
@@ -153,13 +122,11 @@ const Attendance = () => {
     }
   };
 
-  // Update the handleUpdateAll function
-  const handleUpdateAll = async () => {
+  const handleUpdateAll = () => {
     if (!canEdit) {
       error("You don't have permission to update attendance records");
       return;
     }
-    
     setShowBulkUpdate(true);
   };
 
@@ -191,14 +158,6 @@ const Attendance = () => {
     } finally {
       setIsSubmitting(false);
     }
-  };
-
-  const handleNoteChange = (index: number, value: string) => {
-    if (!canEdit) return;
-    
-    const newData = [...attendanceData];
-    newData[index].note = value;
-    setAttendanceData(newData);
   };
 
   return (
@@ -238,196 +197,20 @@ const Attendance = () => {
         </div>
       </div>
 
-      {/* Date Navigation */}
-      <div className="flex items-center justify-center p-4 bg-card rounded-lg border space-x-4">
-        <button
-          onClick={goToPreviousDay}
-          className="w-10 h-10 rounded-full flex items-center justify-center 
-                     transition-all duration-300 
-                     bg-secondary text-secondary-foreground 
-                     hover:bg-secondary/80 
-                     focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2
-                     shadow-sm hover:shadow-md"
-          aria-label="Previous day"
-        >
-          <ChevronLeft size={20} />
-        </button>
-        
-        <div className="flex items-center space-x-4">
-          <button
-            onClick={goToToday}
-            className="px-4 py-2 bg-primary text-primary-foreground rounded-full text-sm font-medium
-                       hover:bg-primary/90 transition-colors shadow-sm hover:shadow-md"
-          >
-            Today
-          </button>
-          
-          <Popover>
-            <PopoverTrigger asChild>
-              <button
-                className="flex items-center space-x-2 px-6 py-3 border rounded-lg hover:bg-accent/50 
-                           transition-all duration-300 min-w-[280px] justify-center
-                           shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-              >
-                <CalendarIcon size={18} />
-                <span className="font-medium">
-                  {format(parse(currentDate, "yyyy-MM-dd", new Date()), "EEEE, MMMM d, yyyy")}
-                </span>
-              </button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="center">
-              <Calendar
-                mode="single"
-                selected={parse(currentDate, "yyyy-MM-dd", new Date())}
-                onSelect={(date) => {
-                  if (date) {
-                    setCurrentDate(format(date, "yyyy-MM-dd"));
-                  }
-                }}
-                initialFocus
-                className="rounded-md border shadow-md p-3 pointer-events-auto"
-              />
-            </PopoverContent>
-          </Popover>
-        </div>
-        
-        <button
-          onClick={goToNextDay}
-          className="w-10 h-10 rounded-full flex items-center justify-center 
-                     transition-all duration-300 
-                     bg-secondary text-secondary-foreground 
-                     hover:bg-secondary/80 
-                     focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2
-                     shadow-sm hover:shadow-md"
-          aria-label="Next day"
-        >
-          <ChevronRight size={20} />
-        </button>
-      </div>
-      
-      {/* Attendance Table */}
-      <div className="bg-card shadow-sm rounded-lg border overflow-hidden">
-        <div className="data-table-container">
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>Employee</th>
-                <th>Status</th>
-                <th>Start Time</th>
-                <th>End Time</th>
-                <th>Overtime Hours</th>
-                <th>Notes</th>
-              </tr>
-            </thead>
-            <tbody>
-              {attendanceData.length > 0 ? (
-                attendanceData.map((record, index) => {
-                  // Find the corresponding employee
-                  const employee = filteredEmployees.find(
-                    emp => emp.id === record.employeeId
-                  );
-                  
-                  if (!employee) return null;
-                  
-                  return (
-                    <tr key={record.id}>
-                      <td>
-                        <div>
-                          <div className="font-medium">{employee.fullName}</div>
-                          <div className="text-xs text-muted-foreground">{employee.employeeId}</div>
-                        </div>
-                      </td>
-                      
-                      <td>
-                        <div className="flex items-center">
-                          <div 
-                            className={`relative w-12 h-6 rounded-full cursor-pointer transition-colors ${
-                              record.present 
-                                ? "attendance-present" 
-                                : "attendance-absent"
-                            }`}
-                            onClick={() => toggleAttendance(index)}
-                          >
-                            <div 
-                              className={`absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${
-                                record.present ? "translate-x-6" : ""
-                              }`} 
-                            />
-                          </div>
-                          <span className="ml-2">
-                            {record.present ? "Present" : "Absent"}
-                          </span>
-                        </div>
-                      </td>
-                      
-                      <td>
-                        {record.present ? (
-                          <input
-                            type="time"
-                            value={record.startTime}
-                            onChange={(e) => handleTimeChange(index, "startTime", e.target.value)}
-                            disabled={!canEdit || !record.present}
-                            className="p-1 border rounded-md w-28"
-                          />
-                        ) : (
-                          <span className="text-muted-foreground">N/A</span>
-                        )}
-                      </td>
-                      
-                      <td>
-                        {record.present ? (
-                          <input
-                            type="time"
-                            value={record.endTime}
-                            onChange={(e) => handleTimeChange(index, "endTime", e.target.value)}
-                            disabled={!canEdit || !record.present}
-                            className="p-1 border rounded-md w-28"
-                          />
-                        ) : (
-                          <span className="text-muted-foreground">N/A</span>
-                        )}
-                      </td>
-                      
-                      <td>
-                        {record.present ? (
-                          <input
-                            type="number"
-                            min="0"
-                            step="0.5"
-                            value={record.overtimeHours}
-                            onChange={(e) => handleOvertimeChange(index, e.target.value)}
-                            disabled={!canEdit || !record.present}
-                            className="p-1 border rounded-md w-20"
-                          />
-                        ) : (
-                          <span className="text-muted-foreground">0</span>
-                        )}
-                      </td>
-                      <td>
-                        <Textarea
-                          value={record.note || ""}
-                          onChange={(e) => handleNoteChange(index, e.target.value)}
-                          placeholder="Add a note..."
-                          className="min-h-[60px] resize-none w-full"
-                          disabled={!canEdit}
-                        />
-                      </td>
-                    </tr>
-                  );
-                })
-              ) : (
-                <tr>
-                  <td colSpan={5} className="text-center py-4">
-                    No employees found for attendance tracking
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-      
-      
+      <DateNavigation
+        currentDate={currentDate}
+        setCurrentDate={setCurrentDate}
+      />
+
+      <AttendanceTable
+        attendanceData={attendanceData}
+        filteredEmployees={filteredEmployees}
+        canEdit={canEdit}
+        onToggleAttendance={toggleAttendance}
+        onTimeChange={handleTimeChange}
+        onOvertimeChange={handleOvertimeChange}
+        onNoteChange={handleNoteChange}
+      />
 
       <BulkUpdateDialog 
         open={showBulkUpdate}
