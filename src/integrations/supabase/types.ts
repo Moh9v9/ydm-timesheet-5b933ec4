@@ -13,8 +13,8 @@ export type Database = {
         Row: {
           created_at: string | null
           date: string
-          employee_id: string | null
           employee_name: string | null
+          employee_uuid: string | null
           end_time: string | null
           id: string
           note: string | null
@@ -26,8 +26,8 @@ export type Database = {
         Insert: {
           created_at?: string | null
           date: string
-          employee_id?: string | null
           employee_name?: string | null
+          employee_uuid?: string | null
           end_time?: string | null
           id?: string
           note?: string | null
@@ -39,8 +39,8 @@ export type Database = {
         Update: {
           created_at?: string | null
           date?: string
-          employee_id?: string | null
           employee_name?: string | null
+          employee_uuid?: string | null
           end_time?: string | null
           id?: string
           note?: string | null
@@ -51,8 +51,8 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "attendance_records_employee_id_fkey"
-            columns: ["employee_id"]
+            foreignKeyName: "attendance_records_employee_uuid_fkey"
+            columns: ["employee_uuid"]
             isOneToOne: false
             referencedRelation: "employees"
             referencedColumns: ["id"]

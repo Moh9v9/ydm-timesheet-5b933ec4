@@ -1,4 +1,3 @@
-
 import { AttendanceRecord } from "@/lib/types";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -12,18 +11,16 @@ export const useAttendanceOperations = (
     return attendanceRecords.find(record => record.id === id);
   };
 
-  // Get attendance record by employee ID and date
   const getRecordsByEmployeeAndDate = async (employeeId: string, date: string): Promise<AttendanceRecord | null> => {
     const { data, error } = await supabase
       .from('attendance_records')
       .select('*')
-      .eq('employee_id', employeeId)
+      .eq('employee_uuid', employeeId)
       .eq('date', date)
       .single();
 
     if (error) {
       if (error.code === 'PGRST116') {
-        // No data found error - return null instead of throwing
         return null;
       }
       console.error('Error fetching attendance record:', error);
@@ -32,7 +29,7 @@ export const useAttendanceOperations = (
 
     return data ? {
       id: data.id,
-      employeeId: data.employee_id,
+      employeeId: data.employee_uuid,
       employeeName: data.employee_name || '',
       date: data.date,
       present: data.present,
@@ -43,7 +40,6 @@ export const useAttendanceOperations = (
     } : null;
   };
 
-  // Add new attendance record
   const addAttendanceRecord = async (record: Omit<AttendanceRecord, "id">): Promise<AttendanceRecord> => {
     setLoading(true);
     
@@ -51,7 +47,7 @@ export const useAttendanceOperations = (
       const { data, error } = await supabase
         .from('attendance_records')
         .insert({
-          employee_id: record.employeeId,
+          employee_uuid: record.employeeId,
           employee_name: record.employeeName,
           date: record.date,
           present: record.present,
@@ -68,7 +64,7 @@ export const useAttendanceOperations = (
 
       const newRecord: AttendanceRecord = {
         id: data.id,
-        employeeId: data.employee_id,
+        employeeId: data.employee_uuid,
         employeeName: data.employee_name || '',
         date: data.date,
         present: data.present,
@@ -161,25 +157,21 @@ export const useAttendanceOperations = (
     }
   };
 
-  // Bulk save attendance records
   const bulkSaveAttendance = async (
     records: (Omit<AttendanceRecord, "id"> | AttendanceRecord)[]
   ): Promise<AttendanceRecord[]> => {
     setLoading(true);
     
     try {
-      // Prepare records for upsert - remove temporary IDs and format correctly
       const recordsToUpsert = records.map(record => {
-        // Extract real ID if it exists and isn't a temporary ID
         let recordId = null;
         if ('id' in record && !record.id.toString().includes('temp_')) {
           recordId = record.id;
         }
         
         return {
-          // Only include id if it's not a temporary ID
           ...(recordId ? { id: recordId } : {}),
-          employee_id: record.employeeId,
+          employee_uuid: record.employeeId,
           employee_name: record.employeeName,
           date: record.date,
           present: record.present,
@@ -204,12 +196,12 @@ export const useAttendanceOperations = (
 
       const savedRecords: AttendanceRecord[] = data.map(record => ({
         id: record.id,
-        employeeId: record.employee_id,
+        employeeId: record.employee_uuid,
         employeeName: record.employee_name || '',
         date: record.date,
         present: record.present,
         startTime: record.start_time || '',
-        endTime: record.end_time || '',  // Fixed: accessing end_time from each record, not from the data array
+        endTime: record.end_time || '',
         overtimeHours: record.overtime_hours || 0,
         note: record.note || ''
       }));
