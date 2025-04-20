@@ -11,6 +11,7 @@ interface AttendanceTableProps {
   onTimeChange: (index: number, field: "startTime" | "endTime", value: string) => void;
   onOvertimeChange: (index: number, value: string) => void;
   onNoteChange: (index: number, value: string) => void;
+  isLoading?: boolean;
 }
 
 const AttendanceTable = ({
@@ -21,6 +22,7 @@ const AttendanceTable = ({
   onTimeChange,
   onOvertimeChange,
   onNoteChange,
+  isLoading = false,
 }: AttendanceTableProps) => {
   return (
     <div className="bg-card shadow-sm rounded-lg border overflow-hidden">
@@ -37,7 +39,16 @@ const AttendanceTable = ({
             </tr>
           </thead>
           <tbody>
-            {attendanceData.length > 0 ? (
+            {isLoading ? (
+              <tr>
+                <td colSpan={6} className="text-center py-6">
+                  <div className="flex justify-center items-center">
+                    <div className="animate-spin h-5 w-5 mr-3 border-t-2 border-b-2 border-primary rounded-full"></div>
+                    Loading attendance records...
+                  </div>
+                </td>
+              </tr>
+            ) : attendanceData.length > 0 ? (
               attendanceData.map((record, index) => {
                 const employee = filteredEmployees.find(
                   emp => emp.id === record.employeeId

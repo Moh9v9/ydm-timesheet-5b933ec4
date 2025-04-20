@@ -12,7 +12,7 @@ export interface AttendanceContextType {
   updateAttendanceRecord: (id: string, record: Partial<AttendanceRecord>) => Promise<AttendanceRecord>;
   deleteAttendanceRecord: (id: string) => Promise<void>;
   getAttendanceRecord: (id: string) => AttendanceRecord | undefined;
-  getRecordsByEmployeeAndDate: (employeeId: string, date: string) => AttendanceRecord | undefined;
+  getRecordsByEmployeeAndDate: (employeeId: string, date: string) => Promise<AttendanceRecord | null>;
   bulkSaveAttendance: (records: (Omit<AttendanceRecord, "id"> | AttendanceRecord)[]) => Promise<AttendanceRecord[]>;
   loading: boolean;
 }

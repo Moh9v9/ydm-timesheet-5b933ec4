@@ -1,3 +1,4 @@
+
 import { useAuth } from "@/contexts/AuthContext";
 import { useAttendance } from "@/contexts/AttendanceContext";
 import { useEmployees } from "@/contexts/EmployeeContext";
@@ -20,6 +21,7 @@ const Attendance = () => {
   
   const {
     attendanceData,
+    isLoading,
     toggleAttendance,
     handleTimeChange,
     handleOvertimeChange,
@@ -62,6 +64,7 @@ const Attendance = () => {
         onTimeChange={handleTimeChange}
         onOvertimeChange={handleOvertimeChange}
         onNoteChange={handleNoteChange}
+        isLoading={isLoading}
       />
 
       <BulkUpdateDialog 

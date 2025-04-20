@@ -13,7 +13,7 @@ export const useAttendanceOperations = (
   };
 
   // Get attendance record by employee ID and date
-  const getRecordsByEmployeeAndDate = async (employeeId: string, date: string) => {
+  const getRecordsByEmployeeAndDate = async (employeeId: string, date: string): Promise<AttendanceRecord | null> => {
     const { data, error } = await supabase
       .from('attendance_records')
       .select('*')
@@ -22,6 +22,10 @@ export const useAttendanceOperations = (
       .single();
 
     if (error) {
+      if (error.code === 'PGRST116') {
+        // No data found error - return null instead of throwing
+        return null;
+      }
       console.error('Error fetching attendance record:', error);
       return null;
     }

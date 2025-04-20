@@ -8,29 +8,43 @@ export const useAttendanceData = (canEdit: boolean) => {
   const { filteredEmployees } = useEmployees();
   const { currentDate, getRecordsByEmployeeAndDate } = useAttendance();
   const [attendanceData, setAttendanceData] = useState<AttendanceRecord[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const activeEmployees = filteredEmployees.filter(emp => emp.status === "Active");
-    
-    const initialAttendanceData = activeEmployees.map(employee => {
-      const existingRecord = getRecordsByEmployeeAndDate(employee.id, currentDate);
+    const fetchAttendanceData = async () => {
+      setIsLoading(true);
+      const activeEmployees = filteredEmployees.filter(emp => emp.status === "Active");
       
-      if (existingRecord) {
-        return existingRecord;
-      } else {
-        return {
-          id: `temp_${employee.id}_${currentDate}`,
-          employeeId: employee.id,
-          date: currentDate,
-          present: true,
-          startTime: "07:00",
-          endTime: "17:00",
-          overtimeHours: 0
-        };
+      try {
+        const attendancePromises = activeEmployees.map(async (employee) => {
+          const existingRecord = await getRecordsByEmployeeAndDate(employee.id, currentDate);
+          
+          if (existingRecord) {
+            return existingRecord;
+          } else {
+            return {
+              id: `temp_${employee.id}_${currentDate}`,
+              employeeId: employee.id,
+              date: currentDate,
+              present: true,
+              startTime: "07:00",
+              endTime: "17:00",
+              overtimeHours: 0,
+              note: ''
+            };
+          }
+        });
+        
+        const results = await Promise.all(attendancePromises);
+        setAttendanceData(results);
+      } catch (error) {
+        console.error("Error fetching attendance data:", error);
+      } finally {
+        setIsLoading(false);
       }
-    });
+    };
     
-    setAttendanceData(initialAttendanceData);
+    fetchAttendanceData();
   }, [filteredEmployees, currentDate, getRecordsByEmployeeAndDate]);
 
   const toggleAttendance = (index: number) => {
@@ -81,6 +95,7 @@ export const useAttendanceData = (canEdit: boolean) => {
 
   return {
     attendanceData,
+    isLoading,
     toggleAttendance,
     handleTimeChange,
     handleOvertimeChange,
