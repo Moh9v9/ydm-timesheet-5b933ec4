@@ -19,12 +19,13 @@ export const useUsersOperations = (
         throw new Error("A user with this email already exists");
       }
       
-      // Create the user with proper metadata
+      // Create the user with properly structured metadata
       const { data: authData, error: authError } = await supabase.auth.admin.createUser({
         email: user.email,
         password: user.password,
         email_confirm: true,
         user_metadata: {
+          full_name: user.fullName,
           fullName: user.fullName,
           role: user.role,
           permissions: user.permissions

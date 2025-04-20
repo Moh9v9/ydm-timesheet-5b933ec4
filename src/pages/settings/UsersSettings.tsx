@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { useUsers } from "@/contexts/UsersContext";
-import { useNotification } from "@/components/ui/notification";
+import { toast } from "@/components/ui/sonner";
 import { Plus } from "lucide-react";
 import { User } from "@/lib/types";
 import { UserModal } from "./components/UserModal";
@@ -9,7 +9,6 @@ import { UsersTable } from "./components/UsersTable";
 
 const UsersSettings = () => {
   const { users, addUser, updateUser, deleteUser, loading } = useUsers();
-  const { success, error, NotificationContainer } = useNotification();
   
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -32,22 +31,22 @@ const UsersSettings = () => {
     
     try {
       await deleteUser(id);
-      success("User deleted successfully");
+      toast.success("User deleted successfully");
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Failed to delete user";
-      error(errorMessage);
+      toast.error(errorMessage);
     }
   };
   
   const handleSubmit = async (formData: any) => {
     // Validation
     if (!formData.fullName || !formData.email) {
-      error("Name and email are required");
+      toast.error("Name and email are required");
       return;
     }
     
     if (!currentUser && !formData.password) {
-      error("Password is required for new users");
+      toast.error("Password is required for new users");
       return;
     }
     
@@ -60,23 +59,27 @@ const UsersSettings = () => {
           ...formData,
           password: formData.password || undefined
         });
-        success("User updated successfully");
+        toast.success("User updated successfully");
       } else {
-        // Create new user
+        // Create new user with explicit full permissions for admin
         await addUser({
           fullName: formData.fullName,
           email: formData.email,
           password: formData.password,
           role: formData.role,
-          permissions: formData.permissions
+          permissions: formData.role === "admin" ? {
+            view: true,
+            edit: true,
+            delete: true
+          } : formData.permissions
         });
-        success("User created successfully");
+        toast.success("User created successfully");
       }
       
       handleCloseModal();
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Failed to save user";
-      error(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
@@ -84,8 +87,6 @@ const UsersSettings = () => {
 
   return (
     <div>
-      <NotificationContainer />
-      
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-medium">User Management</h2>
         <button
