@@ -427,16 +427,7 @@ const Attendance = () => {
         </div>
       </div>
       
-      {/* Instructions */}
-      <div className="bg-accent text-accent-foreground p-4 rounded-lg text-sm">
-        <h3 className="font-medium mb-2">Instructions:</h3>
-        <ul className="list-disc list-inside space-y-1">
-          <li>Toggle the switch to mark an employee as present or absent</li>
-          <li>Enter start and end times for present employees</li>
-          <li>Add overtime hours if applicable</li>
-          <li>Click 'Save Attendance' to save all records</li>
-        </ul>
-      </div>
+      
 
       <BulkUpdateDialog 
         open={showBulkUpdate}
