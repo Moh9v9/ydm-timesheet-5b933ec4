@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useUsers } from "@/contexts/UsersContext";
 import { useNotification } from "@/components/ui/notification";
@@ -54,10 +55,10 @@ const UsersSettings = () => {
     
     try {
       const newUser = await addUser({
-        fullName: "Mohamed Osman",
-        email: "eng.mohamdOsman@gmail.com",
-        password: "000000",
-        role: "admin",
+        fullName: formData.fullName,
+        email: formData.email,
+        password: formData.password,
+        role: formData.role || "admin",
         permissions: {
           view: true,
           edit: true,
