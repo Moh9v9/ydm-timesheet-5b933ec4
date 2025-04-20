@@ -19,31 +19,39 @@ export const useUsersOperations = (
         throw new Error("A user with this email already exists");
       }
       
-      // Create user with BOTH fullName and full_name in metadata to ensure compatibility
-      const { data: authData, error: authError } = await supabase.auth.admin.createUser({
-        email: user.email,
-        password: user.password,
-        email_confirm: true,
-        user_metadata: {
-          full_name: user.fullName, // Primary field used by the trigger
-          fullName: user.fullName,  // Keep for backward compatibility
+      // Get the current session token
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error("Authentication required");
+      
+      // Call the edge function to create the user
+      const response = await fetch(`${supabase.supabaseUrl}/functions/v1/create-user`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`
+        },
+        body: JSON.stringify({
+          fullName: user.fullName,
+          email: user.email,
+          password: user.password,
           role: user.role,
           permissions: user.permissions
-        }
+        })
       });
       
-      if (authError || !authData.user) {
-        console.error("Auth error:", authError);
-        throw new Error(authError?.message || "Failed to create user");
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to create user");
       }
       
       const newUser: User = {
-        id: authData.user.id,
-        fullName: user.fullName,
-        email: user.email,
+        id: data.user.id,
+        fullName: data.user.fullName,
+        email: data.user.email,
         password: '',
-        role: user.role,
-        permissions: user.permissions
+        role: data.user.role,
+        permissions: data.user.permissions
       };
       
       setUsers([...users, newUser]);
