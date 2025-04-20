@@ -1,4 +1,3 @@
-
 import { User } from "@/lib/types";
 import { supabase } from "@/integrations/supabase/client";
 
