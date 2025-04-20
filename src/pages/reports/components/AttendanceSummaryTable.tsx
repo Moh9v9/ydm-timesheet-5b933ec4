@@ -16,10 +16,13 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { Download, Calendar, FileSpreadsheet, FileText } from "lucide-react";
+import { Download, Calendar, FileSpreadsheet, FileText, check, x as XIcon } from "lucide-react";
 import { useAttendance } from "@/contexts/AttendanceContext";
 import { useEmployees } from "@/contexts/EmployeeContext";
 import { format } from "date-fns";
+
+// Import lucide icons as components
+import { Check, X } from "lucide-react";
 
 interface AttendanceSummaryTableProps {
   view: "daily" | "weekly" | "monthly";
@@ -45,7 +48,7 @@ const AttendanceSummaryTable = ({ view, currentDate }: AttendanceSummaryTablePro
 
   const filteredRecords = getFilteredRecords();
   const totalPages = Math.ceil(filteredRecords.length / itemsPerPage);
-  
+
   // Get the records for the current page
   const paginatedRecords = filteredRecords.slice(
     (currentPage - 1) * itemsPerPage,
@@ -78,12 +81,28 @@ const AttendanceSummaryTable = ({ view, currentDate }: AttendanceSummaryTablePro
     }
   };
 
+  // Determine if there is an attendance record for the selected date (for daily view only)
+  const hasAttendanceForDate = view === "daily" && attendanceRecords.some(record => record.date === currentDate);
+
   return (
     <div>
       <div className="flex items-center justify-between px-4 py-3 border-b dark:border-gray-700">
         <div className="flex items-center gap-2">
           {getReportTypeIcon()}
-          <h3 className="text-sm font-medium capitalize">{view} Summary</h3>
+          <h3 className="text-sm font-medium capitalize flex items-center">
+            {view} Summary
+            {view === "daily" && (
+              <span className="ml-3 flex items-center gap-1">
+                {hasAttendanceForDate 
+                  ? <Check size={16} className="text-green-600" title="Attendance exists" /> 
+                  : <X size={16} className="text-red-500" title="No attendance record" />
+                }
+                <span className="text-xs text-muted-foreground">
+                  {formatDate(currentDate)}
+                </span>
+              </span>
+            )}
+          </h3>
         </div>
         <button className="text-primary hover:text-primary/80 p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
           <Download size={16} />
