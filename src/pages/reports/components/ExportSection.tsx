@@ -6,6 +6,15 @@ import { useNotification } from "@/components/ui/notification";
 import { Download, FileText, FileSpreadsheet } from "lucide-react";
 import { ExportFormat, ReportType } from "@/lib/types";
 
+// Use Radix UI Select component for better dark mode support
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from "@/components/ui/select";
+
 const ExportSection = () => {
   const [reportType, setReportType] = useState<ReportType>("daily");
   const [exportFormat, setExportFormat] = useState<ExportFormat>("csv");
@@ -62,17 +71,20 @@ const ExportSection = () => {
             <label htmlFor="reportType" className="block text-sm font-medium mb-1">
               Report Type
             </label>
-            <select
-              id="reportType"
-              value={reportType}
-              onChange={(e) => setReportType(e.target.value as ReportType)}
-              className="w-full p-2 border border-input rounded-md"
+            <Select 
+              value={reportType} 
+              onValueChange={(value: ReportType) => setReportType(value)}
             >
-              <option value="daily">Daily Attendance</option>
-              <option value="weekly">Weekly Attendance</option>
-              <option value="monthly">Monthly Attendance</option>
-              <option value="employees">Full Employee List</option>
-            </select>
+              <SelectTrigger className="w-full dark:bg-gray-800 dark:border-gray-700 dark:text-white">
+                <SelectValue placeholder="Select Report Type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="daily">Daily Attendance</SelectItem>
+                <SelectItem value="weekly">Weekly Attendance</SelectItem>
+                <SelectItem value="monthly">Monthly Attendance</SelectItem>
+                <SelectItem value="employees">Full Employee List</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
           
           {/* Export Format */}
@@ -80,16 +92,19 @@ const ExportSection = () => {
             <label htmlFor="exportFormat" className="block text-sm font-medium mb-1">
               Export Format
             </label>
-            <select
-              id="exportFormat"
-              value={exportFormat}
-              onChange={(e) => setExportFormat(e.target.value as ExportFormat)}
-              className="w-full p-2 border border-input rounded-md"
+            <Select 
+              value={exportFormat} 
+              onValueChange={(value: ExportFormat) => setExportFormat(value)}
             >
-              <option value="csv">CSV</option>
-              <option value="xlsx">Excel (XLSX)</option>
-              <option value="pdf">PDF</option>
-            </select>
+              <SelectTrigger className="w-full dark:bg-gray-800 dark:border-gray-700 dark:text-white">
+                <SelectValue placeholder="Select Export Format" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="csv">CSV</SelectItem>
+                <SelectItem value="xlsx">Excel (XLSX)</SelectItem>
+                <SelectItem value="pdf">PDF</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
           
           {/* Additional options based on report type */}
@@ -102,7 +117,7 @@ const ExportSection = () => {
                 type="date"
                 id="date"
                 value={currentDate}
-                className="w-full p-2 border border-input rounded-md"
+                className="w-full p-2 border border-input rounded-md dark:bg-gray-800 dark:border-gray-700 dark:text-white"
               />
             </div>
           )}
@@ -115,7 +130,7 @@ const ExportSection = () => {
               <input
                 type="week"
                 id="week"
-                className="w-full p-2 border border-input rounded-md"
+                className="w-full p-2 border border-input rounded-md dark:bg-gray-800 dark:border-gray-700 dark:text-white"
               />
             </div>
           )}
@@ -128,7 +143,7 @@ const ExportSection = () => {
               <input
                 type="month"
                 id="month"
-                className="w-full p-2 border border-input rounded-md"
+                className="w-full p-2 border border-input rounded-md dark:bg-gray-800 dark:border-gray-700 dark:text-white"
               />
             </div>
           )}
