@@ -1,3 +1,4 @@
+
 import { AttendanceRecord } from "@/lib/types";
 import { Employee } from "@/lib/types";
 import AttendanceTableRow from "./AttendanceTableRow";
