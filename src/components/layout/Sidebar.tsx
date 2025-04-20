@@ -6,7 +6,8 @@ import {
   Calendar, 
   Settings, 
   ChevronLeft,
-  BarChart3
+  BarChart3,
+  FileSpreadsheet
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -108,6 +109,20 @@ const Sidebar = ({ isOpen, toggleSidebar }: SidebarProps) => {
             >
               <Calendar size={20} className={isOpen ? "mr-3" : ""} />
               {(isOpen || window.innerWidth < 768) && <span>Attendance</span>}
+            </NavLink>
+
+            <NavLink
+              to="/reports"
+              className={({ isActive }) =>
+                `flex items-center px-3 py-2 rounded-md transition-colors ${
+                  isActive
+                    ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                    : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                } ${!isOpen && "md:justify-center"}`
+              }
+            >
+              <FileSpreadsheet size={20} className={isOpen ? "mr-3" : ""} />
+              {(isOpen || window.innerWidth < 768) && <span>Reports</span>}
             </NavLink>
 
             <NavLink
