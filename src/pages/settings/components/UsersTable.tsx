@@ -1,4 +1,3 @@
-
 import { User } from "@/lib/types";
 import { Edit, Trash2, Users, Calendar, FileText, Eye, Pencil } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -80,6 +79,36 @@ export const UsersTable = ({ users, onEdit, onDelete, loading }: UsersTableProps
     </div>
   );
 
+  const renderPermissions = (user: User) => {
+    if (user.role === 'admin') {
+      return (
+        <div className="text-blue-600 dark:text-blue-400 text-sm italic text-center">
+          Admin users automatically have full permissions
+        </div>
+      );
+    }
+
+    return (
+      <div className="flex flex-wrap gap-4 justify-center">
+        {renderPermissionBadge(
+          <Users size={14} />,
+          "Employees",
+          user.permissions.employees
+        )}
+        {renderPermissionBadge(
+          <Calendar size={14} />,
+          "Attendees",
+          user.permissions.attendees
+        )}
+        {renderPermissionBadge(
+          <FileText size={14} />,
+          "Export",
+          { Allow: user.permissions.export }
+        )}
+      </div>
+    );
+  };
+
   return (
     <div className="rounded-md border bg-card overflow-hidden">
       <div className="w-full overflow-auto">
@@ -106,23 +135,7 @@ export const UsersTable = ({ users, onEdit, onDelete, loading }: UsersTableProps
                       </Badge>
                     </TableCell>
                     <TableCell>
-                      <div className="flex flex-wrap gap-4 justify-center">
-                        {renderPermissionBadge(
-                          <Users size={14} />,
-                          "Employees",
-                          user.permissions.employees
-                        )}
-                        {renderPermissionBadge(
-                          <Calendar size={14} />,
-                          "Attendees",
-                          user.permissions.attendees
-                        )}
-                        {renderPermissionBadge(
-                          <FileText size={14} />,
-                          "Export",
-                          { Allow: user.permissions.export }
-                        )}
-                      </div>
+                      {renderPermissions(user)}
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center space-x-2">
