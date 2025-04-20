@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useEmployees } from "@/contexts/EmployeeContext";
 import { useNotification } from "@/components/ui/notification";
@@ -20,21 +19,19 @@ import {
   downloadFile 
 } from "@/lib/reportUtils";
 import { format } from "date-fns";
+import EmployeeExportFilters from "./export/EmployeeExportFilters";
+import EmployeeExportFormatSelect from "./export/EmployeeExportFormatSelect";
 
 const EmployeeExportSection = () => {
   const [exportFormat, setExportFormat] = useState<ExportFormat>("csv");
   const [isGenerating, setIsGenerating] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
-  
-  // Filters
   const [filters, setFilters] = useState<EmployeeFilters>({});
-  
   const { filteredEmployees, getUniqueValues } = useEmployees();
   const { success, error } = useNotification();
-  
+
   const generateReport = () => {
     setIsGenerating(true);
-    
     setTimeout(() => {
       try {
         const formatName = {
@@ -42,20 +39,11 @@ const EmployeeExportSection = () => {
           xlsx: "Excel",
           pdf: "PDF"
         }[exportFormat];
-        
-        // Format employee data for export
         const formattedData = formatEmployeesForExport(filteredEmployees);
-        
-        // Generate file content
         const { content, mimeType, isBinary } = generateFileContent(formattedData, exportFormat);
-        
-        // Create filename
         const dateStr = format(new Date(), "yyyyMMdd");
         const filename = `employee-data-${dateStr}.${exportFormat}`;
-        
-        // Download the file
         downloadFile(content, filename, mimeType, isBinary);
-        
         success(`Employee data exported as ${formatName} successfully with ${filteredEmployees.length} records`);
         console.log("Export request:", {
           type: "employees",
@@ -72,31 +60,26 @@ const EmployeeExportSection = () => {
     }, 1200);
   };
 
+  // Filters logic
   const handleFilterChange = (key: keyof EmployeeFilters, value: string | undefined) => {
     if (!value || value === "all") {
       const newFilters = { ...filters };
       delete newFilters[key];
       setFilters(newFilters);
     } else {
-      setFilters({ 
-        ...filters, 
-        [key]: value 
+      setFilters({
+        ...filters,
+        [key]: value
       });
     }
   };
-  
-  const exportFormatOptions = [
-    { value: "csv", label: "CSV" },
-    { value: "xlsx", label: "Excel (XLSX)" },
-    { value: "pdf", label: "PDF" }
-  ];
 
   // Get unique values for filters
   const projects = ["all", ...getUniqueValues("project")];
   const locations = ["all", ...getUniqueValues("location")];
   const paymentTypes = ["all", ...getUniqueValues("paymentType")];
   const sponsorships = ["all", ...getUniqueValues("sponsorship")];
-  
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <div className="lg:col-span-2">
@@ -110,20 +93,15 @@ const EmployeeExportSection = () => {
               <FileText className="text-gray-400 dark:text-gray-500" size={20} />
             </div>
           </CardHeader>
-          
+
           <CardContent>
             <div className="flex justify-between items-center mb-4">
-              <StyledSelect
-                label="Export Format"
-                value={exportFormat}
-                onValueChange={(value: ExportFormat) => setExportFormat(value)}
-                placeholder="Select Export Format"
-                options={exportFormatOptions}
-                className="w-64"
+              <EmployeeExportFormatSelect
+                exportFormat={exportFormat}
+                setExportFormat={setExportFormat}
               />
-              
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 className="flex items-center gap-2"
                 onClick={() => setShowFilters(!showFilters)}
               >
@@ -131,56 +109,22 @@ const EmployeeExportSection = () => {
                 {showFilters ? "Hide Filters" : "Show Filters"}
               </Button>
             </div>
-            
-            {showFilters && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4 p-4 border rounded-lg bg-muted/20 dark:bg-gray-800/30">
-                <StyledSelect
-                  label="Project"
-                  value={filters.project || "all"}
-                  onValueChange={(value) => handleFilterChange("project", value === "all" ? undefined : value)}
-                  placeholder="All Projects"
-                  options={projects.map(p => ({ value: p, label: p === "all" ? "All Projects" : p }))}
-                />
-                
-                <StyledSelect
-                  label="Location"
-                  value={filters.location || "all"}
-                  onValueChange={(value) => handleFilterChange("location", value === "all" ? undefined : value)}
-                  placeholder="All Locations"
-                  options={locations.map(l => ({ value: l, label: l === "all" ? "All Locations" : l }))}
-                />
-                
-                <StyledSelect
-                  label="Payment Type"
-                  value={filters.paymentType || "all"}
-                  onValueChange={(value) => handleFilterChange("paymentType", value === "all" ? undefined : value as PaymentType)}
-                  placeholder="All Payment Types"
-                  options={paymentTypes.map(p => ({ value: p, label: p === "all" ? "All Payment Types" : p }))}
-                />
-                
-                <StyledSelect
-                  label="Sponsorship"
-                  value={filters.sponsorship || "all"}
-                  onValueChange={(value) => handleFilterChange("sponsorship", value === "all" ? undefined : value as SponsorshipType)}
-                  placeholder="All Sponsorships"
-                  options={sponsorships.map(s => ({ value: s, label: s === "all" ? "All Sponsorships" : s }))}
-                />
-                
-                <div className="col-span-1 sm:col-span-2">
-                  <small className="text-muted-foreground">
-                    {filteredEmployees.length} employees match the selected filters
-                  </small>
-                </div>
-              </div>
-            )}
-            
+            <EmployeeExportFilters
+              filters={filters}
+              onFilterChange={handleFilterChange}
+              filteredEmployeesCount={filteredEmployees.length}
+              projects={projects}
+              locations={locations}
+              paymentTypes={paymentTypes}
+              sponsorships={sponsorships}
+              show={showFilters}
+            />
             <div className="flex mt-6 justify-between items-center">
               <div>
                 <p className="text-sm text-muted-foreground">
                   Total employees: <strong>{filteredEmployees.length}</strong>
                 </p>
               </div>
-              
               <Button
                 onClick={generateReport}
                 disabled={isGenerating || filteredEmployees.length === 0}
@@ -193,7 +137,6 @@ const EmployeeExportSection = () => {
           </CardContent>
         </Card>
       </div>
-      
       <div className="lg:col-span-1">
         <AvailableReports />
       </div>
