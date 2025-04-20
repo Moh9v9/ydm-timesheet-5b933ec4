@@ -54,14 +54,14 @@ const ExportSection = () => {
         const formattedData = formatAttendanceForExport(attendanceRecords, reportType, currentDate);
         
         // Generate file content
-        const { content, mimeType } = generateFileContent(formattedData, exportFormat);
+        const { content, mimeType, isBinary } = generateFileContent(formattedData, exportFormat);
         
         // Create filename based on report type and date
         const dateStr = format(new Date(currentDate), "yyyyMMdd");
         const filename = `${reportType}-attendance-${dateStr}.${exportFormat}`;
         
         // Download the file
-        downloadFile(content, filename, mimeType);
+        downloadFile(content, filename, mimeType, isBinary);
         
         success(`${reportTypeName} exported as ${formatName} successfully`);
         console.log("Export request:", {

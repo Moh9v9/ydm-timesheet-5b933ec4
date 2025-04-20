@@ -1,5 +1,6 @@
 
 import { AttendanceRecord, Employee, ExportFormat } from "./types";
+import * as XLSX from 'xlsx';
 
 /**
  * Convert data to CSV format
@@ -27,13 +28,22 @@ const convertToCSV = (data: Record<string, any>[]): string => {
 };
 
 /**
- * Convert data to XLSX format (simplified - in real scenario would use a library like xlsx)
- * This is a placeholder that generates CSV as a fallback
+ * Convert data to XLSX format using xlsx library
  */
-const convertToXLSX = (data: Record<string, any>[]): string => {
-  // In a real app, we would use a library like xlsx or exceljs to generate a proper Excel file
-  // For this demo, we'll use CSV as a fallback
-  return convertToCSV(data);
+const convertToXLSX = (data: Record<string, any>[]): Uint8Array => {
+  // Create a new workbook
+  const workbook = XLSX.utils.book_new();
+  
+  // Convert the data to a worksheet
+  const worksheet = XLSX.utils.json_to_sheet(data);
+  
+  // Add the worksheet to the workbook
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Report");
+  
+  // Generate a binary string from the workbook
+  const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+  
+  return new Uint8Array(excelBuffer);
 };
 
 /**
@@ -67,9 +77,10 @@ const convertToPDF = (data: Record<string, any>[]): string => {
 export const generateFileContent = (
   data: Record<string, any>[],
   format: ExportFormat
-): { content: string; mimeType: string } => {
-  let content: string;
+): { content: string | Uint8Array; mimeType: string; isBinary: boolean } => {
+  let content: string | Uint8Array;
   let mimeType: string;
+  let isBinary: boolean = false;
   
   switch (format) {
     case 'csv':
@@ -79,6 +90,7 @@ export const generateFileContent = (
     case 'xlsx':
       content = convertToXLSX(data);
       mimeType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+      isBinary = true;
       break;
     case 'pdf':
       content = convertToPDF(data);
@@ -89,7 +101,7 @@ export const generateFileContent = (
       mimeType = 'text/csv';
   }
   
-  return { content, mimeType };
+  return { content, mimeType, isBinary };
 };
 
 /**
@@ -133,8 +145,12 @@ export const formatEmployeesForExport = (
 /**
  * Download generated file
  */
-export const downloadFile = (content: string, filename: string, mimeType: string): void => {
-  const blob = new Blob([content], { type: mimeType });
+export const downloadFile = (content: string | Uint8Array, filename: string, mimeType: string, isBinary: boolean = false): void => {
+  // Create appropriate blob based on content type
+  const blob = isBinary 
+    ? new Blob([content as Uint8Array], { type: mimeType })
+    : new Blob([content as string], { type: mimeType });
+    
   const url = URL.createObjectURL(blob);
   
   const link = document.createElement('a');

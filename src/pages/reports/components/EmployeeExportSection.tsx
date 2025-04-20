@@ -47,14 +47,14 @@ const EmployeeExportSection = () => {
         const formattedData = formatEmployeesForExport(filteredEmployees);
         
         // Generate file content
-        const { content, mimeType } = generateFileContent(formattedData, exportFormat);
+        const { content, mimeType, isBinary } = generateFileContent(formattedData, exportFormat);
         
         // Create filename
         const dateStr = format(new Date(), "yyyyMMdd");
         const filename = `employee-data-${dateStr}.${exportFormat}`;
         
         // Download the file
-        downloadFile(content, filename, mimeType);
+        downloadFile(content, filename, mimeType, isBinary);
         
         success(`Employee data exported as ${formatName} successfully with ${filteredEmployees.length} records`);
         console.log("Export request:", {
