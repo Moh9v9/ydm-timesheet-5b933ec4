@@ -19,14 +19,14 @@ export const useUsersOperations = (
         throw new Error("A user with this email already exists");
       }
       
-      // Create the user with correctly formatted metadata to match the trigger expectations
+      // Create user with BOTH fullName and full_name in metadata to ensure compatibility
       const { data: authData, error: authError } = await supabase.auth.admin.createUser({
         email: user.email,
         password: user.password,
         email_confirm: true,
         user_metadata: {
-          full_name: user.fullName, // This is crucial - matches the column name in the profiles table
-          fullName: user.fullName,
+          full_name: user.fullName, // Primary field used by the trigger
+          fullName: user.fullName,  // Keep for backward compatibility
           role: user.role,
           permissions: user.permissions
         }

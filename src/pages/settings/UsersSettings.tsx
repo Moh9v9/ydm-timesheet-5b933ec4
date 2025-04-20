@@ -61,7 +61,7 @@ const UsersSettings = () => {
         });
         toast.success("User updated successfully");
       } else {
-        // Create new user - ensure metadata structure matches the database trigger expectations
+        // Create new user - with both full_name and fullName for trigger compatibility
         const userToAdd = {
           fullName: formData.fullName,
           email: formData.email,
