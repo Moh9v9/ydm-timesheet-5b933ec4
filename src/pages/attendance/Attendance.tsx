@@ -1,3 +1,4 @@
+
 import { useAuth } from "@/contexts/AuthContext";
 import { useAttendance } from "@/contexts/AttendanceContext";
 import { useEmployees } from "@/contexts/EmployeeContext";
@@ -10,12 +11,15 @@ import AttendanceHeader from "./components/AttendanceHeader";
 import { useAttendanceData } from "./hooks/useAttendanceData";
 import { useAttendanceOperations } from "./hooks/useAttendanceOperations";
 import AttendanceStatusMark from "./components/AttendanceStatusMark";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 const Attendance = () => {
   const { user } = useAuth();
   const { filteredEmployees } = useEmployees();
   const { currentDate, setCurrentDate } = useAttendance();
   const { NotificationContainer } = useNotification();
+  const [actualRecordCount, setActualRecordCount] = useState(0);
   
   const canEdit = user?.permissions.attendees.edit;
   
@@ -40,10 +44,28 @@ const Attendance = () => {
     handleBulkUpdate
   } = useAttendanceOperations(canEdit);
 
-  // We're using attendanceData and currentDate from useAttendanceData,
-  // but let's check how many records exist for currentDate.
-  const recordsForDate = attendanceData.filter(record => record.date === currentDate);
-  const attendanceCount = recordsForDate.length;
+  // This useEffect will fetch the actual count from Supabase
+  useEffect(() => {
+    const fetchActualRecordCount = async () => {
+      try {
+        const { count, error } = await supabase
+          .from('attendance_records')
+          .select('*', { count: 'exact', head: true })
+          .eq('date', currentDate);
+        
+        if (error) {
+          console.error('Error fetching attendance count:', error);
+          return;
+        }
+        
+        setActualRecordCount(count || 0);
+      } catch (err) {
+        console.error('Failed to fetch attendance count:', err);
+      }
+    };
+
+    fetchActualRecordCount();
+  }, [currentDate]);
 
   return (
     <div className="space-y-4 sm:space-y-6 animate-fade-in pb-20">
@@ -58,7 +80,7 @@ const Attendance = () => {
 
       <div className="flex items-center mb-2">
         <DateNavigation currentDate={currentDate} setCurrentDate={setCurrentDate} />
-        <AttendanceStatusMark attendanceCount={attendanceCount} />
+        <AttendanceStatusMark attendanceCount={actualRecordCount} />
       </div>
 
       <AttendanceTable
