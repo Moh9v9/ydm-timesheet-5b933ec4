@@ -4,8 +4,10 @@ import { useAttendance } from "@/contexts/AttendanceContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNotification } from "@/components/ui/notification";
 import { format, parse, addDays, subDays } from "date-fns";
-import { Calendar, ChevronLeft, ChevronRight, Save } from "lucide-react";
+import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Save } from "lucide-react";
 import { AttendanceRecord } from "@/lib/types";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 const Attendance = () => {
   const { user } = useAuth();
@@ -171,59 +173,69 @@ const Attendance = () => {
       </div>
       
       {/* Date Navigation */}
-      <div className="flex items-center justify-between p-4 bg-card rounded-lg border">
+      <div className="flex items-center justify-center p-4 bg-card rounded-lg border space-x-4">
         <button
           onClick={goToPreviousDay}
-          className="p-2 rounded-md hover:bg-accent flex items-center justify-center 
+          className="w-10 h-10 rounded-full flex items-center justify-center 
                      transition-all duration-300 
                      bg-secondary text-secondary-foreground 
                      hover:bg-secondary/80 
-                     focus:outline-none focus:ring-2 focus:ring-ring 
-                     shadow-md hover:shadow-lg"
+                     focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2
+                     shadow-sm hover:shadow-md"
+          aria-label="Previous day"
         >
-          <ChevronLeft size={24} className="text-current" />
+          <ChevronLeft size={20} />
         </button>
         
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-4">
           <button
             onClick={goToToday}
-            className="px-3 py-1 border rounded-md hover:bg-accent text-sm"
+            className="px-4 py-2 bg-primary text-primary-foreground rounded-full text-sm font-medium
+                       hover:bg-primary/90 transition-colors shadow-sm hover:shadow-md"
           >
             Today
           </button>
           
-          <div className="relative">
-            <button
-              onClick={() => setShowDatePicker(!showDatePicker)}
-              className="flex items-center space-x-2 px-3 py-2 border rounded-md hover:bg-accent"
-            >
-              <Calendar size={16} />
-              <span>{format(parse(currentDate, "yyyy-MM-dd", new Date()), "EEEE, MMMM d, yyyy")}</span>
-            </button>
-            
-            {showDatePicker && (
-              <div className="absolute z-10 mt-1 bg-card border rounded-md shadow-md p-2">
-                <input
-                  type="date"
-                  value={currentDate}
-                  onChange={handleDateChange}
-                  className="p-1 border rounded-md"
-                />
-              </div>
-            )}
-          </div>
+          <Popover>
+            <PopoverTrigger asChild>
+              <button
+                className="flex items-center space-x-2 px-6 py-3 border rounded-lg hover:bg-accent/50 
+                           transition-all duration-300 min-w-[280px] justify-center
+                           shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+              >
+                <CalendarIcon size={18} />
+                <span className="font-medium">
+                  {format(parse(currentDate, "yyyy-MM-dd", new Date()), "EEEE, MMMM d, yyyy")}
+                </span>
+              </button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="center">
+              <Calendar
+                mode="single"
+                selected={parse(currentDate, "yyyy-MM-dd", new Date())}
+                onSelect={(date) => {
+                  if (date) {
+                    setCurrentDate(format(date, "yyyy-MM-dd"));
+                  }
+                }}
+                initialFocus
+                className="rounded-md border shadow-md p-3 pointer-events-auto"
+              />
+            </PopoverContent>
+          </Popover>
         </div>
         
         <button
           onClick={goToNextDay}
-          className="p-2 rounded-md hover:bg-accent flex items-center justify-center 
+          className="w-10 h-10 rounded-full flex items-center justify-center 
                      transition-all duration-300 
                      bg-secondary text-secondary-foreground 
                      hover:bg-secondary/80 
-                     focus:outline-none focus:ring-2 focus:ring-ring 
-                     shadow-md hover:shadow-lg"
+                     focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2
+                     shadow-sm hover:shadow-md"
+          aria-label="Next day"
         >
-          <ChevronRight size={24} className="text-current" />
+          <ChevronRight size={20} />
         </button>
       </div>
       
