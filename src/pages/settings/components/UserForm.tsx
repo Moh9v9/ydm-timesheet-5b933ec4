@@ -1,8 +1,9 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { User, UserRole } from "@/lib/types";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
+import { BasicInfoSection } from "./user-form/BasicInfoSection";
+import { PermissionsSection } from "./user-form/PermissionsSection";
+import { FormActions } from "./user-form/FormActions";
 
 interface UserFormProps {
   currentUser: User | null;
@@ -68,10 +69,8 @@ export const UserForm = ({ currentUser, onSubmit, onCancel, isSubmitting }: User
 
     if (section === 'employees') {
       if (permission === 'view' && !formData.permissions.employees.view) {
-        // When enabling employee view, no other changes needed
         newPermissions.employees.view = true;
       } else if (permission === 'view' && formData.permissions.employees.view) {
-        // When disabling employee view, also disable attendees view and employee edit/delete
         newPermissions.employees = {
           view: false,
           edit: false,
@@ -79,7 +78,6 @@ export const UserForm = ({ currentUser, onSubmit, onCancel, isSubmitting }: User
         };
         newPermissions.attendees.view = false;
       } else {
-        // For edit and delete toggles
         newPermissions.employees = {
           ...newPermissions.employees,
           [permission]: !newPermissions.employees[permission as keyof typeof newPermissions.employees],
@@ -87,7 +85,6 @@ export const UserForm = ({ currentUser, onSubmit, onCancel, isSubmitting }: User
       }
     } else if (section === 'attendees') {
       if (permission === 'view' && !formData.permissions.attendees.view) {
-        // When enabling attendees view, ensure employees view is also enabled
         newPermissions.employees.view = true;
         newPermissions.attendees.view = true;
       } else if (permission === 'edit') {
@@ -95,10 +92,7 @@ export const UserForm = ({ currentUser, onSubmit, onCancel, isSubmitting }: User
       }
     }
 
-    setFormData({
-      ...formData,
-      permissions: newPermissions,
-    });
+    setFormData({ ...formData, permissions: newPermissions });
   };
 
   const handleExportToggle = () => {
@@ -120,172 +114,27 @@ export const UserForm = ({ currentUser, onSubmit, onCancel, isSubmitting }: User
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      {/* Basic Information Fields */}
-      <div className="space-y-4">
-        <div>
-          <Label htmlFor="fullName">Full Name *</Label>
-          <input
-            type="text"
-            id="fullName"
-            name="fullName"
-            value={formData.fullName}
-            onChange={handleInputChange}
-            className="w-full p-2 border border-input rounded-md"
-            required
-          />
-        </div>
-        
-        <div>
-          <Label htmlFor="email">Email Address *</Label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            value={formData.email}
-            onChange={handleInputChange}
-            className="w-full p-2 border border-input rounded-md"
-            required
-          />
-        </div>
-        
-        <div>
-          <Label htmlFor="password">
-            {currentUser ? "Password (leave blank to keep current)" : "Password *"}
-          </Label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            value={formData.password}
-            onChange={handleInputChange}
-            className="w-full p-2 border border-input rounded-md"
-            required={!currentUser}
-          />
-        </div>
+      <BasicInfoSection
+        fullName={formData.fullName}
+        email={formData.email}
+        password={formData.password}
+        role={formData.role}
+        isEditMode={!!currentUser}
+        onInputChange={handleInputChange}
+      />
 
-        <div>
-          <Label htmlFor="role">Role *</Label>
-          <select
-            id="role"
-            name="role"
-            value={formData.role}
-            onChange={handleInputChange}
-            className="w-full p-2 border border-input rounded-md"
-            required
-          >
-            <option value="admin">Admin</option>
-            <option value="user">User</option>
-          </select>
-        </div>
-      </div>
+      <PermissionsSection
+        role={formData.role}
+        permissions={formData.permissions}
+        onPermissionChange={handlePermissionChange}
+        onExportToggle={handleExportToggle}
+      />
 
-      {/* Permissions Section */}
-      {formData.role !== "admin" && (
-        <div className="space-y-6 mt-6">
-          <div className="space-y-4">
-            <h3 className="text-lg font-medium">Employee Permissions</h3>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="emp-view">View Employee List</Label>
-                <Switch
-                  id="emp-view"
-                  checked={formData.permissions.employees.view}
-                  onCheckedChange={() => handlePermissionChange('employees', 'view')}
-                />
-              </div>
-              
-              {formData.permissions.employees.view && (
-                <>
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="emp-edit">Edit Employees</Label>
-                    <Switch
-                      id="emp-edit"
-                      checked={formData.permissions.employees.edit}
-                      onCheckedChange={() => handlePermissionChange('employees', 'edit')}
-                    />
-                  </div>
-                  
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="emp-delete">Delete Employees</Label>
-                    <Switch
-                      id="emp-delete"
-                      checked={formData.permissions.employees.delete}
-                      onCheckedChange={() => handlePermissionChange('employees', 'delete')}
-                    />
-                  </div>
-                </>
-              )}
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            <h3 className="text-lg font-medium">Attendance Permissions</h3>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="att-view">View Attendance</Label>
-                <Switch
-                  id="att-view"
-                  checked={formData.permissions.attendees.view}
-                  onCheckedChange={() => handlePermissionChange('attendees', 'view')}
-                />
-              </div>
-              
-              {formData.permissions.attendees.view && (
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="att-edit">Edit Attendance</Label>
-                  <Switch
-                    id="att-edit"
-                    checked={formData.permissions.attendees.edit}
-                    onCheckedChange={() => handlePermissionChange('attendees', 'edit')}
-                  />
-                </div>
-              )}
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            <h3 className="text-lg font-medium">Report Permissions</h3>
-            <div className="flex items-center justify-between">
-              <Label htmlFor="export-toggle">Allow Export Reports</Label>
-              <Switch
-                id="export-toggle"
-                checked={formData.permissions.export}
-                onCheckedChange={handleExportToggle}
-              />
-            </div>
-          </div>
-        </div>
-      )}
-
-      {formData.role === "admin" && (
-        <div className="bg-blue-50 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300 p-3 rounded-md text-sm">
-          Admin users automatically have full permissions
-        </div>
-      )}
-
-      <div className="flex justify-end space-x-3 pt-4">
-        <button
-          type="button"
-          onClick={onCancel}
-          className="px-4 py-2 border border-input rounded-md"
-          disabled={isSubmitting}
-        >
-          Cancel
-        </button>
-        <button
-          type="submit"
-          className="px-4 py-2 bg-primary text-primary-foreground rounded-md"
-          disabled={isSubmitting}
-        >
-          {isSubmitting
-            ? currentUser
-              ? "Updating..."
-              : "Adding..."
-            : currentUser
-            ? "Update"
-            : "Add"}
-        </button>
-      </div>
+      <FormActions
+        onCancel={onCancel}
+        isSubmitting={isSubmitting}
+        isEditMode={!!currentUser}
+      />
     </form>
   );
 };
