@@ -63,10 +63,9 @@ const EmployeeModal = ({ employee, onClose }: EmployeeModalProps) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validation
-    if (!formData.fullName || !formData.employeeId || !formData.project || 
-        !formData.location || !formData.jobTitle || formData.rateOfPayment <= 0) {
-      error("Please fill in all required fields");
+    // Validation - only check full name
+    if (!formData.fullName) {
+      error("Please fill in the full name");
       return;
     }
     
@@ -124,7 +123,7 @@ const EmployeeModal = ({ employee, onClose }: EmployeeModalProps) => {
           {/* Employee ID */}
           <div>
             <label htmlFor="employeeId" className="block text-sm font-medium mb-1">
-              Employee ID *
+              Employee ID
             </label>
             <input
               type="text"
@@ -133,14 +132,13 @@ const EmployeeModal = ({ employee, onClose }: EmployeeModalProps) => {
               value={formData.employeeId}
               onChange={handleChange}
               className="w-full p-2 border border-input rounded-md"
-              required
             />
           </div>
           
           {/* Project */}
           <div>
             <label htmlFor="project" className="block text-sm font-medium mb-1">
-              Project *
+              Project
             </label>
             <input
               type="text"
@@ -149,14 +147,13 @@ const EmployeeModal = ({ employee, onClose }: EmployeeModalProps) => {
               value={formData.project}
               onChange={handleChange}
               className="w-full p-2 border border-input rounded-md"
-              required
             />
           </div>
           
           {/* Location */}
           <div>
             <label htmlFor="location" className="block text-sm font-medium mb-1">
-              Location *
+              Location
             </label>
             <input
               type="text"
@@ -165,14 +162,13 @@ const EmployeeModal = ({ employee, onClose }: EmployeeModalProps) => {
               value={formData.location}
               onChange={handleChange}
               className="w-full p-2 border border-input rounded-md"
-              required
             />
           </div>
           
           {/* Job Title */}
           <div>
             <label htmlFor="jobTitle" className="block text-sm font-medium mb-1">
-              Job Title *
+              Job Title
             </label>
             <input
               type="text"
@@ -181,14 +177,13 @@ const EmployeeModal = ({ employee, onClose }: EmployeeModalProps) => {
               value={formData.jobTitle}
               onChange={handleChange}
               className="w-full p-2 border border-input rounded-md"
-              required
             />
           </div>
           
           {/* Payment Type */}
           <div>
             <label htmlFor="paymentType" className="block text-sm font-medium mb-1">
-              Payment Type *
+              Payment Type
             </label>
             <select
               id="paymentType"
@@ -196,7 +191,6 @@ const EmployeeModal = ({ employee, onClose }: EmployeeModalProps) => {
               value={formData.paymentType}
               onChange={handleChange}
               className="w-full border border-input rounded-md p-2 bg-background dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:focus:ring-primary"
-              required
             >
               <option value="Monthly">Monthly</option>
               <option value="Daily">Daily</option>
@@ -206,7 +200,7 @@ const EmployeeModal = ({ employee, onClose }: EmployeeModalProps) => {
           {/* Rate of Payment */}
           <div>
             <label htmlFor="rateOfPayment" className="block text-sm font-medium mb-1">
-              Rate of Payment *
+              Rate of Payment
             </label>
             <input
               type="number"
@@ -216,14 +210,13 @@ const EmployeeModal = ({ employee, onClose }: EmployeeModalProps) => {
               onChange={handleChange}
               className="w-full p-2 border border-input rounded-md"
               min="0"
-              required
             />
           </div>
           
           {/* Sponsorship */}
           <div>
             <label htmlFor="sponsorship" className="block text-sm font-medium mb-1">
-              Sponsorship *
+              Sponsorship
             </label>
             <select
               id="sponsorship"
@@ -231,7 +224,6 @@ const EmployeeModal = ({ employee, onClose }: EmployeeModalProps) => {
               value={formData.sponsorship}
               onChange={handleChange}
               className="w-full border border-input rounded-md p-2 bg-background dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:focus:ring-primary"
-              required
             >
               <option value="YDM co">YDM co</option>
               <option value="YDM est">YDM est</option>
@@ -242,7 +234,7 @@ const EmployeeModal = ({ employee, onClose }: EmployeeModalProps) => {
           {/* Status */}
           <div>
             <label htmlFor="status" className="block text-sm font-medium mb-1">
-              Status *
+              Status
             </label>
             <select
               id="status"
@@ -250,7 +242,6 @@ const EmployeeModal = ({ employee, onClose }: EmployeeModalProps) => {
               value={formData.status}
               onChange={handleChange}
               className="w-full border border-input rounded-md p-2 bg-background dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:focus:ring-primary"
-              required
             >
               <option value="Active">Active</option>
               <option value="Archived">Archived</option>
