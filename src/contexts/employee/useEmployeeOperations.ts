@@ -1,5 +1,5 @@
 
-import { Employee } from "@/lib/types";
+import { Employee, PaymentType, SponsorshipType, EmployeeStatus } from "@/lib/types";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -43,10 +43,10 @@ export const useEmployeeOperations = (
         project: data.project,
         location: data.location,
         jobTitle: data.job_title,
-        paymentType: data.payment_type,
+        paymentType: data.payment_type as PaymentType,
         rateOfPayment: data.rate_of_payment,
-        sponsorship: data.sponsorship,
-        status: data.status,
+        sponsorship: data.sponsorship as SponsorshipType,
+        status: data.status as EmployeeStatus,
       };
 
       setEmployees([...employees, newEmployee]);
@@ -90,10 +90,10 @@ export const useEmployeeOperations = (
         project: data.project,
         location: data.location,
         jobTitle: data.job_title,
-        paymentType: data.payment_type,
+        paymentType: data.payment_type as PaymentType,
         rateOfPayment: data.rate_of_payment,
-        sponsorship: data.sponsorship,
-        status: data.status,
+        sponsorship: data.sponsorship as SponsorshipType,
+        status: data.status as EmployeeStatus,
       };
 
       setEmployees(employees.map(emp => emp.id === id ? updatedEmployee : emp));

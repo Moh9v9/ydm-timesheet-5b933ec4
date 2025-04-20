@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { Employee, EmployeeFilters } from "@/lib/types";
+import { Employee, EmployeeFilters, PaymentType, SponsorshipType, EmployeeStatus } from "@/lib/types";
 import { supabase } from "@/integrations/supabase/client";
 
 export const useEmployeeState = () => {
@@ -31,10 +31,10 @@ export const useEmployeeState = () => {
             project: emp.project,
             location: emp.location,
             jobTitle: emp.job_title,
-            paymentType: emp.payment_type,
+            paymentType: emp.payment_type as PaymentType, // Cast to PaymentType
             rateOfPayment: emp.rate_of_payment,
-            sponsorship: emp.sponsorship,
-            status: emp.status,
+            sponsorship: emp.sponsorship as SponsorshipType, // Cast to SponsorshipType
+            status: emp.status as EmployeeStatus, // Cast to EmployeeStatus
           }));
           setEmployees(formattedEmployees);
         }
