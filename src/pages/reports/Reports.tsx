@@ -1,9 +1,8 @@
 
-import { Download, Table, FileSpreadsheet, ChartBar, Users, Calendar } from "lucide-react";
+import { Download, Calendar, Users } from "lucide-react";
 import { useNotification } from "@/components/ui/notification";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import ExportSection from "./components/ExportSection";
-import ViewsSection from "./components/ViewsSection";
 import EmployeeExportSection from "./components/EmployeeExportSection";
 
 const Reports = () => {
@@ -20,73 +19,36 @@ const Reports = () => {
             Generate attendance data and employee insights
           </p>
         </div>
-        
-        <div className="inline-flex gap-2 self-start">
-          <button className="px-3 py-2 bg-primary/10 text-primary rounded-md flex items-center gap-2 text-sm hover:bg-primary/20 transition-colors">
-            <ChartBar size={16} />
-            <span>Analytics</span>
-          </button>
-          <button className="px-3 py-2 bg-primary text-primary-foreground rounded-md flex items-center gap-2 text-sm hover:bg-primary/90 transition-colors">
-            <FileSpreadsheet size={16} />
-            <span>Export</span>
-          </button>
-        </div>
       </div>
       
       <div className="bg-card dark:bg-gray-800/50 border dark:border-gray-700 rounded-xl shadow-sm">
-        <Tabs defaultValue="export" className="w-full">
+        <Tabs defaultValue="attendance" className="w-full">
           <div className="border-b dark:border-gray-700 px-6 pt-4">
             <TabsList className="bg-transparent mb-0 gap-6">
               <TabsTrigger 
-                value="export" 
+                value="attendance" 
                 className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-1 py-3 bg-transparent data-[state=active]:bg-transparent data-[state=active]:shadow-none gap-2"
               >
-                <Download size={16} />
-                <span>Export Reports</span>
+                <Calendar size={16} />
+                <span>Attendance Reports</span>
               </TabsTrigger>
               <TabsTrigger 
-                value="view" 
+                value="employees" 
                 className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-1 py-3 bg-transparent data-[state=active]:bg-transparent data-[state=active]:shadow-none gap-2"
               >
-                <Table size={16} />
-                <span>Views & Summaries</span>
+                <Users size={16} />
+                <span>Employee Reports</span>
               </TabsTrigger>
             </TabsList>
           </div>
           
           <div className="p-6">
-            <TabsContent value="export" className="mt-0">
-              {/* New Tabs for Employees vs Attendance */}
-              <Tabs defaultValue="attendance" className="w-full">
-                <TabsList className="w-full mb-4 flex">
-                  <TabsTrigger 
-                    value="attendance" 
-                    className="flex-1 gap-2"
-                  >
-                    <Calendar size={16} />
-                    <span>Attendance Reports</span>
-                  </TabsTrigger>
-                  <TabsTrigger 
-                    value="employees" 
-                    className="flex-1 gap-2"
-                  >
-                    <Users size={16} />
-                    <span>Employee Reports</span>
-                  </TabsTrigger>
-                </TabsList>
-                
-                <TabsContent value="attendance" className="mt-0 p-0">
-                  <ExportSection />
-                </TabsContent>
-                
-                <TabsContent value="employees" className="mt-0 p-0">
-                  <EmployeeExportSection />
-                </TabsContent>
-              </Tabs>
+            <TabsContent value="attendance" className="mt-0">
+              <ExportSection />
             </TabsContent>
             
-            <TabsContent value="view" className="mt-0">
-              <ViewsSection />
+            <TabsContent value="employees" className="mt-0">
+              <EmployeeExportSection />
             </TabsContent>
           </div>
         </Tabs>
