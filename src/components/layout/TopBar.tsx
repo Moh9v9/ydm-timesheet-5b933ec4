@@ -3,6 +3,18 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { Menu, Sun, Moon, LogOut } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface TopBarProps {
   toggleSidebar: () => void;
@@ -13,14 +25,24 @@ const TopBar = ({ toggleSidebar, isSidebarOpen }: TopBarProps) => {
   const { logout, user } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const navigate = useNavigate();
 
   const handleLogout = () => {
     setShowLogoutConfirm(true);
   };
 
-  const confirmLogout = () => {
-    logout();
-    setShowLogoutConfirm(false);
+  const confirmLogout = async () => {
+    try {
+      setShowLogoutConfirm(false);
+      toast.loading("Logging out...");
+      await logout();
+      // Redirect is handled in the logout function
+    } catch (error) {
+      console.error("Error during logout:", error);
+      toast.error("Logout failed. Please try again.");
+      // Fallback redirect if there's an error
+      navigate("/login");
+    }
   };
 
   const cancelLogout = () => {
@@ -82,32 +104,23 @@ const TopBar = ({ toggleSidebar, isSidebarOpen }: TopBarProps) => {
         </div>
       </div>
 
-      {/* Logout confirmation modal */}
-      {showLogoutConfirm && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm z-50 p-4">
-          <div className="bg-card rounded-lg shadow-lg p-6 max-w-sm w-full mx-4">
-            <h3 className="text-lg font-medium mb-4">Confirm Logout</h3>
-            <p className="mb-6">Are you sure you want to log out?</p>
-            <div className="flex justify-end gap-3">
-              <button
-                onClick={cancelLogout}
-                className="px-4 py-2 bg-secondary text-secondary-foreground rounded-md"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={confirmLogout}
-                className="px-4 py-2 bg-primary text-primary-foreground rounded-md"
-              >
-                Logout
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Using AlertDialog instead of custom modal for better accessibility */}
+      <AlertDialog open={showLogoutConfirm} onOpenChange={setShowLogoutConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirm Logout</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to log out?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={cancelLogout}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmLogout}>Logout</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </header>
   );
 };
 
 export default TopBar;
-

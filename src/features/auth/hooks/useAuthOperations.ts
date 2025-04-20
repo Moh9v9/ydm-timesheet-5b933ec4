@@ -1,3 +1,4 @@
+
 import { User } from "@/lib/types";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -46,11 +47,26 @@ export const useAuthOperations = () => {
 
   const logout = async (): Promise<void> => {
     try {
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
+      // Get the current session first to check if we're logged in
+      const { data: sessionData } = await supabase.auth.getSession();
+      
+      // Only attempt to sign out if we have a session
+      if (sessionData?.session) {
+        const { error } = await supabase.auth.signOut();
+        if (error) throw error;
+      } else {
+        // If no session, consider it already logged out
+        console.log("No active session found, already logged out");
+      }
+
+      // Clear any local state regardless of session status
+      // This ensures the UI updates even if the backend logout had issues
+      window.location.href = "/login";
     } catch (error: any) {
       console.error("Logout error:", error);
-      throw new Error(error.message || "Failed to logout");
+      // Force redirect to login page even if there was an error
+      // This provides a fallback for the user
+      window.location.href = "/login";
     }
   };
 
