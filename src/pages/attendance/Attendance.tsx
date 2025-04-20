@@ -10,7 +10,7 @@ import DateNavigation from "./components/DateNavigation";
 import AttendanceTable from "./components/AttendanceTable";
 import BulkUpdateDialog from "./components/BulkUpdateDialog";
 import ConfirmDialog from "@/components/ConfirmDialog";
-import { Button } from "@/components/ui/button"; // Import Button component
+import { Button } from "@/components/ui/button";
 
 const Attendance = () => {
   const { user } = useAuth();
@@ -179,7 +179,7 @@ const Attendance = () => {
               onClick={handleUpdateAll}
               disabled={isSubmitting}
               variant="secondary"
-              className="w-full flex items-center justify-center"
+              className="w-full min-h-[40px] flex items-center justify-center"
             >
               <Save size={16} className="mr-2" />
               {isSubmitting ? "Updating..." : "Update All"}
@@ -188,7 +188,7 @@ const Attendance = () => {
             <Button 
               onClick={handleSave}
               disabled={isSubmitting}
-              className="w-full flex items-center justify-center"
+              className="w-full min-h-[40px] flex items-center justify-center"
             >
               <Save size={16} className="mr-2" />
               {isSubmitting ? "Saving..." : "Save"}
