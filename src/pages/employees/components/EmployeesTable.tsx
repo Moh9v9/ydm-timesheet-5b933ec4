@@ -1,4 +1,3 @@
-
 import { useAuth } from "@/contexts/AuthContext";
 import { Employee } from "@/lib/types";
 import { Edit, Trash2, ArrowUp, ArrowDown } from "lucide-react";
@@ -29,10 +28,12 @@ export const EmployeesTable = ({
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
+      // If the same column is clicked, toggle the order
       setSortOrder(sortOrder === "asc" ? "desc" : "asc");
     } else {
+      // If a new column is clicked, set the sort field and default to descending
       setSortField(field);
-      setSortOrder("asc");
+      setSortOrder("desc");
     }
   };
 
@@ -138,4 +139,3 @@ export const EmployeesTable = ({
     </div>
   );
 };
-
