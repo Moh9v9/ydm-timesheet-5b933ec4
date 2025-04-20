@@ -1,4 +1,5 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -10,7 +11,6 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [loginSuccess, setLoginSuccess] = useState(false);
   const { login } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
@@ -28,16 +28,14 @@ const Login = () => {
     try {
       await login(email, password);
       
-      // Show success message but don't redirect immediately
-      toast.success("Login successful! Click Continue to proceed.", {
-        duration: 5000,
-        action: {
-          label: "Continue",
-          onClick: () => navigate("/")
-        }
-      });
+      // Show success message and automatically redirect after a short delay
+      toast.success("Login successful! Redirecting to dashboard...");
       
-      setLoginSuccess(true);
+      // Automatically redirect after a short delay (1.5 seconds)
+      setTimeout(() => {
+        navigate("/");
+      }, 1500);
+      
     } catch (err) {
       const errorMessage = err instanceof Error 
         ? err.message 
@@ -88,81 +86,69 @@ const Login = () => {
           
           <div>
             <div className="bg-card shadow-md rounded-lg px-6 py-8">
-              {loginSuccess ? (
-                <div className="text-center space-y-4">
-                  <p className="text-green-600 dark:text-green-400">Login successful!</p>
+              <form className="space-y-6" onSubmit={handleSubmit}>
+                <div>
+                  <label htmlFor="email" className="block text-sm font-medium text-foreground">
+                    Email address
+                  </label>
+                  <div className="mt-1">
+                    <input
+                      id="email"
+                      name="email"
+                      type="email"
+                      autoComplete="email"
+                      required
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="appearance-none block w-full px-3 py-2 border border-input rounded-md shadow-sm 
+                               placeholder-muted-foreground focus:outline-none focus:ring-primary focus:border-primary 
+                               text-foreground bg-background dark:text-white dark:bg-gray-800"
+                      placeholder="you@example.com"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label htmlFor="password" className="block text-sm font-medium text-foreground">
+                    Password
+                  </label>
+                  <div className="mt-1">
+                    <input
+                      id="password"
+                      name="password"
+                      type="password"
+                      autoComplete="current-password"
+                      required
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="appearance-none block w-full px-3 py-2 border border-input rounded-md shadow-sm 
+                               placeholder-muted-foreground focus:outline-none focus:ring-primary focus:border-primary 
+                               text-foreground bg-background dark:text-white dark:bg-gray-800"
+                      placeholder="Password"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div className="text-sm">
+                    <Link to="/forgot-password" className="font-medium text-primary hover:text-primary/80">
+                      Forgot your password?
+                    </Link>
+                  </div>
+                </div>
+
+                <div className="mt-8">
                   <button
-                    onClick={() => navigate("/")}
-                    className="w-full bg-primary text-white py-2 px-4 rounded-md hover:bg-primary/90 transition-colors"
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="group relative w-full flex justify-center py-2 px-4 border border-transparent rounded-md 
+                             text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 
+                             focus:ring-primary disabled:opacity-70 disabled:cursor-not-allowed"
                   >
-                    Continue to Dashboard
+                    {isSubmitting ? "Signing in..." : "Sign in"}
                   </button>
                 </div>
-              ) : (
-                <form className="space-y-6" onSubmit={handleSubmit}>
-                  <div>
-                    <label htmlFor="email" className="block text-sm font-medium text-foreground">
-                      Email address
-                    </label>
-                    <div className="mt-1">
-                      <input
-                        id="email"
-                        name="email"
-                        type="email"
-                        autoComplete="email"
-                        required
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        className="appearance-none block w-full px-3 py-2 border border-input rounded-md shadow-sm 
-                                 placeholder-muted-foreground focus:outline-none focus:ring-primary focus:border-primary 
-                                 text-foreground bg-background dark:text-white dark:bg-gray-800"
-                        placeholder="you@example.com"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label htmlFor="password" className="block text-sm font-medium text-foreground">
-                      Password
-                    </label>
-                    <div className="mt-1">
-                      <input
-                        id="password"
-                        name="password"
-                        type="password"
-                        autoComplete="current-password"
-                        required
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className="appearance-none block w-full px-3 py-2 border border-input rounded-md shadow-sm 
-                                 placeholder-muted-foreground focus:outline-none focus:ring-primary focus:border-primary 
-                                 text-foreground bg-background dark:text-white dark:bg-gray-800"
-                        placeholder="Password"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <div className="text-sm">
-                      <Link to="/forgot-password" className="font-medium text-primary hover:text-primary/80">
-                        Forgot your password?
-                      </Link>
-                    </div>
-                  </div>
-
-                  <div className="mt-8">
-                    <button
-                      type="submit"
-                      disabled={isSubmitting}
-                      className="group relative w-full flex justify-center py-2 px-4 border border-transparent rounded-md 
-                               text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 
-                               focus:ring-primary disabled:opacity-70 disabled:cursor-not-allowed"
-                    >
-                      {isSubmitting ? "Signing in..." : "Sign in"}
-                    </button>
-                  </div>
-                </form>
-              )}
+              </form>
             </div>
           </div>
         </div>
