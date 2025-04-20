@@ -11,7 +11,7 @@ interface EmployeesTableProps {
   onDelete: (id: string) => void;
 }
 
-type SortField = "fullName" | "employeeId" | "project" | "location" | "jobTitle" | "paymentType" | "rateOfPayment" | "sponsorship" | "status";
+type SortField = "fullName" | "iqamaNo" | "project" | "location" | "jobTitle" | "paymentType" | "rateOfPayment" | "sponsorship" | "status";
 type SortDirection = "asc" | "desc";
 
 export const EmployeesTable = ({ 
@@ -49,8 +49,8 @@ export const EmployeesTable = ({
       switch (sortField) {
         case "fullName":
           return direction * (a.employee.fullName || "").localeCompare(b.employee.fullName || "");
-        case "employeeId":
-          return direction * (a.employee.employeeId || "").localeCompare(b.employee.employeeId || "");
+        case "iqamaNo":
+          return direction * ((a.employee.iqamaNo || 0) - (b.employee.iqamaNo || 0));
         case "project":
           return direction * (a.employee.project || "").localeCompare(b.employee.project || "");
         case "location":
@@ -90,8 +90,8 @@ export const EmployeesTable = ({
             <th onClick={() => handleSort("fullName")} className="cursor-pointer hover:bg-muted/30">
               Full Name <SortIcon field="fullName" />
             </th>
-            <th onClick={() => handleSort("employeeId")} className="cursor-pointer hover:bg-muted/30">
-              ID <SortIcon field="employeeId" />
+            <th onClick={() => handleSort("iqamaNo")} className="cursor-pointer hover:bg-muted/30">
+              Iqama No <SortIcon field="iqamaNo" />
             </th>
             <th onClick={() => handleSort("project")} className="cursor-pointer hover:bg-muted/30">
               Project <SortIcon field="project" />
@@ -122,7 +122,7 @@ export const EmployeesTable = ({
             getSortedData().map(({ employee }) => (
               <tr key={employee.id}>
                 <td>{employee.fullName}</td>
-                <td>{employee.employeeId}</td>
+                <td>{employee.iqamaNo || "-"}</td>
                 <td>{employee.project}</td>
                 <td>{employee.location}</td>
                 <td>{employee.jobTitle}</td>

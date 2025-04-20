@@ -3,7 +3,7 @@ import { Employee, PaymentType, SponsorshipType, EmployeeStatus } from "@/lib/ty
 
 export interface EmployeeFormData {
   fullName: string;
-  employeeId: string;
+  iqamaNo: number;
   project: string;
   location: string;
   jobTitle: string;

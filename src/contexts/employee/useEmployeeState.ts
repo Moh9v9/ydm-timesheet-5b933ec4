@@ -37,7 +37,7 @@ export const useEmployeeState = () => {
         const formattedEmployees: Employee[] = data.map(emp => ({
           id: emp.id,
           fullName: emp.full_name,
-          employeeId: emp.employee_id,
+          iqamaNo: emp.iqama_no !== null ? Number(emp.iqama_no) : 0,
           project: emp.project,
           location: emp.location,
           jobTitle: emp.job_title,

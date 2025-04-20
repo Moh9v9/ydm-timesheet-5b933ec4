@@ -31,7 +31,7 @@ export type EmployeeStatus = "Active" | "Archived";
 export interface Employee {
   id: string;
   fullName: string;
-  employeeId: string;
+  iqamaNo: number;           // Changed from employeeId
   project: string;
   location: string;
   jobTitle: string;

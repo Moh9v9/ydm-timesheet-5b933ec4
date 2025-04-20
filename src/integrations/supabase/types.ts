@@ -17,6 +17,7 @@ export type Database = {
           employee_uuid: string | null
           end_time: string | null
           id: string
+          iqama_no: number | null
           note: string | null
           overtime_hours: number | null
           present: boolean
@@ -30,6 +31,7 @@ export type Database = {
           employee_uuid?: string | null
           end_time?: string | null
           id?: string
+          iqama_no?: number | null
           note?: string | null
           overtime_hours?: number | null
           present?: boolean
@@ -43,6 +45,7 @@ export type Database = {
           employee_uuid?: string | null
           end_time?: string | null
           id?: string
+          iqama_no?: number | null
           note?: string | null
           overtime_hours?: number | null
           present?: boolean
@@ -65,6 +68,7 @@ export type Database = {
           employee_id: string | null
           full_name: string
           id: string
+          iqama_no: number | null
           job_title: string
           location: string
           payment_type: string
@@ -79,6 +83,7 @@ export type Database = {
           employee_id?: string | null
           full_name: string
           id?: string
+          iqama_no?: number | null
           job_title: string
           location: string
           payment_type: string
@@ -93,6 +98,7 @@ export type Database = {
           employee_id?: string | null
           full_name?: string
           id?: string
+          iqama_no?: number | null
           job_title?: string
           location?: string
           payment_type?: string

@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { EmployeeFormData, EmployeeFormProps } from "../types/employee-form";
 import { EmployeeFormField } from "./EmployeeFormField";
@@ -19,7 +20,7 @@ export const EmployeeForm = ({ initialData, onSubmit, isSubmitting, onClose }: E
       });
     }
     
-    if (name === "rateOfPayment") {
+    if (name === "rateOfPayment" || name === "iqamaNo") {
       setFormData({
         ...formData,
         [name]: parseFloat(value) || 0,
@@ -35,12 +36,18 @@ export const EmployeeForm = ({ initialData, onSubmit, isSubmitting, onClose }: E
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
     
-    // Required field validation
     if (!formData.fullName.trim()) {
       newErrors.fullName = "Full name is required";
     }
+
+    // Iqama No is optional, but if entered must be a valid number
+    if (
+      formData.iqamaNo &&
+      (isNaN(formData.iqamaNo) || formData.iqamaNo <= 0)
+    ) {
+      newErrors.iqamaNo = "Iqama No must be a positive number";
+    }
     
-    // If there are no errors, we're good to go
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -56,12 +63,11 @@ export const EmployeeForm = ({ initialData, onSubmit, isSubmitting, onClose }: E
     try {
       await onSubmit(formData);
     } catch (error: any) {
-      // Display specific validation errors
-      if (error.message?.includes("duplicate key value")) {
+      if (error.message?.includes("Iqama No")) {
         setErrors({
-          employeeId: "An employee with this ID already exists"
+          iqamaNo: "An employee with this Iqama No already exists"
         });
-        toast.error("An employee with this ID already exists");
+        toast.error("An employee with this Iqama No already exists");
       } else {
         toast.error(error.message || "Error saving employee");
       }
@@ -98,18 +104,19 @@ export const EmployeeForm = ({ initialData, onSubmit, isSubmitting, onClose }: E
       </EmployeeFormField>
 
       <EmployeeFormField 
-        label="Employee ID (Optional)" 
-        name="employeeId"
-        error={errors.employeeId}
+        label="Iqama No (Optional)" 
+        name="iqamaNo"
+        error={errors.iqamaNo}
       >
         <input
-          type="text"
-          id="employeeId"
-          name="employeeId"
-          value={formData.employeeId}
+          type="number"
+          id="iqamaNo"
+          name="iqamaNo"
+          value={formData.iqamaNo || ''}
           onChange={handleChange}
-          className={`w-full p-2 border ${errors.employeeId ? 'border-destructive' : 'border-input'} rounded-md dark:bg-gray-800 dark:border-gray-700 dark:text-white`}
-          placeholder="Leave blank to auto-generate"
+          className={`w-full p-2 border ${errors.iqamaNo ? 'border-destructive' : 'border-input'} rounded-md dark:bg-gray-800 dark:border-gray-700 dark:text-white`}
+          placeholder="Leave blank if unknown"
+          min="0"
         />
       </EmployeeFormField>
 

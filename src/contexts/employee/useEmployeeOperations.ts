@@ -17,24 +17,23 @@ export const useEmployeeOperations = (
   const addEmployee = async (employee: Omit<Employee, "id">): Promise<Employee> => {
     setLoading(true);
     try {
-      // Check if employeeId already exists (if it's provided)
-      if (employee.employeeId && employee.employeeId.trim() !== '') {
-        const existingEmployee = employees.find(emp => emp.employeeId === employee.employeeId);
+      // Check if iqamaNo already exists (if it's provided)
+      if (employee.iqamaNo && employee.iqamaNo !== 0) {
+        const existingEmployee = employees.find(emp => emp.iqamaNo === employee.iqamaNo);
         if (existingEmployee) {
-          throw new Error(`An employee with ID ${employee.employeeId} already exists`);
+          throw new Error(`An employee with Iqama No ${employee.iqamaNo} already exists`);
         }
       }
 
-      // Set employeeId to null if it's empty
-      const employeeId = employee.employeeId && employee.employeeId.trim() !== '' 
-        ? employee.employeeId 
+      const iqamaNo = employee.iqamaNo && employee.iqamaNo !== 0
+        ? employee.iqamaNo
         : null;
 
       const { data, error } = await supabase
         .from('employees')
         .insert({
           full_name: employee.fullName,
-          employee_id: employeeId,
+          iqama_no: iqamaNo,
           project: employee.project,
           location: employee.location,
           job_title: employee.jobTitle,
@@ -52,7 +51,7 @@ export const useEmployeeOperations = (
       const newEmployee: Employee = {
         id: data.id,
         fullName: data.full_name,
-        employeeId: data.employee_id || '',
+        iqamaNo: data.iqama_no !== null ? Number(data.iqama_no) : 0,
         project: data.project,
         location: data.location,
         jobTitle: data.job_title,
@@ -76,16 +75,15 @@ export const useEmployeeOperations = (
   const updateEmployee = async (id: string, employeeData: Partial<Employee>): Promise<Employee> => {
     setLoading(true);
     try {
-      // Set employeeId to null if it's empty
-      const employeeId = employeeData.employeeId && employeeData.employeeId.trim() !== '' 
-        ? employeeData.employeeId 
+      const iqamaNo = employeeData.iqamaNo && employeeData.iqamaNo !== 0 
+        ? employeeData.iqamaNo 
         : null;
 
       const { data, error } = await supabase
         .from('employees')
         .update({
           full_name: employeeData.fullName,
-          employee_id: employeeId,
+          iqama_no: iqamaNo,
           project: employeeData.project,
           location: employeeData.location,
           job_title: employeeData.jobTitle,
@@ -104,7 +102,7 @@ export const useEmployeeOperations = (
       const updatedEmployee: Employee = {
         id: data.id,
         fullName: data.full_name,
-        employeeId: data.employee_id || '',
+        iqamaNo: data.iqama_no !== null ? Number(data.iqama_no) : 0,
         project: data.project,
         location: data.location,
         jobTitle: data.job_title,
@@ -145,7 +143,7 @@ export const useEmployeeOperations = (
 
   // Helper to get unique values for filter dropdowns
   const getUniqueValues = (field: keyof Employee) => {
-    const values = employees.map(emp => emp[field] as string);
+    const values = employees.map(emp => String(emp[field] ?? ''));
     return [...new Set(values)].sort();
   };
 

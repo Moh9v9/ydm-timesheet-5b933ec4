@@ -14,7 +14,7 @@ const EmployeeModal = ({ employee, onClose }: EmployeeModalProps) => {
   // Initialize form data based on employee prop or defaults
   const initialData: EmployeeFormData = employee ? {
     fullName: employee.fullName,
-    employeeId: employee.employeeId || '',
+    iqamaNo: employee.iqamaNo || 0,
     project: employee.project,
     location: employee.location,
     jobTitle: employee.jobTitle,
@@ -24,7 +24,7 @@ const EmployeeModal = ({ employee, onClose }: EmployeeModalProps) => {
     status: employee.status
   } : {
     fullName: "",
-    employeeId: "",
+    iqamaNo: 0,
     project: "",
     location: "",
     jobTitle: "",
