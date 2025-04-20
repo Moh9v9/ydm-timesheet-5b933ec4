@@ -1,8 +1,9 @@
+
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
-import { toast } from "sonner";
+import { toast } from "sonner";  // Explicitly use sonner toast
 import MainLayout from "@/components/layout/MainLayout";
 import { Moon, Sun } from "lucide-react";
 
@@ -33,8 +34,11 @@ const Login = () => {
         ? err.message 
         : "Login failed. Please check your credentials.";
       
-      // Use a single toast notification for login errors
-      toast.error(errorMessage);
+      // Use only sonner toast for login errors
+      toast.error(errorMessage, {
+        duration: 3000,  // Optional: control toast duration
+        position: "top-right"  // Optional: control toast position
+      });
     } finally {
       setIsSubmitting(false);
     }
