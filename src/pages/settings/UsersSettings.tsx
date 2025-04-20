@@ -35,6 +35,7 @@ const UsersSettings = () => {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Failed to delete user";
       toast.error(errorMessage);
+      console.error("Delete user error details:", err);
     }
   };
   
@@ -84,12 +85,17 @@ const UsersSettings = () => {
         };
         
         console.log("Creating user with data:", userToAdd);
-        const result = await addUser(userToAdd);
-        console.log("User creation result:", result);
-        toast.success("User created successfully");
+        try {
+          const result = await addUser(userToAdd);
+          console.log("User creation result:", result);
+          toast.success("User created successfully");
+          handleCloseModal();
+        } catch (addError) {
+          console.error("Error in addUser:", addError);
+          const errorMsg = addError instanceof Error ? addError.message : "Failed to create user";
+          toast.error(errorMsg);
+        }
       }
-      
-      handleCloseModal();
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Failed to save user";
       console.error("Error in handleSubmit:", err);

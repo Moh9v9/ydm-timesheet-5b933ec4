@@ -1,3 +1,4 @@
+
 import { User } from "@/lib/types";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -60,6 +61,11 @@ export const useUsersOperations = (
       
       if (!response.ok) {
         throw new Error(data.error || "Failed to create user");
+      }
+      
+      if (!data.user || !data.user.id) {
+        console.error("No user ID returned from edge function:", data);
+        throw new Error("Invalid response from server");
       }
       
       const newUser: User = {

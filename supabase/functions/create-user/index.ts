@@ -36,7 +36,7 @@ serve(async (req) => {
     if (!authHeader) {
       console.error("No authorization header");
       return new Response(
-        JSON.stringify({ error: "Unauthorized" }),
+        JSON.stringify({ error: "Unauthorized - No auth header" }),
         { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
@@ -48,7 +48,7 @@ serve(async (req) => {
     if (authError || !caller) {
       console.error("Auth error or no caller user:", authError);
       return new Response(
-        JSON.stringify({ error: "Unauthorized", details: authError?.message }),
+        JSON.stringify({ error: "Unauthorized - Invalid token", details: authError?.message }),
         { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
@@ -123,6 +123,14 @@ serve(async (req) => {
       return new Response(
         JSON.stringify({ error: createError.message }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+    
+    if (!newUser || !newUser.user) {
+      console.error("No user created or returned");
+      return new Response(
+        JSON.stringify({ error: "Failed to create user" }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
     
