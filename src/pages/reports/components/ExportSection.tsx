@@ -24,7 +24,7 @@ import { format } from "date-fns";
 
 const ExportSection = () => {
   const [reportType, setReportType] = useState<ReportType>("daily");
-  const [exportFormat, setExportFormat] = useState<ExportFormat>("csv");
+  const [exportFormat, setExportFormat] = useState<ExportFormat>("pdf");
   const [isGenerating, setIsGenerating] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   
@@ -139,3 +139,4 @@ const ExportSection = () => {
 };
 
 export default ExportSection;
+

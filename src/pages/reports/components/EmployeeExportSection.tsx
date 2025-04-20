@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useEmployees } from "@/contexts/EmployeeContext";
 import { useNotification } from "@/components/ui/notification";
@@ -23,7 +24,7 @@ import EmployeeExportFilters from "./export/EmployeeExportFilters";
 import EmployeeExportFormatSelect from "./export/EmployeeExportFormatSelect";
 
 const EmployeeExportSection = () => {
-  const [exportFormat, setExportFormat] = useState<ExportFormat>("csv");
+  const [exportFormat, setExportFormat] = useState<ExportFormat>("pdf");
   const [isGenerating, setIsGenerating] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState<EmployeeFilters>({});
@@ -145,3 +146,4 @@ const EmployeeExportSection = () => {
 };
 
 export default EmployeeExportSection;
+
