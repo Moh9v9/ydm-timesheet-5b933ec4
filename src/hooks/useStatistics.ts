@@ -40,14 +40,23 @@ export const useStatistics = (selectedDate: string) => {
   useEffect(() => {
     const fetchDirectFromDatabase = async () => {
       try {
-        // Ensure we're using the correct date format for the query
-        // Get records directly from Supabase for the selected date
+        console.log("useStatistics - Fetching data for date:", selectedDate);
+        
+        // Force to use today's date to ensure we're getting current data
+        const today = new Date().toISOString().split('T')[0];
+        
+        // Get records directly from Supabase for today's date
         const { data, error } = await supabase
           .from('attendance_records')
           .select('*')
-          .eq('date', selectedDate);
+          .eq('date', today);
         
-        if (error) throw error;
+        if (error) {
+          console.error("Error fetching attendance stats:", error);
+          throw error;
+        }
+
+        console.log(`useStatistics - Retrieved ${data?.length || 0} records for ${today}`);
 
         const formattedRecords: AttendanceRecord[] = (data || []).map(record => ({
           id: record.id,
@@ -73,7 +82,8 @@ export const useStatistics = (selectedDate: string) => {
         
         // Fallback to using context records if database fetch fails
         const records = attendanceRecords || [];
-        const todayRecords = getTodayAttendanceRecords(records, selectedDate);
+        const today = new Date().toISOString().split('T')[0];
+        const todayRecords = getTodayAttendanceRecords(records, today); // Use today's date for fallback too
         const { presentCount, absentCount } = calculateAttendanceCounts(todayRecords);
 
         setStats({
@@ -85,6 +95,12 @@ export const useStatistics = (selectedDate: string) => {
     };
 
     fetchDirectFromDatabase();
+    
+    // Set up a refresh interval to fetch data every minute
+    const intervalId = setInterval(fetchDirectFromDatabase, 60000);
+    
+    // Clean up the interval on component unmount
+    return () => clearInterval(intervalId);
   }, [filteredEmployees, attendanceRecords, selectedDate]);
 
   return stats;

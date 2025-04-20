@@ -11,15 +11,21 @@ import { useEffect } from "react";
 const Dashboard = () => {
   const { user } = useAuth();
   const { setCurrentDate } = useAttendance();
-  const today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
-  const stats = useStatistics(today); // Always use today's date for statistics
+  
+  // Always use current date, formatted correctly to ensure consistency
+  const today = new Date();
+  const formattedToday = today.toISOString().split('T')[0]; // YYYY-MM-DD format
+  
+  // Get statistics for today's date
+  const stats = useStatistics(formattedToday);
 
   // Always set to current day when Dashboard mounts
   useEffect(() => {
+    console.log("Dashboard - Setting current date to:", formattedToday);
     if (setCurrentDate) {
-      setCurrentDate(today);
+      setCurrentDate(formattedToday);
     }
-  }, [setCurrentDate, today]);
+  }, [setCurrentDate, formattedToday]);
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -31,7 +37,7 @@ const Dashboard = () => {
           </p>
         </div>
         <div className="mt-2 md:mt-0 text-sm font-medium text-muted-foreground">
-          {format(new Date(), "EEEE, MMMM d, yyyy")}
+          {format(today, "EEEE, MMMM d, yyyy")}
         </div>
       </div>
 
