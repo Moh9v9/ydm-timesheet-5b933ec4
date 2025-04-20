@@ -10,6 +10,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import BulkUpdateDialog from "./components/BulkUpdateDialog";
 import ConfirmDialog from "@/components/ConfirmDialog";
+import { Textarea } from "@/components/ui/textarea";
 
 const Attendance = () => {
   const { user } = useAuth();
@@ -167,6 +168,7 @@ const Attendance = () => {
     startTime: string;
     endTime: string;
     overtimeHours: number;
+    note: string;
   }) => {
     setIsSubmitting(true);
     
@@ -176,7 +178,8 @@ const Attendance = () => {
         present: data.present,
         startTime: data.startTime,
         endTime: data.endTime,
-        overtimeHours: data.overtimeHours
+        overtimeHours: data.overtimeHours,
+        note: data.note
       }));
       
       await bulkSaveAttendance(updatedRecords);
@@ -188,6 +191,14 @@ const Attendance = () => {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleNoteChange = (index: number, value: string) => {
+    if (!canEdit) return;
+    
+    const newData = [...attendanceData];
+    newData[index].note = value;
+    setAttendanceData(newData);
   };
 
   return (
@@ -305,6 +316,7 @@ const Attendance = () => {
                 <th>Start Time</th>
                 <th>End Time</th>
                 <th>Overtime Hours</th>
+                <th>Notes</th>
               </tr>
             </thead>
             <tbody>
@@ -390,6 +402,15 @@ const Attendance = () => {
                         ) : (
                           <span className="text-muted-foreground">0</span>
                         )}
+                      </td>
+                      <td>
+                        <Textarea
+                          value={record.note || ""}
+                          onChange={(e) => handleNoteChange(index, e.target.value)}
+                          placeholder="Add a note..."
+                          className="min-h-[60px] resize-none w-full"
+                          disabled={!canEdit}
+                        />
                       </td>
                     </tr>
                   );

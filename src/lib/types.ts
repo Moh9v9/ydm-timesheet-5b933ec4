@@ -1,4 +1,3 @@
-
 // Authentication & User Management Types
 export type UserRole = "admin" | "user";
 
@@ -44,6 +43,7 @@ export interface AttendanceRecord {
   startTime: string; // HH:MM format
   endTime: string; // HH:MM format
   overtimeHours: number;
+  note?: string; // Added note field
 }
 
 // Export Types

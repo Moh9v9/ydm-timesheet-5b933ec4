@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import {
   Dialog,
@@ -9,8 +8,9 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Check, X, Clock } from "lucide-react";
+import { Check, X, Clock, StickyNote } from "lucide-react";
 
 interface BulkUpdateDialogProps {
   open: boolean;
@@ -20,15 +20,17 @@ interface BulkUpdateDialogProps {
     startTime: string;
     endTime: string;
     overtimeHours: number;
+    note: string;
   }) => void;
 }
 
 const BulkUpdateDialog = ({ open, onClose, onConfirm }: BulkUpdateDialogProps) => {
   const [updateType, setUpdateType] = useState<"presence" | "times">("presence");
   const [present, setPresent] = useState(true);
-  const [startTime, setStartTime] = useState("07:00");     // Updated default start time
-  const [endTime, setEndTime] = useState("17:00");         // Updated default end time (5 PM = 17:00)
+  const [startTime, setStartTime] = useState("07:00");
+  const [endTime, setEndTime] = useState("17:00");
   const [overtimeHours, setOvertimeHours] = useState(0);
+  const [note, setNote] = useState("");
 
   const handleConfirm = () => {
     onConfirm({
@@ -36,6 +38,7 @@ const BulkUpdateDialog = ({ open, onClose, onConfirm }: BulkUpdateDialogProps) =
       startTime: updateType === "presence" ? (present ? startTime : "") : startTime,
       endTime: updateType === "presence" ? (present ? endTime : "") : endTime,
       overtimeHours: updateType === "presence" ? (present ? overtimeHours : 0) : overtimeHours,
+      note
     });
   };
 
@@ -125,14 +128,12 @@ const BulkUpdateDialog = ({ open, onClose, onConfirm }: BulkUpdateDialogProps) =
                 </div>
 
                 <div className="flex items-center gap-4">
-                  <label className="text-right font-medium min-w-24">Overtime Hours:</label>
-                  <Input
-                    type="number"
-                    min="0"
-                    step="0.5"
-                    value={overtimeHours}
-                    onChange={(e) => setOvertimeHours(parseFloat(e.target.value) || 0)}
-                    className="w-32"
+                  <label className="text-right font-medium min-w-24">Note:</label>
+                  <Textarea
+                    value={note}
+                    onChange={(e) => setNote(e.target.value)}
+                    placeholder="Add a note for all employees..."
+                    className="min-h-[80px] resize-none"
                   />
                 </div>
               </div>
@@ -172,4 +173,3 @@ const BulkUpdateDialog = ({ open, onClose, onConfirm }: BulkUpdateDialogProps) =
 };
 
 export default BulkUpdateDialog;
-
