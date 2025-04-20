@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { format } from "date-fns";
 import { ChevronDown } from "lucide-react";
@@ -29,113 +28,104 @@ const DateRangeInputs = ({ reportType, currentDate }: DateRangeInputsProps) => {
 
   const yearMonthCaptionLayout = {
     components: {
-      Dropdown: () => <ChevronDown className="w-4 h-4 text-muted-foreground" />,
+      Dropdown: () => <ChevronDown className="w-3.5 h-3.5 text-muted-foreground/70 hover:text-primary transition-colors" />,
     },
   };
 
+  const renderDatePicker = (label: string, dateFormat: string) => (
+    <div>
+      <label className="block text-sm font-medium mb-1.5 dark:text-gray-200">
+        {label}
+      </label>
+      <Popover>
+        <PopoverTrigger asChild>
+          <button
+            className={cn(
+              "w-full flex items-center px-4 py-2.5 text-left",
+              "border rounded-lg dark:bg-gray-800/50 dark:border-gray-700 dark:text-gray-100",
+              "text-sm font-medium transition-all duration-200",
+              "hover:border-primary/50 dark:hover:border-primary/50",
+              "focus:outline-none focus:ring-2 focus:ring-primary/20 dark:focus:ring-primary/20",
+              "active:scale-[0.98]"
+            )}
+          >
+            {format(date, dateFormat)}
+          </button>
+        </PopoverTrigger>
+        <PopoverContent 
+          className={cn(
+            "w-auto p-0",
+            "border dark:border-gray-700/50",
+            "rounded-lg overflow-hidden",
+            "shadow-lg dark:shadow-black/10",
+            "dark:bg-gray-800/95 backdrop-blur-sm"
+          )} 
+          align="start"
+        >
+          <Calendar
+            mode="single"
+            selected={date}
+            onSelect={handleSelect}
+            initialFocus
+            captionLayout="dropdown-buttons"
+            fromYear={2020}
+            toYear={2025}
+            classNames={{
+              months: "space-y-4",
+              month: "space-y-4",
+              caption: "relative flex items-center justify-center pt-1 pb-2",
+              caption_label: "flex items-center gap-1 text-sm font-medium",
+              nav: "flex items-center gap-1",
+              nav_button: cn(
+                "inline-flex items-center justify-center rounded-md p-1.5",
+                "text-muted-foreground/70 hover:text-primary hover:bg-gray-100/50 dark:hover:bg-gray-700/50",
+                "transition-colors duration-200"
+              ),
+              table: "w-full border-collapse",
+              head_row: "flex",
+              head_cell: cn(
+                "text-muted-foreground rounded-md w-9 font-normal text-xs",
+                "uppercase tracking-wide"
+              ),
+              row: "flex w-full mt-2",
+              cell: cn(
+                "relative p-0 text-center text-sm focus-within:relative focus-within:z-20",
+                "first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md"
+              ),
+              day: cn(
+                "h-9 w-9 p-0 font-normal",
+                "rounded-md transition-colors duration-200",
+                "hover:bg-primary/10 dark:hover:bg-primary/20",
+                "focus:outline-none focus:ring-2 focus:ring-primary/20"
+              ),
+              day_selected: cn(
+                "bg-primary text-primary-foreground",
+                "hover:bg-primary hover:text-primary-foreground",
+                "focus:bg-primary focus:text-primary-foreground"
+              ),
+              day_today: "bg-accent/50 text-accent-foreground",
+              day_outside: "text-muted-foreground/50",
+              day_disabled: "text-muted-foreground/50",
+              day_hidden: "invisible",
+            }}
+            components={yearMonthCaptionLayout.components}
+            className={cn("p-4 pointer-events-auto select-none")}
+          />
+        </PopoverContent>
+      </Popover>
+    </div>
+  );
+
   if (reportType === "daily") {
-    return (
-      <div>
-        <label htmlFor="date" className="block text-sm font-medium mb-1 dark:text-gray-200">
-          Select Date
-        </label>
-        <Popover open={open} onOpenChange={setOpen}>
-          <PopoverTrigger asChild>
-            <button
-              className="w-full flex items-center px-3 py-2 text-left border rounded-md dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100 text-sm"
-            >
-              {format(date, "PPP")}
-            </button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="start">
-            <Calendar
-              mode="single"
-              selected={date}
-              onSelect={handleSelect}
-              initialFocus
-              captionLayout="dropdown-buttons"
-              fromYear={2020}
-              toYear={2025}
-              classNames={{
-                caption_label: "flex items-center gap-2",
-              }}
-              components={yearMonthCaptionLayout.components}
-              className={cn("p-3 pointer-events-auto")}
-            />
-          </PopoverContent>
-        </Popover>
-      </div>
-    );
+    return renderDatePicker("Select Date", "PPP");
   }
 
   if (reportType === "weekly") {
-    return (
-      <div>
-        <label htmlFor="week" className="block text-sm font-medium mb-1 dark:text-gray-200">
-          Select Week
-        </label>
-        <Popover open={open} onOpenChange={setOpen}>
-          <PopoverTrigger asChild>
-            <button
-              className="w-full flex items-center px-3 py-2 text-left border rounded-md dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100 text-sm"
-            >
-              {format(date, "'Week of' MMM d, yyyy")}
-            </button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="start">
-            <Calendar
-              mode="single"
-              selected={date}
-              onSelect={handleSelect}
-              initialFocus
-              captionLayout="dropdown-buttons"
-              fromYear={2020}
-              toYear={2025}
-              classNames={{
-                caption_label: "flex items-center gap-2",
-              }}
-              components={yearMonthCaptionLayout.components}
-              className={cn("p-3 pointer-events-auto")}
-            />
-          </PopoverContent>
-        </Popover>
-      </div>
-    );
+    return renderDatePicker("Select Week", "'Week of' MMM d, yyyy");
   }
 
   if (reportType === "monthly") {
-    return (
-      <div>
-        <label htmlFor="month" className="block text-sm font-medium mb-1 dark:text-gray-200">
-          Select Month
-        </label>
-        <Popover open={open} onOpenChange={setOpen}>
-          <PopoverTrigger asChild>
-            <button
-              className="w-full flex items-center px-3 py-2 text-left border rounded-md dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100 text-sm"
-            >
-              {format(date, "MMMM yyyy")}
-            </button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="start">
-            <Calendar
-              mode="single"
-              selected={date}
-              onSelect={handleSelect}
-              initialFocus
-              captionLayout="dropdown-buttons"
-              fromYear={2020}
-              toYear={2025}
-              classNames={{
-                caption_label: "flex items-center gap-2",
-              }}
-              components={yearMonthCaptionLayout.components}
-              className={cn("p-3 pointer-events-auto")}
-            />
-          </PopoverContent>
-        </Popover>
-      </div>
-    );
+    return renderDatePicker("Select Month", "MMMM yyyy");
   }
 
   return null;
