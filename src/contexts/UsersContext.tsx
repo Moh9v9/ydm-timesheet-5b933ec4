@@ -1,3 +1,4 @@
+
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { User, UserRole, UserPermissions } from "@/lib/types";
 import { supabase } from "@/integrations/supabase/client";
@@ -34,11 +35,14 @@ export const UsersProvider = ({ children }: { children: ReactNode }) => {
         if (profiles) {
           // Convert profiles to User[] format with proper type handling
           const loadedUsers: User[] = profiles.map(profile => {
+            // Safely handle permissions as an object or default to empty object
+            const permissionsObj = typeof profile.permissions === 'object' ? profile.permissions : {};
+            
             // Make sure permissions is properly handled
             const permissions: UserPermissions = {
-              view: profile.permissions?.view === true,
-              edit: profile.permissions?.edit === true,
-              delete: profile.permissions?.delete === true
+              view: Boolean(permissionsObj?.view),
+              edit: Boolean(permissionsObj?.edit),
+              delete: Boolean(permissionsObj?.delete)
             };
 
             return {

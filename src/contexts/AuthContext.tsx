@@ -47,6 +47,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               
               if (profile) {
                 // Convert profile data to User type with proper type conversion for permissions
+                // Parse the permissions object safely
+                const permissionsObj = typeof profile.permissions === 'object' ? profile.permissions : {};
+                
                 const userData: User = {
                   id: currentSession.user.id,
                   fullName: profile.full_name,
@@ -54,9 +57,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                   password: '', // We don't store or return passwords
                   role: profile.role as any,
                   permissions: {
-                    view: profile.permissions?.view === true,
-                    edit: profile.permissions?.edit === true,
-                    delete: profile.permissions?.delete === true
+                    view: Boolean(permissionsObj?.view),
+                    edit: Boolean(permissionsObj?.edit),
+                    delete: Boolean(permissionsObj?.delete)
                   }
                 };
                 
@@ -91,6 +94,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           }
           
           if (profile) {
+            // Parse the permissions object safely
+            const permissionsObj = typeof profile.permissions === 'object' ? profile.permissions : {};
+            
             const userData: User = {
               id: currentSession.user.id,
               fullName: profile.full_name,
@@ -98,9 +104,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               password: '', // We don't store or return passwords
               role: profile.role as any,
               permissions: {
-                view: profile.permissions?.view === true,
-                edit: profile.permissions?.edit === true,
-                delete: profile.permissions?.delete === true
+                view: Boolean(permissionsObj?.view),
+                edit: Boolean(permissionsObj?.edit),
+                delete: Boolean(permissionsObj?.delete)
               }
             };
             
