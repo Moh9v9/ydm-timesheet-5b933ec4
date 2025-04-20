@@ -1,4 +1,4 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { 
   User, 
   Users, 
@@ -17,6 +17,14 @@ interface SidebarProps {
 
 const Sidebar = ({ isOpen, toggleSidebar }: SidebarProps) => {
   const { user } = useAuth();
+  const navigate = useNavigate();
+
+  const handleProfileClick = () => {
+    navigate("/settings");
+    if (window.innerWidth < 768) {
+      toggleSidebar();
+    }
+  };
 
   return (
     <>
@@ -126,10 +134,13 @@ const Sidebar = ({ isOpen, toggleSidebar }: SidebarProps) => {
           </nav>
 
           <div className="p-4 border-t border-sidebar-border">
-            <div className={`flex items-center ${!isOpen && "md:justify-center"}`}>
+            <button
+              onClick={handleProfileClick}
+              className={`flex items-center w-full transition-colors hover:text-primary ${!isOpen && "md:justify-center"}`}
+            >
               {isOpen || window.innerWidth < 768 ? (
-                <div className="flex flex-col">
-                  <span className="font-medium text-sidebar-foreground">
+                <div className="flex flex-col text-left">
+                  <span className="font-medium text-sidebar-foreground hover:text-primary">
                     {user?.fullName}
                   </span>
                   <span className="text-sm text-sidebar-foreground/70">
@@ -137,9 +148,9 @@ const Sidebar = ({ isOpen, toggleSidebar }: SidebarProps) => {
                   </span>
                 </div>
               ) : (
-                <User size={20} className="text-sidebar-foreground" />
+                <User size={20} className="text-sidebar-foreground hover:text-primary" />
               )}
-            </div>
+            </button>
           </div>
         </div>
       </aside>
