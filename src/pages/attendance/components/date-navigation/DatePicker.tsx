@@ -1,4 +1,3 @@
-
 import React from "react";
 import { CalendarIcon, ChevronDown } from "lucide-react";
 import { format } from "date-fns";
@@ -34,13 +33,15 @@ const DatePicker = ({ currentDate, setCurrentDate }: DatePickerProps) => {
               value={value}
               onChange={onChange}
               className={cn(
-                "appearance-none pl-2 pr-6 py-1 outline-none cursor-pointer z-10",
-                "text-sm font-medium",
-                "text-foreground dark:text-gray-100",
-                "dark:bg-gray-800 dark:border dark:border-gray-700",
-                "hover:bg-gray-100 dark:hover:bg-gray-700",
-                "focus:outline-none focus:ring-2 focus:ring-primary/20 dark:focus:ring-primary/40",
-                "rounded transition-colors duration-200"
+                "appearance-none pl-2 pr-6 py-1.5 rounded-md",
+                "text-sm font-medium transition-colors duration-200",
+                "bg-background border border-input",
+                "text-foreground hover:bg-accent",
+                "dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100",
+                "dark:hover:bg-gray-700/80",
+                "focus:outline-none focus:ring-2 focus:ring-primary/20",
+                "dark:focus:ring-primary/40 dark:focus:ring-offset-1 dark:focus:ring-offset-gray-900",
+                "cursor-pointer z-10 min-w-[110px]"
               )}
               {...props}
             >
@@ -48,10 +49,10 @@ const DatePicker = ({ currentDate, setCurrentDate }: DatePickerProps) => {
             </select>
             <ChevronDown 
               className={cn(
-                "w-3.5 h-3.5 absolute right-0.5", 
-                "text-muted-foreground/70 dark:text-gray-300",
+                "w-4 h-4 absolute right-1.5",
+                "text-muted-foreground/70 dark:text-gray-400",
                 "pointer-events-none"
-              )} 
+              )}
             />
           </div>
         );
