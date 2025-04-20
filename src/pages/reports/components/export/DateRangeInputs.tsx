@@ -46,6 +46,9 @@ const DateRangeInputs = ({ reportType, currentDate }: DateRangeInputsProps) => {
               selected={date}
               onSelect={handleSelect}
               initialFocus
+              captionLayout="dropdown-buttons"
+              fromYear={2020}
+              toYear={2025}
               className={cn("p-3 pointer-events-auto")}
             />
           </PopoverContent>
@@ -74,6 +77,9 @@ const DateRangeInputs = ({ reportType, currentDate }: DateRangeInputsProps) => {
               selected={date}
               onSelect={handleSelect}
               initialFocus
+              captionLayout="dropdown-buttons"
+              fromYear={2020}
+              toYear={2025}
               className={cn("p-3 pointer-events-auto")}
             />
           </PopoverContent>
@@ -102,6 +108,9 @@ const DateRangeInputs = ({ reportType, currentDate }: DateRangeInputsProps) => {
               selected={date}
               onSelect={handleSelect}
               initialFocus
+              captionLayout="dropdown-buttons"
+              fromYear={2020}
+              toYear={2025}
               className={cn("p-3 pointer-events-auto")}
             />
           </PopoverContent>
@@ -114,3 +123,4 @@ const DateRangeInputs = ({ reportType, currentDate }: DateRangeInputsProps) => {
 };
 
 export default DateRangeInputs;
+
