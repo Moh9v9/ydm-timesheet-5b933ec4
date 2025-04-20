@@ -2,6 +2,8 @@
 import { AttendanceRecord } from "@/lib/types";
 import { Employee } from "@/lib/types";
 import AttendanceTableRow from "./AttendanceTableRow";
+import { ArrowDown, ArrowUp } from "lucide-react";
+import { useState } from "react";
 
 interface AttendanceTableProps {
   attendanceData: AttendanceRecord[];
@@ -14,6 +16,9 @@ interface AttendanceTableProps {
   isLoading?: boolean;
 }
 
+type SortField = "employee" | "status" | "startTime" | "endTime" | "overtimeHours" | "notes";
+type SortDirection = "asc" | "desc";
+
 const AttendanceTable = ({
   attendanceData,
   filteredEmployees,
@@ -24,18 +29,101 @@ const AttendanceTable = ({
   onNoteChange,
   isLoading = false,
 }: AttendanceTableProps) => {
+  const [sortField, setSortField] = useState<SortField>("employee");
+  const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
+
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+    } else {
+      setSortField(field);
+      setSortDirection("asc");
+    }
+  };
+
+  const getSortedData = () => {
+    const sortedData = [...attendanceData];
+    
+    sortedData.sort((a, b) => {
+      const employeeA = filteredEmployees.find(emp => emp.id === a.employeeId);
+      const employeeB = filteredEmployees.find(emp => emp.id === b.employeeId);
+      
+      if (!employeeA || !employeeB) return 0;
+
+      const direction = sortDirection === "asc" ? 1 : -1;
+      
+      switch (sortField) {
+        case "employee":
+          return direction * employeeA.fullName.localeCompare(employeeB.fullName);
+        case "status":
+          return direction * (Number(a.present) - Number(b.present));
+        case "startTime":
+          return direction * (a.startTime || "").localeCompare(b.startTime || "");
+        case "endTime":
+          return direction * (a.endTime || "").localeCompare(b.endTime || "");
+        case "overtimeHours":
+          return direction * ((a.overtimeHours || 0) - (b.overtimeHours || 0));
+        case "notes":
+          return direction * (a.note || "").localeCompare(b.note || "");
+        default:
+          return 0;
+      }
+    });
+
+    return sortedData;
+  };
+
+  const SortIcon = ({ field }: { field: SortField }) => {
+    if (sortField !== field) return null;
+    return sortDirection === "asc" ? (
+      <ArrowUp className="inline-block ml-1 h-4 w-4" />
+    ) : (
+      <ArrowDown className="inline-block ml-1 h-4 w-4" />
+    );
+  };
+
   return (
     <div className="bg-card shadow-sm rounded-lg border overflow-hidden">
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead className="bg-muted/20">
             <tr>
-              <th className="text-left p-3 font-medium">Employee</th>
-              <th className="text-left p-3 font-medium">Status</th>
-              <th className="text-left p-3 font-medium">Start Time</th>
-              <th className="text-left p-3 font-medium">End Time</th>
-              <th className="text-left p-3 font-medium">Overtime Hours</th>
-              <th className="text-left p-3 font-medium">Notes</th>
+              <th 
+                className="text-left p-3 font-medium cursor-pointer hover:bg-muted/30"
+                onClick={() => handleSort("employee")}
+              >
+                Employee <SortIcon field="employee" />
+              </th>
+              <th 
+                className="text-left p-3 font-medium cursor-pointer hover:bg-muted/30"
+                onClick={() => handleSort("status")}
+              >
+                Status <SortIcon field="status" />
+              </th>
+              <th 
+                className="text-left p-3 font-medium cursor-pointer hover:bg-muted/30"
+                onClick={() => handleSort("startTime")}
+              >
+                Start Time <SortIcon field="startTime" />
+              </th>
+              <th 
+                className="text-left p-3 font-medium cursor-pointer hover:bg-muted/30"
+                onClick={() => handleSort("endTime")}
+              >
+                End Time <SortIcon field="endTime" />
+              </th>
+              <th 
+                className="text-left p-3 font-medium cursor-pointer hover:bg-muted/30"
+                onClick={() => handleSort("overtimeHours")}
+              >
+                Overtime Hours <SortIcon field="overtimeHours" />
+              </th>
+              <th 
+                className="text-left p-3 font-medium cursor-pointer hover:bg-muted/30"
+                onClick={() => handleSort("notes")}
+              >
+                Notes <SortIcon field="notes" />
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -48,8 +136,8 @@ const AttendanceTable = ({
                   </div>
                 </td>
               </tr>
-            ) : attendanceData.length > 0 ? (
-              attendanceData.map((record, index) => {
+            ) : getSortedData().length > 0 ? (
+              getSortedData().map((record, index) => {
                 const employee = filteredEmployees.find(
                   emp => emp.id === record.employeeId
                 );
