@@ -1,4 +1,3 @@
-
 import { User } from "@/lib/types";
 import { Edit, Trash2, Users, Calendar, FileText, Eye, Pencil } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -21,7 +20,7 @@ export const UsersTable = ({ users, onEdit, onDelete, loading }: UsersTableProps
     return enabled ? "bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300" : "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400";
   };
 
-  const renderDetailedPermissions = (permissions: { view?: boolean; edit?: boolean; delete?: boolean }) => {
+  const renderDetailedPermissions = (permissions: { view?: boolean; edit?: boolean; delete?: boolean; Allow?: boolean }) => {
     return (
       <div className="flex gap-1 mt-1 justify-center">
         {permissions.view !== undefined && (
@@ -42,6 +41,12 @@ export const UsersTable = ({ users, onEdit, onDelete, loading }: UsersTableProps
             delete
           </Badge>
         )}
+        {permissions.Allow !== undefined && (
+          <Badge variant="secondary" className={`text-[10px] px-1.5 py-0.5 ${getPermissionColor(permissions.Allow)}`}>
+            <Eye size={10} className="mr-0.5" />
+            Allow
+          </Badge>
+        )}
       </div>
     );
   };
@@ -49,19 +54,19 @@ export const UsersTable = ({ users, onEdit, onDelete, loading }: UsersTableProps
   const renderPermissionBadge = (
     icon: React.ReactNode, 
     label: string, 
-    permissions: { view: boolean; edit?: boolean; delete?: boolean }
+    permissions: { view?: boolean; edit?: boolean; delete?: boolean; Allow?: boolean }
   ) => (
     <div className="flex flex-col items-center">
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger>
-            <Badge variant="secondary" className={`flex items-center gap-1 mb-1 ${getPermissionColor(permissions.view)}`}>
+            <Badge variant="secondary" className={`flex items-center gap-1 mb-1 ${getPermissionColor(permissions.view !== undefined ? permissions.view : permissions.Allow || false)}`}>
               {icon}
               <span className="hidden sm:inline">{label}</span>
             </Badge>
           </TooltipTrigger>
           <TooltipContent>
-            <p>{permissions.view ? "Has access to" : "No access to"} {label.toLowerCase()}</p>
+            <p>{(permissions.view !== undefined ? permissions.view : permissions.Allow) ? "Has access to" : "No access to"} {label.toLowerCase()}</p>
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
