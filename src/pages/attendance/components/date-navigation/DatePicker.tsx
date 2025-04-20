@@ -1,3 +1,4 @@
+
 import React from "react";
 import { CalendarIcon, ChevronDown } from "lucide-react";
 import { format } from "date-fns";
@@ -32,12 +33,26 @@ const DatePicker = ({ currentDate, setCurrentDate }: DatePickerProps) => {
             <select
               value={value}
               onChange={onChange}
-              className="appearance-none bg-transparent pl-2 pr-6 py-1 outline-none cursor-pointer z-10 text-sm font-medium text-foreground dark:text-white"
+              className={cn(
+                "appearance-none pl-2 pr-6 py-1 outline-none cursor-pointer z-10",
+                "text-sm font-medium",
+                "text-foreground dark:text-gray-100",
+                "dark:bg-gray-800 dark:border dark:border-gray-700",
+                "hover:bg-gray-100 dark:hover:bg-gray-700",
+                "focus:outline-none focus:ring-2 focus:ring-primary/20 dark:focus:ring-primary/40",
+                "rounded transition-colors duration-200"
+              )}
               {...props}
             >
               {children}
             </select>
-            <ChevronDown className="w-3.5 h-3.5 absolute right-0.5 text-muted-foreground/70 pointer-events-none" />
+            <ChevronDown 
+              className={cn(
+                "w-3.5 h-3.5 absolute right-0.5", 
+                "text-muted-foreground/70 dark:text-gray-300",
+                "pointer-events-none"
+              )} 
+            />
           </div>
         );
       },

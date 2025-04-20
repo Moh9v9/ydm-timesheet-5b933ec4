@@ -37,13 +37,13 @@ const DateRangeInputs = ({ reportType, currentDate }: DateRangeInputsProps) => {
               value={value}
               onChange={onChange}
               className={cn(
-                "appearance-none bg-transparent pl-2 pr-6 py-1 outline-none cursor-pointer z-10",
+                "appearance-none pl-2 pr-6 py-1 outline-none cursor-pointer z-10",
                 "text-sm font-medium",
-                "text-foreground dark:text-gray-100", // Improved dark mode text color
-                "dark:bg-gray-800/70", // Dark background with slight transparency
-                "dark:border-gray-700", // Dark border
-                "dark:focus:ring-2 dark:focus:ring-primary/50", // Focus state in dark mode
-                "transition-all duration-200"
+                "text-foreground dark:text-gray-100",
+                "dark:bg-gray-800 dark:border dark:border-gray-700",
+                "hover:bg-gray-100 dark:hover:bg-gray-700",
+                "focus:outline-none focus:ring-2 focus:ring-primary/20 dark:focus:ring-primary/40",
+                "rounded transition-colors duration-200"
               )}
               {...props}
             >
@@ -52,7 +52,7 @@ const DateRangeInputs = ({ reportType, currentDate }: DateRangeInputsProps) => {
             <ChevronDown 
               className={cn(
                 "w-3.5 h-3.5 absolute right-0.5", 
-                "text-muted-foreground/70 dark:text-gray-300", // Improved dark mode icon color
+                "text-muted-foreground/70 dark:text-gray-300",
                 "pointer-events-none"
               )} 
             />

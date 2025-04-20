@@ -40,18 +40,24 @@ export function StyledSelect({
           className={cn(
             "w-full transition-colors",
             "dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100",
-            "dark:hover:bg-gray-700 dark:focus:ring-2 dark:focus:ring-primary dark:focus:ring-offset-2 dark:focus:ring-offset-background",
+            "dark:hover:bg-gray-700/90",
+            "dark:focus:ring-2 dark:focus:ring-primary/50 dark:focus:ring-offset-1 dark:focus:ring-offset-gray-900",
             className
           )}
         >
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
-        <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
+        <SelectContent className={cn(
+          "dark:bg-gray-800 dark:border-gray-700",
+          "dark:text-gray-100",
+          "shadow-lg dark:shadow-black/20",
+          "backdrop-blur-sm"
+        )}>
           {options.map((option) => (
             <SelectItem 
               key={option.value} 
               value={option.value}
-              className="dark:text-gray-100 dark:hover:bg-gray-700 dark:focus:bg-gray-700"
+              className="dark:text-gray-100 dark:data-[highlighted]:bg-gray-700 dark:data-[highlighted]:text-gray-50"
             >
               {option.label}
             </SelectItem>
