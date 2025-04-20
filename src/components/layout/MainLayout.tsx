@@ -1,4 +1,3 @@
-
 import { ReactNode, useState, useEffect } from "react";
 import Sidebar from "./Sidebar";
 import TopBar from "./TopBar";
@@ -53,10 +52,9 @@ const MainLayout = ({ children, requireAuth = true }: MainLayoutProps) => {
             <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
             <main 
               className={`
-                w-full min-h-0 p-3 transition-all duration-300 ease-in-out overflow-x-hidden
+                flex-1 min-h-0 p-3 transition-all duration-300 ease-in-out overflow-x-hidden
                 sm:p-4
                 md:p-6
-                ${isSidebarOpen ? 'md:ml-64' : 'ml-0'}
               `}
             >
               <div className="w-full max-w-full">
