@@ -1,3 +1,4 @@
+
 import { AttendanceRecord } from "@/lib/types";
 import { Employee } from "@/lib/types";
 import { Textarea } from "@/components/ui/textarea";
@@ -26,7 +27,7 @@ const AttendanceTableRow = ({
       <td className="p-3">
         <div>
           <div className="font-medium">{employee.fullName}</div>
-          <div className="text-xs text-muted-foreground">{employee.employeeId}</div>
+          <div className="text-xs text-muted-foreground">{employee.iqamaNo || "No Iqama"}</div>
         </div>
       </td>
 

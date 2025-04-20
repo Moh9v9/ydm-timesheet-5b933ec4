@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useEmployees } from "@/contexts/EmployeeContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -104,7 +105,7 @@ const Employees = () => {
   // Filter employees by search term
   const searchedEmployees = filteredEmployees.filter(employee => 
     employee.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    employee.employeeId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (employee.iqamaNo && employee.iqamaNo.toString().includes(searchTerm.toLowerCase())) ||
     employee.project.toLowerCase().includes(searchTerm.toLowerCase()) ||
     employee.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
     employee.jobTitle.toLowerCase().includes(searchTerm.toLowerCase())
