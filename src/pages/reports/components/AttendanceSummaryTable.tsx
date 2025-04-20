@@ -81,15 +81,21 @@ const AttendanceSummaryTable = ({ view, currentDate }: AttendanceSummaryTablePro
   // Determine if there is an attendance record for the selected date (for daily view only)
   const hasAttendanceForDate = view === "daily" && attendanceRecords.some(record => record.date === currentDate);
 
+  console.log("Current date:", currentDate);
+  console.log("Has attendance for date:", hasAttendanceForDate);
+  console.log("Attendance records:", attendanceRecords);
+
   return (
     <div>
       <div className="flex items-center justify-between px-4 py-3 border-b dark:border-gray-700">
         <div className="flex items-center gap-2">
           {getReportTypeIcon()}
-          <h3 className="text-sm font-medium capitalize flex items-center">
-            {view} Summary
+          <div className="flex items-center">
+            <h3 className="text-sm font-medium capitalize">
+              {view} Summary
+            </h3>
             {view === "daily" && (
-              <span className="ml-3 flex items-center gap-2 bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded">
+              <div className="ml-3 flex items-center gap-2 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded-md">
                 {hasAttendanceForDate ? (
                   <Check size={16} className="text-green-600" aria-label="Attendance exists" />
                 ) : (
@@ -98,9 +104,9 @@ const AttendanceSummaryTable = ({ view, currentDate }: AttendanceSummaryTablePro
                 <span className="text-xs text-muted-foreground">
                   {formatDate(currentDate)}
                 </span>
-              </span>
+              </div>
             )}
-          </h3>
+          </div>
         </div>
         <button className="text-primary hover:text-primary/80 p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
           <Download size={16} />
