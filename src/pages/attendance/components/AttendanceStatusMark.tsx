@@ -20,7 +20,7 @@ const AttendanceStatusMark = ({ attendanceCount }: AttendanceStatusMarkProps) =>
           <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-gray-200 text-gray-500 text-sm font-bold">
             <Minus size={12} />
           </span>
-          <span className="text-gray-600 text-xs">No records for this date</span>
+          <span className="text-gray-300 dark:text-gray-400 text-xs">No records for this date</span>
         </>
       )}
     </div>
@@ -28,3 +28,4 @@ const AttendanceStatusMark = ({ attendanceCount }: AttendanceStatusMarkProps) =>
 };
 
 export default AttendanceStatusMark;
+
