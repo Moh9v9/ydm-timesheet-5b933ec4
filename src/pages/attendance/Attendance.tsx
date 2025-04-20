@@ -10,6 +10,7 @@ import DateNavigation from "./components/DateNavigation";
 import AttendanceTable from "./components/AttendanceTable";
 import BulkUpdateDialog from "./components/BulkUpdateDialog";
 import ConfirmDialog from "@/components/ConfirmDialog";
+import { Button } from "@/components/ui/button"; // Import Button component
 
 const Attendance = () => {
   const { user } = useAuth();
@@ -172,29 +173,28 @@ const Attendance = () => {
           </p>
         </div>
         
-        <div className="flex gap-3 mt-2">
-          {canEdit && (
-            <>
-              <button
-                onClick={handleUpdateAll}
-                disabled={isSubmitting}
-                className="flex-1 px-4 py-2 bg-secondary text-secondary-foreground rounded-md flex items-center justify-center hover:bg-secondary/90 transition-colors disabled:opacity-70"
-              >
-                <Save size={16} className="mr-2" />
-                {isSubmitting ? "Updating..." : "Update All"}
-              </button>
-              
-              <button
-                onClick={handleSave}
-                disabled={isSubmitting}
-                className="flex-1 px-4 py-2 bg-primary text-white rounded-md flex items-center justify-center hover:bg-primary/90 transition-colors disabled:opacity-70"
-              >
-                <Save size={16} className="mr-2" />
-                {isSubmitting ? "Saving..." : "Save"}
-              </button>
-            </>
-          )}
-        </div>
+        {canEdit && (
+          <div className="grid grid-cols-2 gap-3 mt-2">
+            <Button 
+              onClick={handleUpdateAll}
+              disabled={isSubmitting}
+              variant="secondary"
+              className="w-full flex items-center justify-center"
+            >
+              <Save size={16} className="mr-2" />
+              {isSubmitting ? "Updating..." : "Update All"}
+            </Button>
+            
+            <Button 
+              onClick={handleSave}
+              disabled={isSubmitting}
+              className="w-full flex items-center justify-center"
+            >
+              <Save size={16} className="mr-2" />
+              {isSubmitting ? "Saving..." : "Save"}
+            </Button>
+          </div>
+        )}
       </div>
 
       <DateNavigation
