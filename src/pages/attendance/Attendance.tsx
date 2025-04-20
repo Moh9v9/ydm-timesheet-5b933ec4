@@ -48,6 +48,8 @@ const Attendance = () => {
   useEffect(() => {
     const fetchActualRecordCount = async () => {
       try {
+        // Make sure we're always using the current date from context
+        console.log("Attendance - Fetching record count for date:", currentDate);
         const { count, error } = await supabase
           .from('attendance_records')
           .select('*', { count: 'exact', head: true })
@@ -58,13 +60,21 @@ const Attendance = () => {
           return;
         }
         
+        console.log(`Attendance - Found ${count || 0} records for date ${currentDate}`);
         setActualRecordCount(count || 0);
       } catch (err) {
         console.error('Failed to fetch attendance count:', err);
       }
     };
 
+    // Always fetch count when component mounts or currentDate changes
     fetchActualRecordCount();
+    
+    // Set up a refresh timer to periodically check the count
+    const timerId = setInterval(fetchActualRecordCount, 15000);
+    
+    // Clean up interval on unmount
+    return () => clearInterval(timerId);
   }, [currentDate]);
 
   return (

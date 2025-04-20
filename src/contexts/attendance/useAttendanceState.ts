@@ -3,9 +3,13 @@ import { useState, useEffect } from "react";
 import { AttendanceRecord, AttendanceFilters } from "@/lib/types";
 import { supabase } from "@/integrations/supabase/client";
 
+// Function to get a fresh date 
+const getTodayISODate = () => new Date().toISOString().split('T')[0];
+
 export const useAttendanceState = () => {
+  // Initialize with fresh date
+  const [currentDate, setCurrentDate] = useState<string>(getTodayISODate());
   const [attendanceRecords, setAttendanceRecords] = useState<AttendanceRecord[]>([]);
-  const [currentDate, setCurrentDate] = useState<string>(new Date().toISOString().split('T')[0]);
   const [filters, setFilters] = useState<AttendanceFilters>({
     date: currentDate
   });
@@ -13,6 +17,7 @@ export const useAttendanceState = () => {
 
   // Update filters when currentDate changes
   useEffect(() => {
+    console.log("useAttendanceState - Setting filters date to:", currentDate);
     setFilters(prevFilters => ({
       ...prevFilters,
       date: currentDate
@@ -24,6 +29,7 @@ export const useAttendanceState = () => {
     const fetchAttendanceRecords = async () => {
       setLoading(true);
       try {
+        console.log("useAttendanceState - Fetching records with filters:", filters);
         const query = supabase
           .from('attendance_records')
           .select('*');
@@ -54,6 +60,7 @@ export const useAttendanceState = () => {
           note: record.note || ''
         }));
 
+        console.log(`useAttendanceState - Fetched ${formattedRecords.length} records for date ${filters.date}`);
         setAttendanceRecords(formattedRecords);
       } catch (error) {
         console.error('Error fetching attendance records:', error);

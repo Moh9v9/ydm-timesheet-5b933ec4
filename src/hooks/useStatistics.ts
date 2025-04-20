@@ -36,13 +36,16 @@ export const useStatistics = () => {
     presentToday: 0,
     absentToday: 0,
   });
+  
+  // State to track refreshes
+  const [refreshCount, setRefreshCount] = useState(0);
 
   useEffect(() => {
     const fetchDirectFromDatabase = async () => {
       try {
         // Always get a fresh date for today
         const today = new Date().toISOString().split('T')[0];
-        console.log("useStatistics - Fetching data for fresh current date:", today);
+        console.log("useStatistics - Fetching data for fresh current date:", today, "Refresh count:", refreshCount);
         
         // Get records directly from Supabase for today's date
         const { data, error } = await supabase
@@ -97,12 +100,15 @@ export const useStatistics = () => {
     // Initial fetch
     fetchDirectFromDatabase();
     
-    // Set up a refresh interval to fetch data every 30 seconds
-    const intervalId = setInterval(fetchDirectFromDatabase, 30000);
+    // Set up a refresh interval to fetch data every 15 seconds
+    const intervalId = setInterval(() => {
+      setRefreshCount(prev => prev + 1);
+      fetchDirectFromDatabase();
+    }, 15000);
     
     // Clean up the interval on component unmount
     return () => clearInterval(intervalId);
-  }, [filteredEmployees, attendanceRecords]); // Remove any date dependency to avoid stale renders
+  }, [filteredEmployees, attendanceRecords, refreshCount]); // Include refreshCount to trigger refresh
 
   return stats;
 };

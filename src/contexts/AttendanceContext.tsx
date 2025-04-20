@@ -1,16 +1,19 @@
 
-import { createContext, useContext, ReactNode } from "react";
+import { createContext, useContext, ReactNode, useEffect } from "react";
 import { AttendanceContextType } from "./attendance/types";
 import { useAttendanceState } from "./attendance/useAttendanceState";
 import { useAttendanceOperations } from "./attendance/useAttendanceOperations";
+
+// Get a fresh date for initialization
+const getTodayISODate = () => new Date().toISOString().split('T')[0];
 
 // Create a context with a default value to prevent the "must be used within Provider" error
 const AttendanceContext = createContext<AttendanceContextType>({
   attendanceRecords: [],
   filteredRecords: [],
-  currentDate: new Date().toISOString().split('T')[0], // Always use fresh date
+  currentDate: getTodayISODate(), // Use function to ensure fresh date on each context creation
   setCurrentDate: () => {},
-  filters: { date: new Date().toISOString().split('T')[0] }, // Always use fresh date
+  filters: { date: getTodayISODate() }, // Use function to ensure fresh date on each context creation
   setFilters: () => {},
   loading: false,
   // Default implementations that will never be used but satisfy TypeScript
@@ -40,6 +43,12 @@ export const AttendanceProvider = ({ children }: { children: ReactNode }) => {
     setAttendanceRecords,
     setLoading
   );
+  
+  // Ensure filters are updated with the current date whenever it changes
+  useEffect(() => {
+    console.log("AttendanceContext - Current date changed to:", currentDate);
+    setFilters(prev => ({ ...prev, date: currentDate }));
+  }, [currentDate, setFilters]);
 
   return (
     <AttendanceContext.Provider
