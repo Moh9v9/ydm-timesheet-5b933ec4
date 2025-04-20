@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -57,11 +56,8 @@ const Login = () => {
       // Show success message
       toast.success("Login successful!");
       
-      // Give a small delay to ensure auth context is updated
-      setTimeout(() => {
-        console.log("Redirecting to home after successful login");
-        navigate("/");
-      }, 100);
+      // Force hard navigation to home page
+      window.location.href = "/";
       
     } catch (err) {
       const errorMessage = err instanceof Error 
