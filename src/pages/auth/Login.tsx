@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -28,13 +27,11 @@ const Login = () => {
     try {
       await login(email, password);
       
-      // Show success message and automatically redirect after a short delay
-      toast.success("Login successful! Redirecting to dashboard...");
+      // Show success message and immediately redirect
+      toast.success("Login successful!");
       
-      // Automatically redirect after a short delay (1.5 seconds)
-      setTimeout(() => {
-        navigate("/");
-      }, 1500);
+      // Immediately redirect to dashboard
+      navigate("/");
       
     } catch (err) {
       const errorMessage = err instanceof Error 
