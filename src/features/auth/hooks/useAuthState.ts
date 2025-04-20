@@ -4,6 +4,7 @@ import { User } from "@/lib/types";
 import { Session } from '@supabase/supabase-js';
 import { supabase } from "@/integrations/supabase/client";
 import { createUserFromProfile } from '../utils';
+import { ProfileData } from '../types';
 
 export const useAuthState = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -33,7 +34,11 @@ export const useAuthState = () => {
               }
               
               if (profile) {
-                const userData = createUserFromProfile(currentSession.user.id, profile);
+                // Cast the profile to ProfileData to ensure type safety
+                const userData = createUserFromProfile(
+                  currentSession.user.id, 
+                  profile as unknown as ProfileData
+                );
                 setUser(userData);
               }
             } catch (error) {
@@ -65,7 +70,11 @@ export const useAuthState = () => {
           }
           
           if (profile) {
-            const userData = createUserFromProfile(currentSession.user.id, profile);
+            // Cast the profile to ProfileData to ensure type safety
+            const userData = createUserFromProfile(
+              currentSession.user.id, 
+              profile as unknown as ProfileData
+            );
             setUser(userData);
           }
         }

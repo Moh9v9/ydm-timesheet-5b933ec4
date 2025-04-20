@@ -1,13 +1,15 @@
 
 import { User, UserRole, UserPermissions } from "@/lib/types";
 import { ProfileData } from "./types";
+import { Json } from "@/integrations/supabase/types";
 
 export const createUserFromProfile = (userId: string, profile: ProfileData): User => {
   // Safely handle permissions
   let permissionsObj: Record<string, unknown> = {};
   
+  // Check if permissions is an object and not null or an array
   if (typeof profile.permissions === 'object' && profile.permissions !== null && !Array.isArray(profile.permissions)) {
-    permissionsObj = profile.permissions;
+    permissionsObj = profile.permissions as Record<string, unknown>;
   }
   
   // Safely convert role string to UserRole type

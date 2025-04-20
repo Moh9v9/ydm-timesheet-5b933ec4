@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { User } from "@/lib/types";
 import { supabase } from "@/integrations/supabase/client";
 import { createUserFromProfile } from '@/features/auth/utils';
+import { ProfileData } from '@/features/auth/types';
 
 export const useUsersState = () => {
   const [users, setUsers] = useState<User[]>([]);
@@ -23,7 +24,7 @@ export const useUsersState = () => {
         
         if (profiles) {
           const loadedUsers = profiles.map(profile => 
-            createUserFromProfile(profile.id, profile)
+            createUserFromProfile(profile.id, profile as unknown as ProfileData)
           );
           setUsers(loadedUsers);
         }

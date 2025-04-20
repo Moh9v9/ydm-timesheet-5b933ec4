@@ -1,6 +1,7 @@
 
 import { User as SupabaseUser, Session } from "@supabase/supabase-js";
 import { UserRole, UserPermissions, User } from "@/lib/types";
+import { Json } from "@/integrations/supabase/types";
 
 export interface AuthContextType {
   user: User | null;
@@ -18,5 +19,5 @@ export interface ProfileData {
   full_name: string;
   email: string;
   role: string;
-  permissions: Record<string, unknown>;
+  permissions: Json;
 }
