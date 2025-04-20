@@ -6,11 +6,18 @@ import { StatsCard } from "@/components/dashboard/StatsCard";
 import { useStatistics } from "@/hooks/useStatistics";
 import Attendance from "@/pages/attendance/Attendance";
 import { useAttendance } from "@/contexts/AttendanceContext";
+import { useEffect } from "react";
 
 const Dashboard = () => {
   const { user } = useAuth();
-  const { currentDate } = useAttendance();
+  const { currentDate, setCurrentDate } = useAttendance();
   const stats = useStatistics(currentDate);
+
+  // Reset to current day whenever Dashboard mounts
+  useEffect(() => {
+    const today = new Date().toISOString().split('T')[0];
+    setCurrentDate(today);
+  }, [setCurrentDate]);
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -55,4 +62,3 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
-
