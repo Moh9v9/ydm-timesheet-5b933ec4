@@ -24,7 +24,7 @@ serve(async (req) => {
     if (!supabaseUrl || !supabaseServiceKey) {
       console.error("Missing Supabase URL or service key");
       return new Response(
-        JSON.stringify({ error: "Server configuration error" }),
+        JSON.stringify({ error: "Server configuration error", details: "Missing Supabase credentials" }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
@@ -37,7 +37,7 @@ serve(async (req) => {
     if (!authHeader) {
       console.error("No authorization header");
       return new Response(
-        JSON.stringify({ error: "Unauthorized - No auth header" }),
+        JSON.stringify({ error: "Unauthorized", details: "No authorization header provided" }),
         { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
@@ -48,10 +48,18 @@ serve(async (req) => {
     
     const { data: { user: caller }, error: authError } = await supabase.auth.getUser(token);
     
-    if (authError || !caller) {
-      console.error("Auth error or no caller user:", authError);
+    if (authError) {
+      console.error("Auth error:", authError);
       return new Response(
-        JSON.stringify({ error: "Unauthorized - Invalid token", details: authError?.message }),
+        JSON.stringify({ error: "Unauthorized", details: `Authentication failed: ${authError.message}` }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+    
+    if (!caller) {
+      console.error("No caller user found");
+      return new Response(
+        JSON.stringify({ error: "Unauthorized", details: "Invalid or expired token" }),
         { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
@@ -61,22 +69,35 @@ serve(async (req) => {
     // Check if the caller is an admin by querying the profiles table
     const { data: callerProfile, error: profileError } = await supabase
       .from('profiles')
-      .select('role')
+      .select('role, permissions')
       .eq('id', caller.id)
       .single();
       
     if (profileError) {
       console.error("Profile error:", profileError);
       return new Response(
-        JSON.stringify({ error: "Failed to verify permissions", details: profileError.message }),
+        JSON.stringify({ 
+          error: "Failed to verify permissions", 
+          details: `Could not retrieve caller's profile: ${profileError.message}` 
+        }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
     
-    if (!callerProfile || callerProfile.role !== 'admin') {
-      console.error("Caller is not admin:", callerProfile);
+    console.log("Caller profile:", callerProfile);
+    
+    if (!callerProfile) {
+      console.error("No caller profile found");
       return new Response(
-        JSON.stringify({ error: "Forbidden: Only admins can create users" }),
+        JSON.stringify({ error: "Forbidden", details: "User profile not found" }),
+        { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+    
+    if (callerProfile.role !== 'admin') {
+      console.error("Caller is not admin:", callerProfile.role);
+      return new Response(
+        JSON.stringify({ error: "Forbidden", details: "Only admins can create users" }),
         { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
@@ -91,7 +112,7 @@ serve(async (req) => {
     } catch (jsonError) {
       console.error("Error parsing request body:", jsonError);
       return new Response(
-        JSON.stringify({ error: "Invalid JSON in request body" }),
+        JSON.stringify({ error: "Bad Request", details: "Invalid JSON in request body" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
@@ -104,7 +125,7 @@ serve(async (req) => {
       console.error("Missing required fields");
       return new Response(
         JSON.stringify({ 
-          error: "Missing required fields", 
+          error: "Bad Request", 
           details: {
             fullName: !fullName ? "Full name is required" : undefined,
             email: !email ? "Email is required" : undefined,
@@ -120,27 +141,43 @@ serve(async (req) => {
     if (!emailRegex.test(email)) {
       console.error("Invalid email format");
       return new Response(
-        JSON.stringify({ error: "Invalid email format" }),
+        JSON.stringify({ error: "Bad Request", details: "Invalid email format" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+    
+    // Validate password length
+    if (password.length < 6) {
+      console.error("Password too short");
+      return new Response(
+        JSON.stringify({ error: "Bad Request", details: "Password must be at least 6 characters long" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
     
     // Check if user with email already exists
-    const { data: existingUser, error: existingUserError } = await supabase
-      .from('profiles')
-      .select('id')
-      .eq('email', email)
-      .maybeSingle();
+    const { data: existingUser, error: existingUserError } = await supabase.auth.admin.listUsers({
+      filter: {
+        email: email
+      }
+    });
       
     if (existingUserError) {
       console.error("Error checking for existing user:", existingUserError);
+      return new Response(
+        JSON.stringify({ 
+          error: "Internal Server Error", 
+          details: `Failed to check for existing user: ${existingUserError.message}` 
+        }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
     
-    if (existingUser) {
+    if (existingUser && existingUser.users && existingUser.users.length > 0) {
       console.error("User with email already exists:", email);
       return new Response(
-        JSON.stringify({ error: "A user with this email already exists" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        JSON.stringify({ error: "Conflict", details: "A user with this email already exists" }),
+        { status: 409, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
     
@@ -195,7 +232,10 @@ serve(async (req) => {
       if (createError) {
         console.error("Error creating user:", createError);
         return new Response(
-          JSON.stringify({ error: createError.message }),
+          JSON.stringify({ 
+            error: "Creation Failed", 
+            details: `Failed to create user: ${createError.message}` 
+          }),
           { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
@@ -203,7 +243,7 @@ serve(async (req) => {
       if (!newUser || !newUser.user) {
         console.error("No user created or returned");
         return new Response(
-          JSON.stringify({ error: "Failed to create user" }),
+          JSON.stringify({ error: "Creation Failed", details: "Failed to create user: No user data returned" }),
           { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
@@ -219,6 +259,7 @@ serve(async (req) => {
         
       if (profileFetchError) {
         console.error("Error fetching new user profile:", profileFetchError);
+        // Continue despite this error - the user is created, but we couldn't fetch the profile
       } else {
         console.log("New user profile created:", profile);
       }
@@ -236,20 +277,20 @@ serve(async (req) => {
         }),
         { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
-    } catch (createUserError) {
+    } catch (createUserError: any) {
       console.error("Error in createUser:", createUserError);
       return new Response(
         JSON.stringify({ 
-          error: "Error creating user",
-          details: createUserError.message || "Unknown error"
+          error: "Creation Failed",
+          details: createUserError.message || "Unknown error during user creation"
         }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error("Server error:", error);
     return new Response(
-      JSON.stringify({ error: "Internal server error", details: error.message }),
+      JSON.stringify({ error: "Internal Server Error", details: error.message || "Unknown server error" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }

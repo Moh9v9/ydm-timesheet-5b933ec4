@@ -1,3 +1,4 @@
+
 import { User } from "@/lib/types";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -35,18 +36,27 @@ export const useUsersOperations = (
       
       console.log("Session acquired, proceeding with edge function call");
       
-      // Use the imported URL directly from the environment
+      // Set up the URL for the edge function
       const supabaseUrl = "https://bkrfhlycvtmpoewlwpcc.supabase.co";
+      const functionUrl = `${supabaseUrl}/functions/v1/create-user`;
       
-      // Call the edge function to create the user
-      console.log("Calling edge function with token:", session.access_token.substring(0, 10) + "...");
+      console.log("Calling edge function with URL:", functionUrl);
+      console.log("Using authentication token:", session.access_token.substring(0, 10) + "...");
       
       // Fetch with timeout to prevent hanging requests
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
       
       try {
-        const response = await fetch(`${supabaseUrl}/functions/v1/create-user`, {
+        console.log("Sending payload:", {
+          fullName: user.fullName,
+          email: user.email,
+          password: user.password,
+          role: user.role,
+          permissions: user.permissions
+        });
+        
+        const response = await fetch(functionUrl, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -68,20 +78,22 @@ export const useUsersOperations = (
         console.log("Edge function response headers:", Object.fromEntries(response.headers.entries()));
         
         // Try to parse the response as JSON
+        let responseText;
         let data;
         try {
-          const text = await response.text();
-          console.log("Raw response text:", text);
-          data = JSON.parse(text);
+          responseText = await response.text();
+          console.log("Raw response text:", responseText);
+          data = JSON.parse(responseText);
         } catch (parseError) {
           console.error("Error parsing response:", parseError);
-          throw new Error("Invalid response from server: Could not parse JSON");
+          throw new Error(`Invalid response from server: Could not parse JSON. Raw response: ${responseText}`);
         }
         
         console.log("Edge function response data:", data);
         
         if (!response.ok) {
-          throw new Error(data.error || `Failed to create user: ${response.status} ${response.statusText}`);
+          console.error("Edge function returned an error:", data);
+          throw new Error(data.error || data.details || `Failed to create user: ${response.status} ${response.statusText}`);
         }
         
         if (!data.user || !data.user.id) {
@@ -99,8 +111,10 @@ export const useUsersOperations = (
         };
         
         setUsers([...users, newUser]);
+        console.log("User created successfully:", newUser);
         return newUser;
-      } catch (fetchError) {
+      } catch (fetchError: any) {
+        console.error("Fetch error:", fetchError);
         if (fetchError.name === 'AbortError') {
           throw new Error("Edge function request timed out after 30 seconds");
         }

@@ -6,6 +6,7 @@ import { Plus } from "lucide-react";
 import { User } from "@/lib/types";
 import { UserModal } from "./components/UserModal";
 import { UsersTable } from "./components/UsersTable";
+import { Button } from "@/components/ui/button";
 
 const UsersSettings = () => {
   const { users, addUser, updateUser, deleteUser, loading } = useUsers();
@@ -91,14 +92,16 @@ const UsersSettings = () => {
           console.log("User creation result:", result);
           toast.success("User created successfully");
           handleCloseModal();
-        } catch (addError) {
+        } catch (addError: any) {
           console.error("Error in addUser:", addError);
-          const errorMsg = addError instanceof Error ? addError.message : "Failed to create user";
+          const errorMsg = addError instanceof Error ? addError.message : 
+            (typeof addError === 'string' ? addError : "Failed to create user");
           toast.error(errorMsg);
         }
       }
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Failed to save user";
+    } catch (err: any) {
+      const errorMessage = err instanceof Error ? err.message : 
+        (typeof err === 'string' ? err : "Failed to save user");
       console.error("Error in handleSubmit:", err);
       toast.error(errorMessage);
     } finally {
@@ -110,13 +113,14 @@ const UsersSettings = () => {
     <div>
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-medium">User Management</h2>
-        <button
+        <Button
           onClick={() => handleOpenModal()}
-          className="px-3 py-2 bg-primary text-white rounded-md flex items-center hover:bg-primary/90 transition-colors"
+          className="flex items-center"
+          variant="default"
         >
           <Plus size={16} className="mr-2" />
           Add User
-        </button>
+        </Button>
       </div>
       
       <UsersTable
