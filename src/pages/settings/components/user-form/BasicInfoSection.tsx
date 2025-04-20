@@ -29,7 +29,10 @@ export const BasicInfoSection = ({
           name="fullName"
           value={fullName}
           onChange={onInputChange}
-          className="w-full p-2 border border-input rounded-md"
+          className="w-full p-2 border border-input rounded-md 
+            dark:bg-gray-800 dark:border-gray-700 dark:text-white 
+            dark:placeholder-gray-500 
+            focus:ring-2 focus:ring-primary dark:focus:ring-primary/50"
           required
         />
       </div>
@@ -42,7 +45,10 @@ export const BasicInfoSection = ({
           name="email"
           value={email}
           onChange={onInputChange}
-          className="w-full p-2 border border-input rounded-md"
+          className="w-full p-2 border border-input rounded-md 
+            dark:bg-gray-800 dark:border-gray-700 dark:text-white 
+            dark:placeholder-gray-500 
+            focus:ring-2 focus:ring-primary dark:focus:ring-primary/50"
           required
         />
       </div>
@@ -57,7 +63,10 @@ export const BasicInfoSection = ({
           name="password"
           value={password}
           onChange={onInputChange}
-          className="w-full p-2 border border-input rounded-md"
+          className="w-full p-2 border border-input rounded-md 
+            dark:bg-gray-800 dark:border-gray-700 dark:text-white 
+            dark:placeholder-gray-500 
+            focus:ring-2 focus:ring-primary dark:focus:ring-primary/50"
           required={!isEditMode}
         />
       </div>
@@ -69,7 +78,10 @@ export const BasicInfoSection = ({
           name="role"
           value={role}
           onChange={onInputChange}
-          className="w-full p-2 border border-input rounded-md"
+          className="w-full p-2 border border-input rounded-md 
+            dark:bg-gray-800 dark:border-gray-700 dark:text-white 
+            dark:placeholder-gray-500 
+            focus:ring-2 focus:ring-primary dark:focus:ring-primary/50"
           required
         >
           <option value="admin">Admin</option>
@@ -79,3 +91,4 @@ export const BasicInfoSection = ({
     </div>
   );
 };
+
