@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { format } from "date-fns";
 import { ChevronDown } from "lucide-react";
@@ -35,12 +36,26 @@ const DateRangeInputs = ({ reportType, currentDate }: DateRangeInputsProps) => {
             <select
               value={value}
               onChange={onChange}
-              className="appearance-none bg-transparent pl-2 pr-6 py-1 outline-none cursor-pointer z-10 text-sm font-medium text-foreground dark:text-white"
+              className={cn(
+                "appearance-none bg-transparent pl-2 pr-6 py-1 outline-none cursor-pointer z-10",
+                "text-sm font-medium",
+                "text-foreground dark:text-gray-100", // Improved dark mode text color
+                "dark:bg-gray-800/70", // Dark background with slight transparency
+                "dark:border-gray-700", // Dark border
+                "dark:focus:ring-2 dark:focus:ring-primary/50", // Focus state in dark mode
+                "transition-all duration-200"
+              )}
               {...props}
             >
               {children}
             </select>
-            <ChevronDown className="w-3.5 h-3.5 absolute right-0.5 text-muted-foreground/70 pointer-events-none" />
+            <ChevronDown 
+              className={cn(
+                "w-3.5 h-3.5 absolute right-0.5", 
+                "text-muted-foreground/70 dark:text-gray-300", // Improved dark mode icon color
+                "pointer-events-none"
+              )} 
+            />
           </div>
         );
       },
