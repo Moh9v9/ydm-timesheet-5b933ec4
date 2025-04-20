@@ -77,7 +77,7 @@ export const UsersTable = ({ users, onEdit, onDelete, loading }: UsersTableProps
             <th className="h-12 px-4 text-left align-middle font-medium">Name</th>
             <th className="h-12 px-4 text-left align-middle font-medium">Email</th>
             <th className="h-12 px-4 text-left align-middle font-medium">Role</th>
-            <th className="h-12 px-4 text-left align-middle font-medium">Permissions</th>
+            <th className="h-12 px-4 text-center align-middle font-medium">Permissions</th>
             <th className="h-12 px-4 text-left align-middle font-medium">Actions</th>
           </tr>
         </thead>
@@ -92,7 +92,7 @@ export const UsersTable = ({ users, onEdit, onDelete, loading }: UsersTableProps
                     {user.role}
                   </Badge>
                 </td>
-                <td className="p-4">
+                <td className="p-4 text-center">
                   <div className="flex flex-wrap gap-4 justify-center">
                     {renderPermissionBadge(
                       <Users size={14} />,
