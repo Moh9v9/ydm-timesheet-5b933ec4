@@ -107,7 +107,7 @@ export const UsersTable = ({ users, onEdit, onDelete, loading }: UsersTableProps
                     {renderPermissionBadge(
                       <FileText size={14} />,
                       "Export",
-                      { view: user.permissions.export, edit: false, delete: false }
+                      { Allow: user.permissions.export }
                     )}
                   </div>
                 </td>
