@@ -174,20 +174,22 @@ const Attendance = () => {
       <div className="flex items-center justify-between p-4 bg-card rounded-lg border">
         <button
           onClick={goToPreviousDay}
-          className="p-2 rounded-md hover:bg-accent flex items-center justify-center 
+          className="p-3 rounded-md flex items-center justify-center 
                      transition-all duration-300 
                      bg-secondary text-secondary-foreground 
                      hover:bg-secondary/80 
                      focus:outline-none focus:ring-2 focus:ring-ring 
-                     shadow-md hover:shadow-lg"
+                     shadow-sm hover:shadow-md
+                     w-12 h-12"
+          aria-label="Previous day"
         >
           <ChevronLeft size={24} className="text-current" />
         </button>
         
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-3">
           <button
             onClick={goToToday}
-            className="px-3 py-1 border rounded-md hover:bg-accent text-sm"
+            className="px-4 py-2 border rounded-md hover:bg-accent text-sm font-medium"
           >
             Today
           </button>
@@ -195,10 +197,12 @@ const Attendance = () => {
           <div className="relative">
             <button
               onClick={() => setShowDatePicker(!showDatePicker)}
-              className="flex items-center space-x-2 px-3 py-2 border rounded-md hover:bg-accent"
+              className="flex items-center space-x-2 px-6 py-3 border rounded-md hover:bg-accent min-w-[240px] justify-center"
             >
-              <Calendar size={16} />
-              <span>{format(parse(currentDate, "yyyy-MM-dd", new Date()), "EEEE, MMMM d, yyyy")}</span>
+              <Calendar size={18} />
+              <span className="font-medium">
+                {format(parse(currentDate, "yyyy-MM-dd", new Date()), "EEEE, MMMM d, yyyy")}
+              </span>
             </button>
             
             {showDatePicker && (
@@ -207,7 +211,7 @@ const Attendance = () => {
                   type="date"
                   value={currentDate}
                   onChange={handleDateChange}
-                  className="p-1 border rounded-md"
+                  className="p-2 border rounded-md w-full"
                 />
               </div>
             )}
@@ -216,12 +220,14 @@ const Attendance = () => {
         
         <button
           onClick={goToNextDay}
-          className="p-2 rounded-md hover:bg-accent flex items-center justify-center 
+          className="p-3 rounded-md flex items-center justify-center 
                      transition-all duration-300 
                      bg-secondary text-secondary-foreground 
                      hover:bg-secondary/80 
                      focus:outline-none focus:ring-2 focus:ring-ring 
-                     shadow-md hover:shadow-lg"
+                     shadow-sm hover:shadow-md
+                     w-12 h-12"
+          aria-label="Next day"
         >
           <ChevronRight size={24} className="text-current" />
         </button>
