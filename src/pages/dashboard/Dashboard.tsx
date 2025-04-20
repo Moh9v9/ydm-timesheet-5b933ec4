@@ -35,13 +35,13 @@ const Dashboard = () => {
         />
         <StatsCard
           icon={UserCheck}
-          title="Present"
+          title="Total Present"
           value={stats.presentToday}
           colorClass="bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-400"
         />
         <StatsCard
           icon={UserX}
-          title="Absent Today"
+          title="Total Absent"
           value={stats.absentToday}
           colorClass="bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-400"
         />
@@ -55,3 +55,4 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
+
