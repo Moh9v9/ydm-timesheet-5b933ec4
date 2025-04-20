@@ -23,8 +23,20 @@ export const useAttendanceOperations = (canEdit: boolean) => {
     setIsSubmitting(true);
     
     try {
-      console.log("Sending attendance data to save:", attendanceData);
-      const result = await bulkSaveAttendance(attendanceData);
+      // Prepare data for saving by making a clean copy
+      const cleanData = attendanceData.map(record => ({
+        ...(record.id && !record.id.toString().includes('temp_') ? { id: record.id } : {}),
+        employeeId: record.employeeId,
+        date: record.date,
+        present: record.present,
+        startTime: record.startTime,
+        endTime: record.endTime,
+        overtimeHours: record.overtimeHours,
+        note: record.note
+      }));
+      
+      console.log("Sending attendance data to save:", cleanData);
+      const result = await bulkSaveAttendance(cleanData);
       console.log("Save result:", result);
       success("Attendance data saved successfully");
       setShowSaveConfirm(false);

@@ -1,3 +1,4 @@
+
 import { AttendanceRecord } from "@/lib/types";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -165,10 +166,14 @@ export const useAttendanceOperations = (
       // Prepare records for upsert - remove temporary IDs and format correctly
       const recordsToUpsert = records.map(record => {
         // Extract real ID if it exists and isn't a temporary ID
-        const id = 'id' in record && !record.id.toString().includes('temp_') ? record.id : undefined;
+        let recordId = null;
+        if ('id' in record && !record.id.toString().includes('temp_')) {
+          recordId = record.id;
+        }
         
         return {
-          id: id, // Will be undefined for new records, letting Supabase generate a UUID
+          // Only include id if it's not a temporary ID
+          ...(recordId ? { id: recordId } : {}),
           employee_id: record.employeeId,
           date: record.date,
           present: record.present,
