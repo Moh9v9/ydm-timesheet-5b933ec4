@@ -4,16 +4,16 @@ import { AttendanceContextType } from "./attendance/types";
 import { useAttendanceState } from "./attendance/useAttendanceState";
 import { useAttendanceOperations } from "./attendance/useAttendanceOperations";
 
-// Get a fresh date for initialization
+// Function to always get a fresh today date
 const getTodayISODate = () => new Date().toISOString().split('T')[0];
 
 // Create a context with a default value to prevent the "must be used within Provider" error
 const AttendanceContext = createContext<AttendanceContextType>({
   attendanceRecords: [],
   filteredRecords: [],
-  currentDate: getTodayISODate(), // Use function to ensure fresh date on each context creation
+  currentDate: getTodayISODate(), // Always use fresh date
   setCurrentDate: () => {},
-  filters: { date: getTodayISODate() }, // Use function to ensure fresh date on each context creation
+  filters: { date: getTodayISODate() }, // Always use fresh date
   setFilters: () => {},
   loading: false,
   // Default implementations that will never be used but satisfy TypeScript
@@ -49,6 +49,16 @@ export const AttendanceProvider = ({ children }: { children: ReactNode }) => {
     console.log("AttendanceContext - Current date changed to:", currentDate);
     setFilters(prev => ({ ...prev, date: currentDate }));
   }, [currentDate, setFilters]);
+
+  // Add an effect to ensure date is always fresh on remount
+  useEffect(() => {
+    const freshDate = getTodayISODate();
+    console.log("AttendanceContext - Initializing with fresh date on mount:", freshDate);
+    
+    // This ensures that when the provider mounts, we always start with today's date
+    // This is especially important after a page refresh
+    setCurrentDate(freshDate);
+  }, [setCurrentDate]);
 
   return (
     <AttendanceContext.Provider

@@ -6,13 +6,13 @@ import { StatsCard } from "@/components/dashboard/StatsCard";
 import { useStatistics } from "@/hooks/useStatistics";
 import Attendance from "@/pages/attendance/Attendance";
 import { useAttendance } from "@/contexts/AttendanceContext";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 const Dashboard = () => {
   const { user } = useAuth();
   const { setCurrentDate } = useAttendance();
   
-  // Get today's date and format it for display
+  // Get today's date and format it for display - always fresh
   const today = new Date();
   const todayISO = today.toISOString().split('T')[0];
   const formattedDate = format(today, "EEEE, MMMM d, yyyy");
@@ -20,13 +20,28 @@ const Dashboard = () => {
   // Get statistics - our hook will use the current date internally
   const stats = useStatistics();
 
-  // Set the current date in the context immediately and whenever the component mounts
-  // This ensures the date is always fresh
+  // Set the current date in the context immediately when the component mounts
+  // This ensures the date is always fresh on page load/refresh
   useEffect(() => {
-    console.log("Dashboard - Setting current date on mount:", todayISO);
-    if (setCurrentDate) {
-      setCurrentDate(todayISO);
-    }
+    const getCurrentDate = () => {
+      // Always calculate a fresh date when setting it
+      const freshToday = new Date();
+      const freshTodayISO = freshToday.toISOString().split('T')[0];
+      console.log("Dashboard - Setting current date on mount/refresh:", freshTodayISO);
+      
+      if (setCurrentDate) {
+        setCurrentDate(freshTodayISO);
+      }
+    };
+    
+    // Set date when component mounts
+    getCurrentDate();
+    
+    // Set up an interval to refresh the date every minute
+    // This is to ensure the date is always current, even if the user leaves the page open overnight
+    const intervalId = setInterval(getCurrentDate, 60000);
+    
+    return () => clearInterval(intervalId);
   }, [setCurrentDate]);
 
   return (

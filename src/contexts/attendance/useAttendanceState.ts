@@ -3,12 +3,13 @@ import { useState, useEffect } from "react";
 import { AttendanceRecord, AttendanceFilters } from "@/lib/types";
 import { supabase } from "@/integrations/supabase/client";
 
-// Function to get a fresh date 
+// Function to always get a fresh today date
 const getTodayISODate = () => new Date().toISOString().split('T')[0];
 
 export const useAttendanceState = () => {
-  // Initialize with fresh date
-  const [currentDate, setCurrentDate] = useState<string>(getTodayISODate());
+  // Initialize with fresh date every time
+  const freshDate = getTodayISODate();
+  const [currentDate, setCurrentDate] = useState<string>(freshDate);
   const [attendanceRecords, setAttendanceRecords] = useState<AttendanceRecord[]>([]);
   const [filters, setFilters] = useState<AttendanceFilters>({
     date: currentDate
