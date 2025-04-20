@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { User, UserRole } from "@/lib/types";
 
@@ -125,7 +124,7 @@ export const UserForm = ({ currentUser, onSubmit, onCancel, isSubmitting }: User
           name="role"
           value={formData.role}
           onChange={handleInputChange}
-          className="w-full p-2 border border-input rounded-md"
+          className="w-full p-2 border border-input rounded-md bg-background text-foreground dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100 dark:focus:ring-2 dark:focus:ring-primary dark:focus:ring-offset-1 dark:focus:ring-offset-gray-900"
           required
         >
           <option value="admin">Admin</option>
