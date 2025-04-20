@@ -17,8 +17,8 @@ export const EmployeesTable = ({
   onDelete 
 }: EmployeesTableProps) => {
   const { user } = useAuth();
-  const canEdit = user?.permissions.edit;
-  const canDelete = user?.permissions.delete;
+  const canEdit = user?.permissions.employees.edit;
+  const canDelete = user?.permissions.employees.delete;
 
   return (
     <div className="data-table-container">

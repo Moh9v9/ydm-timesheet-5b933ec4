@@ -1,4 +1,3 @@
-
 import { useAuth } from "@/contexts/AuthContext";
 import { useAttendance } from "@/contexts/AttendanceContext";
 import { useEmployees } from "@/contexts/EmployeeContext";
@@ -17,7 +16,7 @@ const Attendance = () => {
   const { currentDate, setCurrentDate } = useAttendance();
   const { NotificationContainer } = useNotification();
   
-  const canEdit = user?.permissions.edit;
+  const canEdit = user?.permissions.attendees.edit;
   
   const {
     attendanceData,

@@ -17,6 +17,7 @@ export const createUserFromProfile = (userId: string, profile: ProfileData): Use
     ? profile.role 
     : 'user';
   
+  // Create the user with the updated permission structure
   return {
     id: userId,
     fullName: profile.full_name,
@@ -24,9 +25,16 @@ export const createUserFromProfile = (userId: string, profile: ProfileData): Use
     password: '', // We don't store passwords
     role: role,
     permissions: {
-      view: Boolean(permissionsObj.view),
-      edit: Boolean(permissionsObj.edit),
-      delete: Boolean(permissionsObj.delete)
+      employees: {
+        view: Boolean(permissionsObj.employees && (permissionsObj.employees as any)?.view),
+        edit: Boolean(permissionsObj.employees && (permissionsObj.employees as any)?.edit),
+        delete: Boolean(permissionsObj.employees && (permissionsObj.employees as any)?.delete)
+      },
+      attendees: {
+        view: Boolean(permissionsObj.attendees && (permissionsObj.attendees as any)?.view),
+        edit: Boolean(permissionsObj.attendees && (permissionsObj.attendees as any)?.edit)
+      },
+      export: Boolean(permissionsObj.export)
     }
   };
 };

@@ -1,4 +1,3 @@
-
 import { User } from "@/lib/types";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -27,9 +26,16 @@ export const useAuthOperations = () => {
         password: '',
         role: 'user',
         permissions: {
-          view: true,
-          edit: false,
-          delete: false,
+          employees: {
+            view: false,
+            edit: false,
+            delete: false
+          },
+          attendees: {
+            view: false,
+            edit: false
+          },
+          export: false
         },
       };
     } catch (error: any) {

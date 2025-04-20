@@ -33,17 +33,17 @@ export const UsersTable = ({ users, onEdit, onDelete, loading }: UsersTableProps
                 </td>
                 <td>
                   <div className="flex space-x-2">
-                    {user.permissions.view && (
+                    {user.permissions.employees.view && (
                       <span className="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full dark:bg-blue-900/50 dark:text-blue-300">
                         View
                       </span>
                     )}
-                    {user.permissions.edit && (
+                    {user.permissions.employees.edit && (
                       <span className="px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full dark:bg-green-900/50 dark:text-green-300">
                         Edit
                       </span>
                     )}
-                    {user.permissions.delete && (
+                    {user.permissions.employees.delete && (
                       <span className="px-2 py-1 text-xs bg-red-100 text-red-800 rounded-full dark:bg-red-900/50 dark:text-red-300">
                         Delete
                       </span>

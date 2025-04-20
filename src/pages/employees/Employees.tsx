@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useEmployees } from "@/contexts/EmployeeContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -26,7 +25,7 @@ const Employees = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentEmployee, setCurrentEmployee] = useState<Employee | null>(null);
   
-  const canEdit = user?.permissions.edit;
+  const canEdit = user?.permissions.employees.edit;
   
   // Filter unique values for dropdowns
   const projects = getUniqueValues("project");
