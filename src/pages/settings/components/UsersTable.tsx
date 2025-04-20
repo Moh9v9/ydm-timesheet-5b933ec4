@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/tooltip";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from "@/components/ui/table";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface UsersTableProps {
   users: User[];
@@ -19,6 +20,8 @@ interface UsersTableProps {
 }
 
 export const UsersTable = ({ users, onEdit, onDelete, loading }: UsersTableProps) => {
+  const isMobile = useIsMobile();
+  
   const getPermissionColor = (enabled: boolean) => {
     return enabled ? "bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300" : "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400";
   };
@@ -78,9 +81,9 @@ export const UsersTable = ({ users, onEdit, onDelete, loading }: UsersTableProps
   );
 
   return (
-    <div className="rounded-md border bg-card">
-      <ScrollArea className="w-full">
-        <div className="min-w-[900px]"> {/* Ensures full visibility of all columns */}
+    <div className="rounded-md border bg-card overflow-hidden">
+      <div className="w-full overflow-auto">
+        <div className={isMobile ? "min-w-[800px]" : ""}>
           <Table>
             <TableHeader>
               <TableRow>
@@ -149,7 +152,7 @@ export const UsersTable = ({ users, onEdit, onDelete, loading }: UsersTableProps
             </TableBody>
           </Table>
         </div>
-      </ScrollArea>
+      </div>
     </div>
   );
 };
