@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useEmployees } from "@/contexts/EmployeeContext";
 import { useAttendance } from "@/contexts/AttendanceContext";
@@ -120,36 +119,6 @@ const Dashboard = () => {
               </div>
             </div>
           </div>
-        </div>
-      </div>
-
-      {/* Quick Access Section */}
-      <div className="bg-card shadow-sm rounded-lg p-6 border">
-        <h2 className="text-lg font-medium mb-4">Quick Access</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <a
-            href="/attendance"
-            className="p-4 border rounded-md bg-accent hover:bg-accent/90 transition-colors flex items-center"
-          >
-            <UserCheck className="h-5 w-5 mr-3" />
-            <span>Record Today's Attendance</span>
-          </a>
-          
-          <a
-            href="/employees"
-            className="p-4 border rounded-md bg-accent hover:bg-accent/90 transition-colors flex items-center"
-          >
-            <User className="h-5 w-5 mr-3" />
-            <span>Manage Employees</span>
-          </a>
-          
-          <a
-            href="/reports"
-            className="p-4 border rounded-md bg-accent hover:bg-accent/90 transition-colors flex items-center"
-          >
-            <BarChart3 className="h-5 w-5 mr-3" />
-            <span>View Reports</span>
-          </a>
         </div>
       </div>
 
