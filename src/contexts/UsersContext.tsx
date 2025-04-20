@@ -36,13 +36,17 @@ export const UsersProvider = ({ children }: { children: ReactNode }) => {
           // Convert profiles to User[] format with proper type handling
           const loadedUsers: User[] = profiles.map(profile => {
             // Safely handle permissions as an object or default to empty object
-            const permissionsObj = typeof profile.permissions === 'object' ? profile.permissions : {};
+            let permissionsObj: Record<string, unknown> = {};
+            
+            if (typeof profile.permissions === 'object' && profile.permissions !== null && !Array.isArray(profile.permissions)) {
+              permissionsObj = profile.permissions as Record<string, unknown>;
+            }
             
             // Make sure permissions is properly handled
             const permissions: UserPermissions = {
-              view: Boolean(permissionsObj?.view),
-              edit: Boolean(permissionsObj?.edit),
-              delete: Boolean(permissionsObj?.delete)
+              view: Boolean(permissionsObj.view),
+              edit: Boolean(permissionsObj.edit),
+              delete: Boolean(permissionsObj.delete)
             };
 
             return {

@@ -47,8 +47,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               
               if (profile) {
                 // Convert profile data to User type with proper type conversion for permissions
-                // Parse the permissions object safely
-                const permissionsObj = typeof profile.permissions === 'object' ? profile.permissions : {};
+                // Parse the permissions object safely and handle it could be an array or other type
+                let permissionsObj: Record<string, unknown> = {};
+                
+                if (typeof profile.permissions === 'object' && profile.permissions !== null && !Array.isArray(profile.permissions)) {
+                  permissionsObj = profile.permissions as Record<string, unknown>;
+                }
                 
                 const userData: User = {
                   id: currentSession.user.id,
@@ -57,9 +61,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                   password: '', // We don't store or return passwords
                   role: profile.role as any,
                   permissions: {
-                    view: Boolean(permissionsObj?.view),
-                    edit: Boolean(permissionsObj?.edit),
-                    delete: Boolean(permissionsObj?.delete)
+                    view: Boolean(permissionsObj.view),
+                    edit: Boolean(permissionsObj.edit),
+                    delete: Boolean(permissionsObj.delete)
                   }
                 };
                 
@@ -94,8 +98,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           }
           
           if (profile) {
-            // Parse the permissions object safely
-            const permissionsObj = typeof profile.permissions === 'object' ? profile.permissions : {};
+            // Parse the permissions object safely and handle it could be an array or other type
+            let permissionsObj: Record<string, unknown> = {};
+            
+            if (typeof profile.permissions === 'object' && profile.permissions !== null && !Array.isArray(profile.permissions)) {
+              permissionsObj = profile.permissions as Record<string, unknown>;
+            }
             
             const userData: User = {
               id: currentSession.user.id,
@@ -104,9 +112,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               password: '', // We don't store or return passwords
               role: profile.role as any,
               permissions: {
-                view: Boolean(permissionsObj?.view),
-                edit: Boolean(permissionsObj?.edit),
-                delete: Boolean(permissionsObj?.delete)
+                view: Boolean(permissionsObj.view),
+                edit: Boolean(permissionsObj.edit),
+                delete: Boolean(permissionsObj.delete)
               }
             };
             
