@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useEmployees } from "@/contexts/EmployeeContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -9,6 +8,7 @@ import EmployeeModal from "./EmployeeModal";
 import { EmployeeFiltersSection } from "./components/EmployeeFilters";
 import { SearchBar } from "./components/SearchBar";
 import { EmployeesTable } from "./components/EmployeesTable";
+import DeleteConfirmationDialog from "@/components/DeleteConfirmationDialog";
 
 const Employees = () => {
   const { 
@@ -51,18 +51,32 @@ const Employees = () => {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!window.confirm("Are you sure you want to delete this employee?")) {
-      return;
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [employeeToDelete, setEmployeeToDelete] = useState<string | null>(null);
+
+  const handleDeleteClick = (id: string) => {
+    setEmployeeToDelete(id);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (employeeToDelete) {
+      try {
+        await deleteEmployee(employeeToDelete);
+        success("Employee deleted successfully");
+      } catch (err) {
+        showError("Failed to delete employee");
+        console.error(err);
+      } finally {
+        setDeleteDialogOpen(false);
+        setEmployeeToDelete(null);
+      }
     }
-    
-    try {
-      await deleteEmployee(id);
-      success("Employee deleted successfully");
-    } catch (err) {
-      showError("Failed to delete employee");
-      console.error(err);
-    }
+  };
+
+  const handleDeleteCancel = () => {
+    setDeleteDialogOpen(false);
+    setEmployeeToDelete(null);
   };
 
   const handleEdit = (employee: Employee) => {
@@ -167,7 +181,7 @@ const Employees = () => {
           employees={searchedEmployees}
           loading={loading}
           onEdit={handleEdit}
-          onDelete={handleDelete}
+          onDelete={handleDeleteClick}
         />
       </div>
       
@@ -177,6 +191,14 @@ const Employees = () => {
           onClose={closeModal}
         />
       )}
+
+      <DeleteConfirmationDialog
+        isOpen={deleteDialogOpen}
+        onClose={handleDeleteCancel}
+        onConfirm={handleDeleteConfirm}
+        title="Delete Employee"
+        description="Are you sure you want to delete this employee? This action cannot be undone."
+      />
     </div>
   );
 };
