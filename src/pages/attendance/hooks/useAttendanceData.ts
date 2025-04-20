@@ -26,9 +26,9 @@ export const useAttendanceData = (canEdit: boolean) => {
               id: `temp_${employee.id}_${currentDate}`,
               employeeId: employee.id,
               date: currentDate,
-              present: true,
-              startTime: "07:00",
-              endTime: "17:00",
+              present: false, // Changed default to false (absent)
+              startTime: "",  // Empty start time for absent employees
+              endTime: "",    // Empty end time for absent employees
               overtimeHours: 0,
               note: ''
             };
@@ -102,3 +102,4 @@ export const useAttendanceData = (canEdit: boolean) => {
     handleNoteChange
   };
 };
+
