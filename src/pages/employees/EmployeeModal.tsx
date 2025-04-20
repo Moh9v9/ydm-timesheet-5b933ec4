@@ -1,91 +1,87 @@
 
-import { useState, useEffect } from "react";
-import { useEmployees } from "@/contexts/EmployeeContext";
-import { useNotification } from "@/components/ui/notification";
+import { useState } from "react";
 import { X } from "lucide-react";
-import { EmployeeModalProps, EmployeeFormData } from "./types/employee-form";
+import { Employee, EmployeeStatus, PaymentType, SponsorshipType } from "@/lib/types";
 import { EmployeeForm } from "./components/EmployeeForm";
+import { EmployeeFormData, EmployeeModalProps } from "./types/employee-form";
+import { useEmployees } from "@/contexts/EmployeeContext"; 
+import { toast } from "sonner";
 
 const EmployeeModal = ({ employee, onClose }: EmployeeModalProps) => {
-  const isEditing = !!employee;
-  const { addEmployee, updateEmployee } = useEmployees();
-  const { success, error } = useNotification();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
-  const [initialFormData, setInitialFormData] = useState<EmployeeFormData>({
+  const { addEmployee, updateEmployee } = useEmployees();
+
+  // Initialize form data based on employee prop or defaults
+  const initialData: EmployeeFormData = employee ? {
+    fullName: employee.fullName,
+    employeeId: employee.employeeId,
+    project: employee.project,
+    location: employee.location,
+    jobTitle: employee.jobTitle,
+    paymentType: employee.paymentType,
+    rateOfPayment: employee.rateOfPayment,
+    sponsorship: employee.sponsorship,
+    status: employee.status
+  } : {
     fullName: "",
     employeeId: "",
     project: "",
     location: "",
     jobTitle: "",
-    paymentType: "Monthly",
+    paymentType: "Monthly" as PaymentType,
     rateOfPayment: 0,
-    sponsorship: "YDM co",
-    status: "Active"
-  });
-  
-  useEffect(() => {
-    if (employee) {
-      setInitialFormData({
-        fullName: employee.fullName,
-        employeeId: employee.employeeId,
-        project: employee.project,
-        location: employee.location,
-        jobTitle: employee.jobTitle,
-        paymentType: employee.paymentType,
-        rateOfPayment: employee.rateOfPayment,
-        sponsorship: employee.sponsorship,
-        status: employee.status,
-      });
-    }
-  }, [employee]);
+    sponsorship: "YDM co" as SponsorshipType,
+    status: "Active" as EmployeeStatus
+  };
 
   const handleSubmit = async (formData: EmployeeFormData) => {
-    if (!formData.fullName) {
-      error("Please fill in the full name");
-      return;
-    }
-    
     setIsSubmitting(true);
-    
+    console.log("Submitting form data:", formData);
+
     try {
-      if (isEditing && employee) {
+      if (employee) {
+        // Update existing employee
         await updateEmployee(employee.id, formData);
-        success("Employee updated successfully");
+        toast.success("Employee updated successfully");
       } else {
+        // Create new employee
         await addEmployee(formData);
-        success("Employee added successfully");
+        toast.success("Employee added successfully");
       }
       onClose();
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Operation failed";
-      error(errorMessage);
+    } catch (error: any) {
+      console.error("Error saving employee:", error);
+      // Let the form component handle the error display
+      throw error;
     } finally {
       setIsSubmitting(false);
     }
   };
 
+  // Close modal with Escape key
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-      <div className="bg-card rounded-lg shadow-lg p-6 max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold">
-            {isEditing ? "Edit Employee" : "Add Employee"}
+    <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50 animate-fade">
+      <div className="bg-background dark:bg-gray-900 rounded-lg shadow-xl max-w-lg w-full max-h-[90vh] overflow-auto">
+        <div className="sticky top-0 bg-background dark:bg-gray-900 z-10 px-6 py-4 border-b dark:border-gray-800 flex justify-between items-center">
+          <h2 className="text-xl font-semibold dark:text-gray-100">
+            {employee ? "Edit Employee" : "Add New Employee"}
           </h2>
-          <button 
+          <button
             onClick={onClose}
-            className="p-1 rounded-full hover:bg-accent"
+            className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
           >
             <X size={20} />
           </button>
         </div>
         
-        <EmployeeForm
-          initialData={initialFormData}
-          onSubmit={handleSubmit}
-          isSubmitting={isSubmitting}
-          onClose={onClose}
-        />
+        <div className="p-6">
+          <EmployeeForm
+            initialData={initialData}
+            onSubmit={handleSubmit}
+            isSubmitting={isSubmitting}
+            onClose={onClose}
+          />
+        </div>
       </div>
     </div>
   );

@@ -17,11 +17,19 @@ export const useEmployeeOperations = (
   const addEmployee = async (employee: Omit<Employee, "id">): Promise<Employee> => {
     setLoading(true);
     try {
+      // Check if employeeId already exists (if it's provided)
+      if (employee.employeeId) {
+        const existingEmployee = employees.find(emp => emp.employeeId === employee.employeeId);
+        if (existingEmployee) {
+          throw new Error(`An employee with ID ${employee.employeeId} already exists`);
+        }
+      }
+
       const { data, error } = await supabase
         .from('employees')
         .insert({
           full_name: employee.fullName,
-          employee_id: employee.employeeId,
+          employee_id: employee.employeeId || null, // Make it null if empty
           project: employee.project,
           location: employee.location,
           job_title: employee.jobTitle,

@@ -1,13 +1,23 @@
-
 import { useState } from "react";
 import { EmployeeFormData, EmployeeFormProps } from "../types/employee-form";
 import { EmployeeFormField } from "./EmployeeFormField";
+import { toast } from "sonner";
 
 export const EmployeeForm = ({ initialData, onSubmit, isSubmitting, onClose }: EmployeeFormProps) => {
   const [formData, setFormData] = useState<EmployeeFormData>(initialData);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
+    
+    // Clear error when field is edited
+    if (errors[name]) {
+      setErrors(prev => {
+        const newErrors = {...prev};
+        delete newErrors[name];
+        return newErrors;
+      });
+    }
     
     if (name === "rateOfPayment") {
       setFormData({
@@ -22,21 +32,57 @@ export const EmployeeForm = ({ initialData, onSubmit, isSubmitting, onClose }: E
     }
   };
 
+  const validateForm = (): boolean => {
+    const newErrors: Record<string, string> = {};
+    
+    // Required field validation
+    if (!formData.fullName.trim()) {
+      newErrors.fullName = "Full name is required";
+    }
+    
+    // If there are no errors, we're good to go
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await onSubmit(formData);
+    
+    if (!validateForm()) {
+      toast.error("Please correct the errors before submitting");
+      return;
+    }
+    
+    try {
+      await onSubmit(formData);
+    } catch (error: any) {
+      // Display specific validation errors
+      if (error.message?.includes("duplicate key value")) {
+        setErrors({
+          employeeId: "An employee with this ID already exists"
+        });
+        toast.error("An employee with this ID already exists");
+      } else {
+        toast.error(error.message || "Error saving employee");
+      }
+    }
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <EmployeeFormField label="Full Name" name="fullName" required>
+      <EmployeeFormField 
+        label="Full Name" 
+        name="fullName" 
+        required 
+        error={errors.fullName}
+      >
         <input
           type="text"
           id="fullName"
           name="fullName"
           value={formData.fullName}
           onChange={handleChange}
-          className="w-full p-2 border border-input rounded-md 
+          className={`w-full p-2 border ${errors.fullName ? 'border-destructive' : 'border-input'} rounded-md 
             bg-background 
             dark:bg-gray-900 
             dark:border-gray-700 
@@ -46,19 +92,23 @@ export const EmployeeForm = ({ initialData, onSubmit, isSubmitting, onClose }: E
             focus:ring-primary 
             dark:focus:ring-primary/70 
             transition-all 
-            duration-300"
+            duration-300`}
           required
         />
       </EmployeeFormField>
 
-      <EmployeeFormField label="Employee ID" name="employeeId">
+      <EmployeeFormField 
+        label="Employee ID" 
+        name="employeeId"
+        error={errors.employeeId}
+      >
         <input
           type="text"
           id="employeeId"
           name="employeeId"
           value={formData.employeeId}
           onChange={handleChange}
-          className="w-full p-2 border border-input rounded-md dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+          className={`w-full p-2 border ${errors.employeeId ? 'border-destructive' : 'border-input'} rounded-md dark:bg-gray-800 dark:border-gray-700 dark:text-white`}
         />
       </EmployeeFormField>
 
