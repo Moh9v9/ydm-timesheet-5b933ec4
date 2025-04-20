@@ -19,13 +19,13 @@ export const useUsersOperations = (
         throw new Error("A user with this email already exists");
       }
       
-      // Create the user with properly structured metadata
+      // Create the user with correctly formatted metadata to match the trigger expectations
       const { data: authData, error: authError } = await supabase.auth.admin.createUser({
         email: user.email,
         password: user.password,
         email_confirm: true,
         user_metadata: {
-          full_name: user.fullName,
+          full_name: user.fullName, // This is crucial - matches the column name in the profiles table
           fullName: user.fullName,
           role: user.role,
           permissions: user.permissions
@@ -33,6 +33,7 @@ export const useUsersOperations = (
       });
       
       if (authError || !authData.user) {
+        console.error("Auth error:", authError);
         throw new Error(authError?.message || "Failed to create user");
       }
       

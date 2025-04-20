@@ -61,8 +61,8 @@ const UsersSettings = () => {
         });
         toast.success("User updated successfully");
       } else {
-        // Create new user with explicit full permissions for admin
-        await addUser({
+        // Create new user - ensure metadata structure matches the database trigger expectations
+        const userToAdd = {
           fullName: formData.fullName,
           email: formData.email,
           password: formData.password,
@@ -72,7 +72,10 @@ const UsersSettings = () => {
             edit: true,
             delete: true
           } : formData.permissions
-        });
+        };
+        
+        console.log("Creating user with data:", userToAdd);
+        await addUser(userToAdd);
         toast.success("User created successfully");
       }
       
@@ -80,6 +83,7 @@ const UsersSettings = () => {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Failed to save user";
       toast.error(errorMessage);
+      console.error("Error in handleSubmit:", err);
     } finally {
       setIsSubmitting(false);
     }
