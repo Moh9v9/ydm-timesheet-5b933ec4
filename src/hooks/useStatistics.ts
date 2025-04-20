@@ -40,6 +40,7 @@ export const useStatistics = (selectedDate: string) => {
   useEffect(() => {
     const fetchDirectFromDatabase = async () => {
       try {
+        // Ensure we're using the correct date format for the query
         // Get records directly from Supabase for the selected date
         const { data, error } = await supabase
           .from('attendance_records')

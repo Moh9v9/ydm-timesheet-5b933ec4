@@ -10,7 +10,7 @@ import { useEffect } from "react";
 
 const Dashboard = () => {
   const { user } = useAuth();
-  const { currentDate, setCurrentDate } = useAttendance();
+  const { setCurrentDate } = useAttendance();
   const today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
   const stats = useStatistics(today); // Always use today's date for statistics
 
