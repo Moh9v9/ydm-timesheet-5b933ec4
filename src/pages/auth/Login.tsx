@@ -13,43 +13,30 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [redirectAttempted, setRedirectAttempted] = useState(false);
-  const { login, user, session } = useAuth();
+  const { login } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
 
-  // Check authentication status and redirect if needed
+  // Only check for existing session on mount, not on every render
   useEffect(() => {
-    const checkAndRedirect = async () => {
+    const checkSession = async () => {
       try {
-        // Skip if already attempting redirect
-        if (redirectAttempted) return;
-        
-        // Check for session directly from Supabase
         const { data } = await supabase.auth.getSession();
         
-        if (data.session || session || user) {
-          console.log("Authentication detected, redirecting to home", { 
-            hasSupabaseSession: !!data.session,
-            hasContextSession: !!session,
-            hasUser: !!user
-          });
-          
-          // Set flag to prevent multiple redirects
+        // Only redirect if we have an active session and haven't tried redirecting yet
+        if (data.session && !redirectAttempted) {
+          console.log("Active session found, attempting to navigate to home");
           setRedirectAttempted(true);
-          
-          // Force redirect with delay to ensure state is updated
-          setTimeout(() => {
-            console.log("Executing redirect to home page");
-            window.location.href = "/";
-          }, 500);
+          navigate("/");
         }
       } catch (error) {
-        console.error("Auth check error:", error);
+        console.error("Session check error:", error);
       }
     };
     
-    checkAndRedirect();
-  }, [user, session, redirectAttempted]);
+    checkSession();
+    // Only run this effect once on mount
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,7 +49,7 @@ const Login = () => {
     setIsSubmitting(true);
     
     try {
-      // Attempt login
+      // Attempt login via supabase directly to avoid context issues
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -75,20 +62,12 @@ const Login = () => {
       // Show success message
       toast.success("Login successful!");
       
-      console.log("Login successful, session acquired", { 
-        user: !!data.user,
-        session: !!data.session
-      });
-      
       // Set redirect flag
       setRedirectAttempted(true);
       
-      // Force navigation after successful login
-      setTimeout(() => {
-        console.log("Forcing navigation after login success");
-        window.location.href = "/";
-      }, 800);
-      
+      // Use React Router for navigation instead of window.location
+      // This avoids full page refreshes
+      navigate("/");
     } catch (err) {
       const errorMessage = err instanceof Error 
         ? err.message 
