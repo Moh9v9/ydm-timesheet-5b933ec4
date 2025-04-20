@@ -1,8 +1,9 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { useEmployees } from "@/contexts/EmployeeContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNotification } from "@/components/ui/notification";
-import { Plus } from "lucide-react";
+import { Plus, RefreshCw } from "lucide-react";
 import { Employee, EmployeeFilters } from "@/lib/types";
 import EmployeeModal from "./EmployeeModal";
 import { EmployeeFiltersSection } from "./components/EmployeeFilters";
@@ -16,16 +17,23 @@ const Employees = () => {
     setFilters, 
     deleteEmployee,
     getUniqueValues,
-    loading
+    loading,
+    error,
+    refreshEmployees
   } = useEmployees();
   const { user } = useAuth();
-  const { success, error, NotificationContainer } = useNotification();
+  const { success, error: showError, NotificationContainer } = useNotification();
   const [searchTerm, setSearchTerm] = useState("");
   const [showFilters, setShowFilters] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentEmployee, setCurrentEmployee] = useState<Employee | null>(null);
   
   const canEdit = user?.permissions.employees.edit;
+  
+  // Refresh data when component mounts
+  useEffect(() => {
+    refreshEmployees();
+  }, []);
   
   // Filter unique values for dropdowns
   const projects = getUniqueValues("project");
@@ -52,7 +60,7 @@ const Employees = () => {
       await deleteEmployee(id);
       success("Employee deleted successfully");
     } catch (err) {
-      error("Failed to delete employee");
+      showError("Failed to delete employee");
       console.error(err);
     }
   };
@@ -70,6 +78,13 @@ const Employees = () => {
   const closeModal = () => {
     setIsModalOpen(false);
     setCurrentEmployee(null);
+    // Refresh data after modal is closed
+    refreshEmployees();
+  };
+
+  const handleRefresh = () => {
+    refreshEmployees();
+    success("Employee data refreshed");
   };
 
   // Filter employees by search term
@@ -92,15 +107,26 @@ const Employees = () => {
             Manage your employees and their details
           </p>
         </div>
-        {canEdit && (
+        <div className="flex gap-2 mt-4 md:mt-0">
           <button
-            onClick={handleAddNew}
-            className="mt-4 md:mt-0 px-4 py-2 bg-primary text-white rounded-md flex items-center hover:bg-primary/90 transition-colors"
+            onClick={handleRefresh}
+            className="px-4 py-2 bg-secondary text-secondary-foreground rounded-md flex items-center hover:bg-secondary/90 transition-colors"
+            disabled={loading}
           >
-            <Plus size={16} className="mr-2" />
-            Add Employee
+            <RefreshCw size={16} className={`mr-2 ${loading ? 'animate-spin' : ''}`} />
+            Refresh
           </button>
-        )}
+          
+          {canEdit && (
+            <button
+              onClick={handleAddNew}
+              className="px-4 py-2 bg-primary text-white rounded-md flex items-center hover:bg-primary/90 transition-colors"
+            >
+              <Plus size={16} className="mr-2" />
+              Add Employee
+            </button>
+          )}
+        </div>
       </div>
       
       <div className="bg-card shadow-sm rounded-lg border overflow-hidden">
@@ -123,6 +149,19 @@ const Employees = () => {
             />
           </div>
         </div>
+        
+        {error && (
+          <div className="p-4 bg-red-50 border-b border-red-200 text-red-700">
+            <p className="font-medium">Error loading employees</p>
+            <p className="text-sm">{error}</p>
+            <button 
+              onClick={refreshEmployees}
+              className="mt-2 text-sm font-medium underline"
+            >
+              Try Again
+            </button>
+          </div>
+        )}
         
         <EmployeesTable 
           employees={searchedEmployees}

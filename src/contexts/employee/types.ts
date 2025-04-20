@@ -11,5 +11,7 @@ export interface EmployeeContextType {
   deleteEmployee: (id: string) => Promise<void>;
   getEmployee: (id: string) => Employee | undefined;
   loading: boolean;
+  error: string | null;
   getUniqueValues: (field: keyof Employee) => string[];
+  refreshEmployees: () => Promise<void>;
 }
