@@ -1,7 +1,8 @@
 
 import { useAuth } from "@/contexts/AuthContext";
 import { Employee } from "@/lib/types";
-import { Edit, Trash2 } from "lucide-react";
+import { Edit, Trash2, ArrowUp, ArrowDown } from "lucide-react";
+import { useState } from "react";
 
 interface EmployeesTableProps {
   employees: Employee[];
@@ -9,6 +10,9 @@ interface EmployeesTableProps {
   onEdit: (employee: Employee) => void;
   onDelete: (id: string) => void;
 }
+
+type SortField = "fullName" | "employeeId" | "project" | "location" | "jobTitle" | "paymentType" | "rateOfPayment" | "sponsorship" | "status";
+type SortDirection = "asc" | "desc";
 
 export const EmployeesTable = ({ 
   employees, 
@@ -20,26 +24,102 @@ export const EmployeesTable = ({
   const canEdit = user?.permissions.employees.edit;
   const canDelete = user?.permissions.employees.delete;
 
+  const [sortField, setSortField] = useState<SortField>("fullName");
+  const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
+
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+    } else {
+      setSortField(field);
+      setSortDirection("asc");
+    }
+  };
+
+  const getSortedData = () => {
+    // Create a new array with original indices to track position
+    const indexedData = employees.map((employee, index) => ({
+      employee,
+      originalIndex: index
+    }));
+    
+    indexedData.sort((a, b) => {
+      const direction = sortDirection === "asc" ? 1 : -1;
+      
+      switch (sortField) {
+        case "fullName":
+          return direction * (a.employee.fullName || "").localeCompare(b.employee.fullName || "");
+        case "employeeId":
+          return direction * (a.employee.employeeId || "").localeCompare(b.employee.employeeId || "");
+        case "project":
+          return direction * (a.employee.project || "").localeCompare(b.employee.project || "");
+        case "location":
+          return direction * (a.employee.location || "").localeCompare(b.employee.location || "");
+        case "jobTitle":
+          return direction * (a.employee.jobTitle || "").localeCompare(b.employee.jobTitle || "");
+        case "paymentType":
+          return direction * (a.employee.paymentType || "").localeCompare(b.employee.paymentType || "");
+        case "rateOfPayment":
+          return direction * (Number(a.employee.rateOfPayment || 0) - Number(b.employee.rateOfPayment || 0));
+        case "sponsorship":
+          return direction * (a.employee.sponsorship || "").localeCompare(b.employee.sponsorship || "");
+        case "status":
+          return direction * (a.employee.status || "").localeCompare(b.employee.status || "");
+        default:
+          return 0;
+      }
+    });
+
+    return indexedData;
+  };
+
+  const SortIcon = ({ field }: { field: SortField }) => {
+    if (sortField !== field) return null;
+    return sortDirection === "asc" ? (
+      <ArrowDown className="inline-block ml-1 h-4 w-4" />
+    ) : (
+      <ArrowUp className="inline-block ml-1 h-4 w-4" />
+    );
+  };
+
   return (
     <div className="data-table-container">
       <table className="data-table">
         <thead>
           <tr>
-            <th>Full Name</th>
-            <th>ID</th>
-            <th>Project</th>
-            <th>Location</th>
-            <th>Job Title</th>
-            <th>Payment Type</th>
-            <th>Rate</th>
-            <th>Sponsorship</th>
-            <th>Status</th>
+            <th onClick={() => handleSort("fullName")} className="cursor-pointer hover:bg-muted/30">
+              Full Name <SortIcon field="fullName" />
+            </th>
+            <th onClick={() => handleSort("employeeId")} className="cursor-pointer hover:bg-muted/30">
+              ID <SortIcon field="employeeId" />
+            </th>
+            <th onClick={() => handleSort("project")} className="cursor-pointer hover:bg-muted/30">
+              Project <SortIcon field="project" />
+            </th>
+            <th onClick={() => handleSort("location")} className="cursor-pointer hover:bg-muted/30">
+              Location <SortIcon field="location" />
+            </th>
+            <th onClick={() => handleSort("jobTitle")} className="cursor-pointer hover:bg-muted/30">
+              Job Title <SortIcon field="jobTitle" />
+            </th>
+            <th onClick={() => handleSort("paymentType")} className="cursor-pointer hover:bg-muted/30">
+              Payment Type <SortIcon field="paymentType" />
+            </th>
+            <th onClick={() => handleSort("rateOfPayment")} className="cursor-pointer hover:bg-muted/30">
+              Rate <SortIcon field="rateOfPayment" />
+            </th>
+            <th onClick={() => handleSort("sponsorship")} className="cursor-pointer hover:bg-muted/30">
+              Sponsorship <SortIcon field="sponsorship" />
+            </th>
+            <th onClick={() => handleSort("status")} className="cursor-pointer hover:bg-muted/30">
+              Status <SortIcon field="status" />
+            </th>
             {(canEdit || canDelete) && <th>Actions</th>}
           </tr>
         </thead>
         <tbody>
           {employees.length > 0 ? (
-            employees.map((employee) => (
+            getSortedData().map(({ employee }) => (
               <tr key={employee.id}>
                 <td>{employee.fullName}</td>
                 <td>{employee.employeeId}</td>
