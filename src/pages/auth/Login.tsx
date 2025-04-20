@@ -29,8 +29,11 @@ const Login = () => {
       toast.success("Login successful!");
       navigate("/");
     } catch (err) {
-      console.error("Login error:", err);
-      const errorMessage = err instanceof Error ? err.message : "Login failed. Please check your credentials.";
+      const errorMessage = err instanceof Error 
+        ? err.message 
+        : "Login failed. Please check your credentials.";
+      
+      // Use a single toast notification for login errors
       toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
