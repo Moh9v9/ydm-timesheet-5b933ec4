@@ -133,25 +133,7 @@ const Sidebar = ({ isOpen, toggleSidebar }: SidebarProps) => {
             </NavLink>
           </nav>
 
-          <div className="p-4 border-t border-sidebar-border">
-            <button
-              onClick={handleProfileClick}
-              className={`flex items-center w-full transition-colors hover:text-primary ${!isOpen && "md:justify-center"}`}
-            >
-              {isOpen || window.innerWidth < 768 ? (
-                <div className="flex flex-col text-left">
-                  <span className="font-medium text-sidebar-foreground hover:text-primary">
-                    {user?.fullName}
-                  </span>
-                  <span className="text-sm text-sidebar-foreground/70">
-                    {user?.role.charAt(0).toUpperCase() + user?.role.slice(1)}
-                  </span>
-                </div>
-              ) : (
-                <User size={20} className="text-sidebar-foreground hover:text-primary" />
-              )}
-            </button>
-          </div>
+          {/* The profile block has been removed from here */}
         </div>
       </aside>
     </>
