@@ -1,3 +1,4 @@
+
 import { User } from "@/lib/types";
 import { Edit, Trash2, Users, Calendar, FileText, Eye, Pencil } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -137,3 +138,4 @@ export const UsersTable = ({ users, onEdit, onDelete, loading }: UsersTableProps
     </div>
   );
 };
+
