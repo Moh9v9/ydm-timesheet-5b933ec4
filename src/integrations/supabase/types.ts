@@ -65,7 +65,6 @@ export type Database = {
       employees: {
         Row: {
           created_at: string | null
-          employee_id: string | null
           full_name: string
           id: string
           iqama_no: number | null
@@ -80,7 +79,6 @@ export type Database = {
         }
         Insert: {
           created_at?: string | null
-          employee_id?: string | null
           full_name: string
           id?: string
           iqama_no?: number | null
@@ -95,7 +93,6 @@ export type Database = {
         }
         Update: {
           created_at?: string | null
-          employee_id?: string | null
           full_name?: string
           id?: string
           iqama_no?: number | null
