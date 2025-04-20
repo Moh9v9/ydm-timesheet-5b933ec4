@@ -1,4 +1,3 @@
-
 import { AttendanceRecord } from "@/lib/types";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -163,16 +162,24 @@ export const useAttendanceOperations = (
     setLoading(true);
     
     try {
-      const recordsToUpsert = records.map(record => ({
-        id: 'id' in record ? record.id : undefined,
-        employee_id: record.employeeId,
-        date: record.date,
-        present: record.present,
-        start_time: record.startTime || null,
-        end_time: record.endTime || null,
-        overtime_hours: record.overtimeHours || 0,
-        note: record.note || null
-      }));
+      // Prepare records for upsert - remove temporary IDs and format correctly
+      const recordsToUpsert = records.map(record => {
+        // Extract real ID if it exists and isn't a temporary ID
+        const id = 'id' in record && !record.id.toString().includes('temp_') ? record.id : undefined;
+        
+        return {
+          id: id, // Will be undefined for new records, letting Supabase generate a UUID
+          employee_id: record.employeeId,
+          date: record.date,
+          present: record.present,
+          start_time: record.startTime || null,
+          end_time: record.endTime || null,
+          overtime_hours: record.overtimeHours || 0,
+          note: record.note || null
+        };
+      });
+
+      console.log("Records prepared for upsert:", recordsToUpsert);
 
       const { data, error } = await supabase
         .from('attendance_records')
@@ -181,6 +188,8 @@ export const useAttendanceOperations = (
 
       if (error) throw error;
       if (!data) throw new Error('No data returned from upsert');
+
+      console.log("Upsert response:", data);
 
       const savedRecords: AttendanceRecord[] = data.map(record => ({
         id: record.id,

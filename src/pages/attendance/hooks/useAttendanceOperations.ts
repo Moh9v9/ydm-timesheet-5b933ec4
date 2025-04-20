@@ -23,12 +23,14 @@ export const useAttendanceOperations = (canEdit: boolean) => {
     setIsSubmitting(true);
     
     try {
-      await bulkSaveAttendance(attendanceData);
+      console.log("Sending attendance data to save:", attendanceData);
+      const result = await bulkSaveAttendance(attendanceData);
+      console.log("Save result:", result);
       success("Attendance data saved successfully");
       setShowSaveConfirm(false);
     } catch (err) {
       error("Failed to save attendance data");
-      console.error(err);
+      console.error("Save error:", err);
     } finally {
       setIsSubmitting(false);
     }
