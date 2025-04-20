@@ -1,19 +1,10 @@
-
 import { useState } from "react";
 import { useEmployees } from "@/contexts/EmployeeContext";
 import { useAttendance } from "@/contexts/AttendanceContext";
 import { useNotification } from "@/components/ui/notification";
 import { Download, FileText, FileSpreadsheet } from "lucide-react";
 import { ExportFormat, ReportType } from "@/lib/types";
-
-// Use Radix UI Select component for better dark mode support
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from "@/components/ui/select";
+import { StyledSelect } from "@/components/ui/styled-select";
 
 const ExportSection = () => {
   const [reportType, setReportType] = useState<ReportType>("daily");
@@ -59,55 +50,41 @@ const ExportSection = () => {
     }, 1500);
   };
 
+  const reportTypeOptions = [
+    { value: "daily", label: "Daily Attendance" },
+    { value: "weekly", label: "Weekly Attendance" },
+    { value: "monthly", label: "Monthly Attendance" },
+    { value: "employees", label: "Full Employee List" }
+  ];
+
+  const exportFormatOptions = [
+    { value: "csv", label: "CSV" },
+    { value: "xlsx", label: "Excel (XLSX)" },
+    { value: "pdf", label: "PDF" }
+  ];
+  
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-      {/* Export Configuration */}
       <div className="md:col-span-2 bg-card shadow-sm rounded-lg border p-6 space-y-6">
         <h2 className="text-xl font-medium">Generate Report</h2>
         
         <div className="space-y-4">
-          {/* Report Type */}
-          <div>
-            <label htmlFor="reportType" className="block text-sm font-medium mb-1 dark:text-gray-200">
-              Report Type
-            </label>
-            <Select 
-              value={reportType} 
-              onValueChange={(value: ReportType) => setReportType(value)}
-            >
-              <SelectTrigger className="w-full dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:hover:bg-gray-800 transition-colors">
-                <SelectValue placeholder="Select Report Type" />
-              </SelectTrigger>
-              <SelectContent className="dark:bg-gray-900 dark:border-gray-700">
-                <SelectItem value="daily" className="dark:hover:bg-gray-800 dark:focus:bg-gray-800">Daily Attendance</SelectItem>
-                <SelectItem value="weekly" className="dark:hover:bg-gray-800 dark:focus:bg-gray-800">Weekly Attendance</SelectItem>
-                <SelectItem value="monthly" className="dark:hover:bg-gray-800 dark:focus:bg-gray-800">Monthly Attendance</SelectItem>
-                <SelectItem value="employees" className="dark:hover:bg-gray-800 dark:focus:bg-gray-800">Full Employee List</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          <StyledSelect
+            label="Report Type"
+            value={reportType}
+            onValueChange={(value: ReportType) => setReportType(value)}
+            placeholder="Select Report Type"
+            options={reportTypeOptions}
+          />
           
-          {/* Export Format */}
-          <div>
-            <label htmlFor="exportFormat" className="block text-sm font-medium mb-1 dark:text-gray-200">
-              Export Format
-            </label>
-            <Select 
-              value={exportFormat} 
-              onValueChange={(value: ExportFormat) => setExportFormat(value)}
-            >
-              <SelectTrigger className="w-full dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:hover:bg-gray-800 transition-colors">
-                <SelectValue placeholder="Select Export Format" />
-              </SelectTrigger>
-              <SelectContent className="dark:bg-gray-900 dark:border-gray-700">
-                <SelectItem value="csv" className="dark:hover:bg-gray-800 dark:focus:bg-gray-800">CSV</SelectItem>
-                <SelectItem value="xlsx" className="dark:hover:bg-gray-800 dark:focus:bg-gray-800">Excel (XLSX)</SelectItem>
-                <SelectItem value="pdf" className="dark:hover:bg-gray-800 dark:focus:bg-gray-800">PDF</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          <StyledSelect
+            label="Export Format"
+            value={exportFormat}
+            onValueChange={(value: ExportFormat) => setExportFormat(value)}
+            placeholder="Select Export Format"
+            options={exportFormatOptions}
+          />
           
-          {/* Additional options based on report type */}
           {reportType === "daily" && (
             <div>
               <label htmlFor="date" className="block text-sm font-medium mb-1 dark:text-gray-200">
@@ -148,7 +125,6 @@ const ExportSection = () => {
             </div>
           )}
           
-          {/* Generate Button */}
           <div className="pt-2">
             <button
               onClick={generateReport}
@@ -162,7 +138,6 @@ const ExportSection = () => {
         </div>
       </div>
       
-      {/* Available Reports */}
       <div className="bg-card shadow-sm rounded-lg border p-6">
         <h2 className="text-xl font-medium mb-4">Available Reports</h2>
         
