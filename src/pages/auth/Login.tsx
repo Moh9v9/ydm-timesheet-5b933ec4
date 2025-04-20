@@ -17,16 +17,14 @@ const Login = () => {
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
 
-  // Only check for existing session on mount, not on every render
+  // Check for existing session on mount
   useEffect(() => {
     const checkSession = async () => {
       try {
         const { data } = await supabase.auth.getSession();
         
-        // Only redirect if we have an active session and haven't tried redirecting yet
-        if (data.session && !redirectAttempted) {
-          console.log("Active session found, attempting to navigate to home");
-          setRedirectAttempted(true);
+        if (data.session) {
+          console.log("Active session found, navigating to dashboard");
           navigate("/");
         }
       } catch (error) {
@@ -35,8 +33,7 @@ const Login = () => {
     };
     
     checkSession();
-    // Only run this effect once on mount
-  }, [navigate, redirectAttempted]);
+  }, [navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,25 +46,13 @@ const Login = () => {
     setIsSubmitting(true);
     
     try {
-      // Attempt login via supabase directly to avoid context issues
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-      
-      if (error) throw new Error(error.message);
-      
-      if (!data.user) throw new Error("Login failed. No user returned.");
+      await login(email, password);
       
       // Show success message
       toast.success("Login successful!");
       
-      // Set redirect flag
-      setRedirectAttempted(true);
-      
-      // Use React Router for navigation instead of window.location
-      // This avoids full page refreshes
-      navigate("/");
+      // Explicitly navigate to the dashboard
+      navigate("/", { replace: true });
     } catch (err) {
       const errorMessage = err instanceof Error 
         ? err.message 

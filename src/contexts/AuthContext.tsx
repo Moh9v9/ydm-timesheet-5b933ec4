@@ -10,9 +10,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const { user, session, loading, setUser, setSession } = useAuthState();
   const operations = useAuthOperations();
 
-  // Enhance logout to also clear local state
+  // Enhance login to update local state immediately
   const enhancedOperations = {
     ...operations,
+    login: async (email: string, password: string) => {
+      try {
+        const userData = await operations.login(email, password);
+        // We'll let the auth state listener handle the session and user update
+        return userData;
+      } catch (error) {
+        console.error("Enhanced login error:", error);
+        throw error;
+      }
+    },
     logout: async () => {
       try {
         // First clear local state

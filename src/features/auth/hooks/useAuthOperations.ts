@@ -1,4 +1,3 @@
-
 import { User } from "@/lib/types";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -18,8 +17,7 @@ export const useAuthOperations = () => {
         throw new Error("User not found");
       }
 
-      // User profile data will be fetched by the onAuthStateChange listener
-      // Return a temporary user object for immediate feedback
+      // Return the user data for immediate feedback
       return {
         id: data.user.id,
         fullName: data.user.user_metadata.fullName || '',
@@ -59,13 +57,11 @@ export const useAuthOperations = () => {
         console.log("No active session found, already logged out");
       }
 
-      // Clear any local state regardless of session status
-      // This ensures the UI updates even if the backend logout had issues
+      // Force redirect to login page regardless of session status
       window.location.href = "/login";
     } catch (error: any) {
       console.error("Logout error:", error);
       // Force redirect to login page even if there was an error
-      // This provides a fallback for the user
       window.location.href = "/login";
     }
   };

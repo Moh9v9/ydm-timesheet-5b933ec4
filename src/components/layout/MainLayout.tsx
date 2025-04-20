@@ -3,7 +3,7 @@ import { ReactNode, useState, useEffect } from "react";
 import Sidebar from "./Sidebar";
 import TopBar from "./TopBar";
 import { useAuth } from "@/contexts/AuthContext";
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 
 interface MainLayoutProps {
   children: ReactNode;
@@ -13,6 +13,7 @@ interface MainLayoutProps {
 const MainLayout = ({ children, requireAuth = true }: MainLayoutProps) => {
   const { user, loading } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Default closed on mobile
+  const navigate = useNavigate();
   
   // Close sidebar by default on mobile devices
   useEffect(() => {
@@ -28,6 +29,13 @@ const MainLayout = ({ children, requireAuth = true }: MainLayoutProps) => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  // Handle authentication state changes
+  useEffect(() => {
+    if (!loading && requireAuth && !user) {
+      navigate("/login");
+    }
+  }, [loading, user, requireAuth, navigate]);
+
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
@@ -37,7 +45,7 @@ const MainLayout = ({ children, requireAuth = true }: MainLayoutProps) => {
     return <div className="min-h-screen bg-background">{children}</div>;
   }
 
-  // Only show loading spinner and redirect for auth-required pages
+  // Only show loading spinner for auth-required pages
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -47,7 +55,7 @@ const MainLayout = ({ children, requireAuth = true }: MainLayoutProps) => {
   }
 
   if (requireAuth && !user) {
-    return <Navigate to="/login" />;
+    return <Navigate to="/login" replace />;
   }
 
   return (
