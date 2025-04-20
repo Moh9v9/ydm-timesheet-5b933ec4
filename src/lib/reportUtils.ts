@@ -16,6 +16,7 @@ export const generateFileContent = (
   let content: string | Uint8Array;
   let mimeType: string;
   let isBinary: boolean = false;
+  
   switch (format) {
     case 'csv':
       content = convertToCSV(data);
@@ -35,6 +36,7 @@ export const generateFileContent = (
       content = convertToCSV(data);
       mimeType = 'text/csv';
   }
+  
   return { content, mimeType, isBinary };
 };
 
