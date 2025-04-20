@@ -1,6 +1,6 @@
 
-import { Button } from "@/components/ui/button";
-import { RefreshCw, Save } from "lucide-react";
+import PageTitle from "./header/PageTitle";
+import ActionButtons from "./header/ActionButtons";
 
 interface AttendanceHeaderProps {
   canEdit: boolean;
@@ -17,34 +17,13 @@ const AttendanceHeader = ({
 }: AttendanceHeaderProps) => {
   return (
     <div className="flex flex-col space-y-4">
-      <div>
-        <h1 className="text-2xl font-bold">Daily Attendance</h1>
-        <p className="text-muted-foreground">
-          Manage employee attendance records
-        </p>
-      </div>
-      
+      <PageTitle />
       {canEdit && (
-        <div className="flex flex-col sm:flex-row gap-3">
-          <Button 
-            onClick={onUpdateAll}
-            disabled={isSubmitting}
-            variant="secondary"
-            className="flex-1 sm:flex-none sm:min-w-[160px]"
-          >
-            <RefreshCw className="mr-2 h-4 w-4" />
-            {isSubmitting ? "Updating..." : "Update All"}
-          </Button>
-          
-          <Button 
-            onClick={onSave}
-            disabled={isSubmitting}
-            className="flex-1 sm:flex-none sm:min-w-[160px]"
-          >
-            <Save className="mr-2 h-4 w-4" />
-            {isSubmitting ? "Saving..." : "Save Changes"}
-          </Button>
-        </div>
+        <ActionButtons
+          isSubmitting={isSubmitting}
+          onUpdateAll={onUpdateAll}
+          onSave={onSave}
+        />
       )}
     </div>
   );
