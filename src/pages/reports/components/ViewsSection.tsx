@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Calendar, FileSpreadsheet, CalendarDays } from "lucide-react";
 import { TabsList, TabsTrigger } from "@/components/ui/tabs";
 import AttendanceSummaryTable from "./AttendanceSummaryTable";
@@ -7,13 +7,7 @@ import { useAttendance } from "@/contexts/AttendanceContext";
 
 const ViewsSection = () => {
   const [viewMode, setViewMode] = useState<"daily" | "weekly" | "monthly">("daily");
-  const { currentDate, attendanceRecords } = useAttendance();
-  
-  useEffect(() => {
-    // Log to verify we have the correct date and records
-    console.log("ViewsSection currentDate:", currentDate);
-    console.log("ViewsSection attendanceRecords:", attendanceRecords);
-  }, [currentDate, attendanceRecords]);
+  const { currentDate } = useAttendance();
 
   return (
     <div className="space-y-5">

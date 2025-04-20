@@ -16,7 +16,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { Download, Calendar, FileSpreadsheet, FileText, Check, X } from "lucide-react";
+import { Download, Calendar, FileSpreadsheet, FileText } from "lucide-react";
 import { useAttendance } from "@/contexts/AttendanceContext";
 import { useEmployees } from "@/contexts/EmployeeContext";
 import { format } from "date-fns";
@@ -45,7 +45,7 @@ const AttendanceSummaryTable = ({ view, currentDate }: AttendanceSummaryTablePro
 
   const filteredRecords = getFilteredRecords();
   const totalPages = Math.ceil(filteredRecords.length / itemsPerPage);
-
+  
   // Get the records for the current page
   const paginatedRecords = filteredRecords.slice(
     (currentPage - 1) * itemsPerPage,
@@ -78,35 +78,12 @@ const AttendanceSummaryTable = ({ view, currentDate }: AttendanceSummaryTablePro
     }
   };
 
-  // Determine if there is an attendance record for the selected date (for daily view only)
-  const hasAttendanceForDate = view === "daily" && attendanceRecords.some(record => record.date === currentDate);
-
-  console.log("Current date:", currentDate);
-  console.log("Has attendance for date:", hasAttendanceForDate);
-  console.log("Attendance records:", attendanceRecords);
-
   return (
     <div>
       <div className="flex items-center justify-between px-4 py-3 border-b dark:border-gray-700">
         <div className="flex items-center gap-2">
           {getReportTypeIcon()}
-          <div className="flex items-center">
-            <h3 className="text-sm font-medium capitalize">
-              {view} Summary
-            </h3>
-            {view === "daily" && (
-              <div className="ml-3 flex items-center gap-2 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded-md">
-                {hasAttendanceForDate ? (
-                  <Check size={16} className="text-green-600" aria-label="Attendance exists" />
-                ) : (
-                  <X size={16} className="text-red-500" aria-label="No attendance record" />
-                )}
-                <span className="text-xs text-muted-foreground">
-                  {formatDate(currentDate)}
-                </span>
-              </div>
-            )}
-          </div>
+          <h3 className="text-sm font-medium capitalize">{view} Summary</h3>
         </div>
         <button className="text-primary hover:text-primary/80 p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
           <Download size={16} />
