@@ -1,92 +1,46 @@
 
-import { useState } from "react";
-import { Employee, EmployeeFilters } from "@/lib/types";
 import { useEmployees } from "@/contexts/EmployeeContext";
 import { useNotification } from "@/components/ui/notification";
+import { useEmployeeSearch } from "./useEmployeeSearch";
+import { useEmployeeModal } from "./useEmployeeModal";
+import { useEmployeeDelete } from "./useEmployeeDelete";
 
 export const useEmployeeActions = () => {
-  const { success, error: showError } = useNotification();
-  const { deleteEmployee, refreshEmployees } = useEmployees();
+  const { refreshEmployees } = useEmployees();
+  const { success } = useNotification();
   
-  const [searchTerm, setSearchTerm] = useState("");
-  const [showFilters, setShowFilters] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentEmployee, setCurrentEmployee] = useState<Employee | null>(null);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [employeeToDelete, setEmployeeToDelete] = useState<string | null>(null);
+  const search = useEmployeeSearch();
+  const modal = useEmployeeModal();
+  const deleteActions = useEmployeeDelete();
 
   const handleRefresh = () => {
     refreshEmployees();
     success("Employee data refreshed");
   };
 
-  const handleAddNew = () => {
-    setCurrentEmployee(null);
-    setIsModalOpen(true);
-  };
-
-  const handleEdit = (employee: Employee) => {
-    setCurrentEmployee(employee);
-    setIsModalOpen(true);
-  };
-
-  const handleDeleteClick = (id: string) => {
-    setEmployeeToDelete(id);
-    setDeleteDialogOpen(true);
-  };
-
-  const handleDeleteConfirm = async () => {
-    if (employeeToDelete) {
-      try {
-        await deleteEmployee(employeeToDelete);
-        success("Employee deleted successfully");
-      } catch (err) {
-        showError("Failed to delete employee");
-        console.error(err);
-      } finally {
-        setDeleteDialogOpen(false);
-        setEmployeeToDelete(null);
-      }
-    }
-  };
-
-  const closeModal = () => {
-    setIsModalOpen(false);
-    setCurrentEmployee(null);
-    refreshEmployees();
-  };
-
-  // Filter function
-  const filterEmployeesBySearch = (employees: Employee[], term: string) => {
-    return employees.filter(employee => 
-      employee.fullName.toLowerCase().includes(term.toLowerCase()) ||
-      employee.employeeId.toLowerCase().includes(term.toLowerCase()) ||
-      employee.project.toLowerCase().includes(term.toLowerCase()) ||
-      employee.location.toLowerCase().includes(term.toLowerCase()) ||
-      employee.jobTitle.toLowerCase().includes(term.toLowerCase())
-    );
-  };
-
   return {
-    // State
-    searchTerm,
-    showFilters,
-    isModalOpen,
-    currentEmployee,
-    deleteDialogOpen,
-    employeeToDelete,
+    // Search functionality
+    searchTerm: search.searchTerm,
+    showFilters: search.showFilters,
+    setSearchTerm: search.setSearchTerm,
+    setShowFilters: search.setShowFilters,
+    filterEmployeesBySearch: search.filterEmployeesBySearch,
     
-    // Setters
-    setSearchTerm,
-    setShowFilters,
+    // Modal functionality
+    isModalOpen: modal.isModalOpen,
+    currentEmployee: modal.currentEmployee,
+    handleAddNew: modal.handleAddNew,
+    handleEdit: modal.handleEdit,
+    closeModal: modal.closeModal,
     
-    // Handlers
-    handleRefresh,
-    handleAddNew,
-    handleEdit,
-    handleDeleteClick,
-    handleDeleteConfirm,
-    closeModal,
-    filterEmployeesBySearch
+    // Delete functionality
+    deleteDialogOpen: deleteActions.deleteDialogOpen,
+    employeeToDelete: deleteActions.employeeToDelete,
+    setDeleteDialogOpen: deleteActions.setDeleteDialogOpen,
+    handleDeleteClick: deleteActions.handleDeleteClick,
+    handleDeleteConfirm: deleteActions.handleDeleteConfirm,
+    
+    // Refresh functionality
+    handleRefresh
   };
 };
