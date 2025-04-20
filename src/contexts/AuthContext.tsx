@@ -46,14 +46,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               }
               
               if (profile) {
-                // Convert profile data to User type
+                // Convert profile data to User type with proper type conversion for permissions
                 const userData: User = {
                   id: currentSession.user.id,
                   fullName: profile.full_name,
                   email: profile.email,
                   password: '', // We don't store or return passwords
                   role: profile.role as any,
-                  permissions: profile.permissions
+                  permissions: {
+                    view: profile.permissions?.view === true,
+                    edit: profile.permissions?.edit === true,
+                    delete: profile.permissions?.delete === true
+                  }
                 };
                 
                 setUser(userData);
@@ -93,7 +97,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               email: profile.email,
               password: '', // We don't store or return passwords
               role: profile.role as any,
-              permissions: profile.permissions
+              permissions: {
+                view: profile.permissions?.view === true,
+                edit: profile.permissions?.edit === true,
+                delete: profile.permissions?.delete === true
+              }
             };
             
             setUser(userData);

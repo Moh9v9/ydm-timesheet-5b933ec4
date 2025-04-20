@@ -1,4 +1,3 @@
-
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { User, UserRole, UserPermissions } from "@/lib/types";
 import { supabase } from "@/integrations/supabase/client";
@@ -33,15 +32,24 @@ export const UsersProvider = ({ children }: { children: ReactNode }) => {
         }
         
         if (profiles) {
-          // Convert profiles to User[] format
-          const loadedUsers: User[] = profiles.map(profile => ({
-            id: profile.id,
-            fullName: profile.full_name,
-            email: profile.email,
-            password: '', // We don't store or return passwords
-            role: profile.role as UserRole,
-            permissions: profile.permissions as UserPermissions
-          }));
+          // Convert profiles to User[] format with proper type handling
+          const loadedUsers: User[] = profiles.map(profile => {
+            // Make sure permissions is properly handled
+            const permissions: UserPermissions = {
+              view: profile.permissions?.view === true,
+              edit: profile.permissions?.edit === true,
+              delete: profile.permissions?.delete === true
+            };
+
+            return {
+              id: profile.id,
+              fullName: profile.full_name,
+              email: profile.email,
+              password: '', // We don't store or return passwords
+              role: profile.role as UserRole,
+              permissions: permissions
+            };
+          });
           
           setUsers(loadedUsers);
         }
