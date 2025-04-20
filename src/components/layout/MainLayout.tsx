@@ -33,24 +33,26 @@ const MainLayout = ({ children, requireAuth = true }: MainLayoutProps) => {
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-background">
+    <div className="flex h-screen overflow-hidden bg-background">
       {user && (
-        <TopBar toggleSidebar={toggleSidebar} isSidebarOpen={isSidebarOpen} />
-      )}
-      <div className="flex flex-1 overflow-hidden">
-        {user && (
-          <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
-        )}
-        <main
-          className={`flex-1 p-4 md:p-6 overflow-auto transition-all duration-300 ease-in-out ${
-            user && isSidebarOpen ? "ml-0 md:ml-64" : "ml-0"
-          }`}
-        >
-          <div className="container mx-auto">
-            {children}
+        <div className="flex flex-col w-full">
+          <TopBar toggleSidebar={toggleSidebar} isSidebarOpen={isSidebarOpen} />
+          <div className="flex flex-1 overflow-hidden">
+            <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
+            <main 
+              className={`
+                flex-1 p-4 md:p-6 overflow-auto
+                transition-[margin] duration-300 ease-in-out
+                ${isSidebarOpen ? 'md:ml-64' : 'ml-0'}
+              `}
+            >
+              <div className="container mx-auto max-w-7xl">
+                {children}
+              </div>
+            </main>
           </div>
-        </main>
-      </div>
+        </div>
+      )}
     </div>
   );
 };
