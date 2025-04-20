@@ -1,4 +1,3 @@
-
 import { AttendanceRecord } from "@/lib/types";
 import { Employee } from "@/lib/types";
 import { Textarea } from "@/components/ui/textarea";
@@ -97,12 +96,12 @@ const AttendanceTableRow = ({
         )}
       </td>
 
-      <td className="p-3">
+      <td className="p-3 min-w-[300px]">
         <Textarea
           value={record.note || ""}
           onChange={(e) => onNoteChange(e.target.value)}
           placeholder="Add a note..."
-          className="min-h-[80px] w-full max-w-[250px] resize-y"
+          className="min-h-[80px] w-full max-w-[400px] resize-both"
           disabled={!canEdit}
         />
       </td>
