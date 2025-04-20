@@ -42,6 +42,10 @@
     --sidebar-accent-foreground: 222.2 47.4% 11.2%;
     --sidebar-border: 214.3 31.8% 91.4%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+
+    --input-dark-bg: 222.2 32.6% 17.5%; /* Dark background for inputs */
+    --input-dark-border: 217.2 32.6% 25%; /* Slightly lighter border */
+    --input-dark-text: 210 40% 98%; /* Light text for readability */
   }
 
   .dark {
@@ -81,16 +85,9 @@
     --sidebar-accent-foreground: 210 40% 98%;
     --sidebar-border: 217.2 32.6% 17.5%;
     --sidebar-ring: 217.2 91.2% 59.8%;
-  }
-}
 
-@layer base {
-  * {
-    @apply border-border;
-  }
-
-  body {
-    @apply bg-background text-foreground;
+    --input: var(--input-dark-bg);
+    --border: var(--input-dark-border);
   }
 }
 
@@ -133,5 +130,13 @@
 
   .form-container {
     @apply space-y-6 p-6 bg-card rounded-lg border shadow-sm;
+  }
+
+  .dark input {
+    @apply bg-gray-800 border-gray-700 text-white placeholder-gray-500;
+  }
+
+  .dark input:focus {
+    @apply ring-2 ring-primary ring-offset-2 ring-offset-background;
   }
 }
