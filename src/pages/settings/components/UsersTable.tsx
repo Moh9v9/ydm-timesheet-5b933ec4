@@ -8,7 +8,6 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from "@/components/ui/table";
 import { useIsMobile } from "@/hooks/use-mobile";
 
@@ -26,32 +25,32 @@ export const UsersTable = ({ users, onEdit, onDelete, loading }: UsersTableProps
     return enabled ? "bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300" : "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400";
   };
 
-  const renderDetailedPermissions = (permissions: { view?: boolean; edit?: boolean; delete?: boolean; Allow?: boolean }) => {
+  const renderDetailedPermissions = (user: User) => {
+    // If user is admin, return special text
+    if (user.role === 'admin') {
+      return (
+        <div className="text-blue-600 dark:text-blue-400 text-sm italic">
+          Admin users automatically have full permissions
+        </div>
+      );
+    }
+
     return (
       <div className="flex flex-wrap gap-1 justify-center">
-        {permissions.view !== undefined && (
-          <Badge variant="secondary" className={`text-[10px] px-1.5 py-0.5 ${getPermissionColor(permissions.view)}`}>
-            <Eye size={10} className="mr-0.5" />
-            view
-          </Badge>
+        {renderPermissionBadge(
+          <Users size={14} />,
+          "Employees",
+          user.permissions.employees
         )}
-        {permissions.edit !== undefined && (
-          <Badge variant="secondary" className={`text-[10px] px-1.5 py-0.5 ${getPermissionColor(permissions.edit)}`}>
-            <Pencil size={10} className="mr-0.5" />
-            edit
-          </Badge>
+        {renderPermissionBadge(
+          <Calendar size={14} />,
+          "Attendees",
+          user.permissions.attendees
         )}
-        {permissions.delete !== undefined && (
-          <Badge variant="secondary" className={`text-[10px] px-1.5 py-0.5 ${getPermissionColor(permissions.delete)}`}>
-            <Trash2 size={10} className="mr-0.5" />
-            delete
-          </Badge>
-        )}
-        {permissions.Allow !== undefined && (
-          <Badge variant="secondary" className={`text-[10px] px-1.5 py-0.5 ${getPermissionColor(permissions.Allow)}`}>
-            <Eye size={10} className="mr-0.5" />
-            Allow
-          </Badge>
+        {renderPermissionBadge(
+          <FileText size={14} />,
+          "Export",
+          { Allow: user.permissions.export }
         )}
       </div>
     );
@@ -76,7 +75,6 @@ export const UsersTable = ({ users, onEdit, onDelete, loading }: UsersTableProps
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
-      {renderDetailedPermissions(permissions)}
     </div>
   );
 
@@ -105,24 +103,8 @@ export const UsersTable = ({ users, onEdit, onDelete, loading }: UsersTableProps
                         {user.role}
                       </Badge>
                     </TableCell>
-                    <TableCell>
-                      <div className="flex flex-wrap gap-4 justify-center">
-                        {renderPermissionBadge(
-                          <Users size={14} />,
-                          "Employees",
-                          user.permissions.employees
-                        )}
-                        {renderPermissionBadge(
-                          <Calendar size={14} />,
-                          "Attendees",
-                          user.permissions.attendees
-                        )}
-                        {renderPermissionBadge(
-                          <FileText size={14} />,
-                          "Export",
-                          { Allow: user.permissions.export }
-                        )}
-                      </div>
+                    <TableCell className="text-center">
+                      {renderDetailedPermissions(user)}
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center space-x-2">
@@ -156,3 +138,4 @@ export const UsersTable = ({ users, onEdit, onDelete, loading }: UsersTableProps
     </div>
   );
 };
+
