@@ -29,6 +29,7 @@ const Employees = () => {
     isModalOpen,
     currentEmployee,
     deleteDialogOpen,
+    setDeleteDialogOpen, // Correctly destructure setDeleteDialogOpen from the hook
     setSearchTerm,
     setShowFilters,
     handleRefresh,

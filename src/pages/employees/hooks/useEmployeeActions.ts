@@ -36,7 +36,7 @@ export const useEmployeeActions = () => {
     // Delete functionality
     deleteDialogOpen: deleteActions.deleteDialogOpen,
     employeeToDelete: deleteActions.employeeToDelete,
-    setDeleteDialogOpen: deleteActions.setDeleteDialogOpen,
+    setDeleteDialogOpen: deleteActions.setDeleteDialogOpen, // Make sure we're exposing this function
     handleDeleteClick: deleteActions.handleDeleteClick,
     handleDeleteConfirm: deleteActions.handleDeleteConfirm,
     
