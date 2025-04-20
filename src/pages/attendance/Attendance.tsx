@@ -1,200 +1,54 @@
-import { useState, useEffect } from "react";
-import { useEmployees } from "@/contexts/EmployeeContext";
-import { useAttendance } from "@/contexts/AttendanceContext";
+
 import { useAuth } from "@/contexts/AuthContext";
+import { useAttendance } from "@/contexts/AttendanceContext";
+import { useEmployees } from "@/contexts/EmployeeContext";
 import { useNotification } from "@/components/ui/notification";
-import { Save, RefreshCw } from "lucide-react"; // Combined import
-import { AttendanceRecord } from "@/lib/types";
 import DateNavigation from "./components/DateNavigation";
 import AttendanceTable from "./components/AttendanceTable";
 import BulkUpdateDialog from "./components/BulkUpdateDialog";
 import ConfirmDialog from "@/components/ConfirmDialog";
-import { Button } from "@/components/ui/button"; // Import Button component
+import AttendanceHeader from "./components/AttendanceHeader";
+import { useAttendanceData } from "./hooks/useAttendanceData";
+import { useAttendanceOperations } from "./hooks/useAttendanceOperations";
 
 const Attendance = () => {
   const { user } = useAuth();
   const { filteredEmployees } = useEmployees();
-  const { 
-    currentDate, 
-    setCurrentDate, 
-    bulkSaveAttendance, 
-    getRecordsByEmployeeAndDate 
-  } = useAttendance();
-  const { success, error, NotificationContainer } = useNotification();
-  
-  const [attendanceData, setAttendanceData] = useState<AttendanceRecord[]>([]);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showBulkUpdate, setShowBulkUpdate] = useState(false);
-  const [showSaveConfirm, setShowSaveConfirm] = useState(false);
+  const { currentDate, setCurrentDate } = useAttendance();
+  const { NotificationContainer } = useNotification();
   
   const canEdit = user?.permissions.edit;
+  
+  const {
+    attendanceData,
+    toggleAttendance,
+    handleTimeChange,
+    handleOvertimeChange,
+    handleNoteChange
+  } = useAttendanceData(canEdit);
 
-  useEffect(() => {
-    const activeEmployees = filteredEmployees.filter(emp => emp.status === "Active");
-    
-    const initialAttendanceData = activeEmployees.map(employee => {
-      const existingRecord = getRecordsByEmployeeAndDate(employee.id, currentDate);
-      
-      if (existingRecord) {
-        return existingRecord;
-      } else {
-        return {
-          id: `temp_${employee.id}_${currentDate}`,
-          employeeId: employee.id,
-          date: currentDate,
-          present: true,
-          startTime: "07:00",
-          endTime: "17:00",
-          overtimeHours: 0
-        };
-      }
-    });
-    
-    setAttendanceData(initialAttendanceData);
-  }, [filteredEmployees, currentDate, getRecordsByEmployeeAndDate]);
-
-  const toggleAttendance = (index: number) => {
-    if (!canEdit) return;
-    
-    const newData = [...attendanceData];
-    newData[index].present = !newData[index].present;
-    
-    if (!newData[index].present) {
-      newData[index].startTime = "";
-      newData[index].endTime = "";
-      newData[index].overtimeHours = 0;
-    } else {
-      newData[index].startTime = "07:00";
-      newData[index].endTime = "17:00";
-    }
-    
-    setAttendanceData(newData);
-  };
-
-  const handleTimeChange = (
-    index: number,
-    field: "startTime" | "endTime",
-    value: string
-  ) => {
-    if (!canEdit) return;
-    
-    const newData = [...attendanceData];
-    newData[index][field] = value;
-    setAttendanceData(newData);
-  };
-
-  const handleOvertimeChange = (index: number, value: string) => {
-    if (!canEdit) return;
-    
-    const newData = [...attendanceData];
-    newData[index].overtimeHours = parseFloat(value) || 0;
-    setAttendanceData(newData);
-  };
-
-  const handleNoteChange = (index: number, value: string) => {
-    if (!canEdit) return;
-    
-    const newData = [...attendanceData];
-    newData[index].note = value;
-    setAttendanceData(newData);
-  };
-
-  const handleSave = () => {
-    if (!canEdit) {
-      error("You don't have permission to edit attendance records");
-      return;
-    }
-    setShowSaveConfirm(true);
-  };
-
-  const confirmSave = async () => {
-    setIsSubmitting(true);
-    
-    try {
-      await bulkSaveAttendance(attendanceData);
-      success("Attendance data saved successfully");
-      setShowSaveConfirm(false);
-    } catch (err) {
-      error("Failed to save attendance data");
-      console.error(err);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleUpdateAll = () => {
-    if (!canEdit) {
-      error("You don't have permission to update attendance records");
-      return;
-    }
-    setShowBulkUpdate(true);
-  };
-
-  const handleBulkUpdate = async (data: {
-    present: boolean;
-    startTime: string;
-    endTime: string;
-    overtimeHours: number;
-    note: string;
-  }) => {
-    setIsSubmitting(true);
-    
-    try {
-      const updatedRecords = attendanceData.map(record => ({
-        ...record,
-        present: data.present,
-        startTime: data.startTime,
-        endTime: data.endTime,
-        overtimeHours: data.overtimeHours,
-        note: data.note
-      }));
-      
-      await bulkSaveAttendance(updatedRecords);
-      success("All attendance records updated successfully");
-      setShowBulkUpdate(false);
-    } catch (err) {
-      error("Failed to update attendance records");
-      console.error(err);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+  const {
+    isSubmitting,
+    showBulkUpdate,
+    setShowBulkUpdate,
+    showSaveConfirm,
+    setShowSaveConfirm,
+    handleSave,
+    confirmSave,
+    handleUpdateAll,
+    handleBulkUpdate
+  } = useAttendanceOperations(canEdit);
 
   return (
     <div className="space-y-4 sm:space-y-6 animate-fade-in pb-20">
       <NotificationContainer />
       
-      <div className="flex flex-col space-y-4">
-        <div>
-          <h1 className="text-2xl font-bold">Daily Attendance</h1>
-          <p className="text-muted-foreground">
-            Manage employee attendance records
-          </p>
-        </div>
-        
-        {canEdit && (
-          <div className="flex flex-col sm:flex-row gap-3">
-            <Button 
-              onClick={handleUpdateAll}
-              disabled={isSubmitting}
-              variant="secondary"
-              className="flex-1 sm:flex-none sm:min-w-[160px]"
-            >
-              <RefreshCw className="mr-2 h-4 w-4" />
-              {isSubmitting ? "Updating..." : "Update All"}
-            </Button>
-            
-            <Button 
-              onClick={handleSave}
-              disabled={isSubmitting}
-              className="flex-1 sm:flex-none sm:min-w-[160px]"
-            >
-              <Save className="mr-2 h-4 w-4" />
-              {isSubmitting ? "Saving..." : "Save Changes"}
-            </Button>
-          </div>
-        )}
-      </div>
+      <AttendanceHeader
+        canEdit={canEdit}
+        isSubmitting={isSubmitting}
+        onUpdateAll={handleUpdateAll}
+        onSave={handleSave}
+      />
 
       <DateNavigation
         currentDate={currentDate}
@@ -214,13 +68,13 @@ const Attendance = () => {
       <BulkUpdateDialog 
         open={showBulkUpdate}
         onClose={() => setShowBulkUpdate(false)}
-        onConfirm={handleBulkUpdate}
+        onConfirm={(data) => handleBulkUpdate(attendanceData, data)}
       />
       
       <ConfirmDialog
         open={showSaveConfirm}
         onOpenChange={setShowSaveConfirm}
-        onConfirm={confirmSave}
+        onConfirm={() => confirmSave(attendanceData)}
         title="Save Attendance Records"
         description="Are you sure you want to save these attendance records? This action cannot be undone."
         confirmText={isSubmitting ? "Saving..." : "Save Records"}
