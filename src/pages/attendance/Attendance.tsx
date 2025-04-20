@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useEmployees } from "@/contexts/EmployeeContext";
 import { useAttendance } from "@/contexts/AttendanceContext";
@@ -11,6 +10,7 @@ import AttendanceTable from "./components/AttendanceTable";
 import BulkUpdateDialog from "./components/BulkUpdateDialog";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import { Button } from "@/components/ui/button"; // Import Button component
+import { Save, RefreshCw } from "lucide-react";
 
 const Attendance = () => {
   const { user } = useAuth();
@@ -174,24 +174,24 @@ const Attendance = () => {
         </div>
         
         {canEdit && (
-          <div className="grid grid-cols-2 gap-3 mt-2">
+          <div className="flex flex-col sm:flex-row gap-3">
             <Button 
               onClick={handleUpdateAll}
               disabled={isSubmitting}
               variant="secondary"
-              className="w-full flex items-center justify-center"
+              className="flex-1 sm:flex-none sm:min-w-[160px]"
             >
-              <Save size={16} className="mr-2" />
+              <RefreshCw className="mr-2 h-4 w-4" />
               {isSubmitting ? "Updating..." : "Update All"}
             </Button>
             
             <Button 
               onClick={handleSave}
               disabled={isSubmitting}
-              className="w-full flex items-center justify-center"
+              className="flex-1 sm:flex-none sm:min-w-[160px]"
             >
-              <Save size={16} className="mr-2" />
-              {isSubmitting ? "Saving..." : "Save"}
+              <Save className="mr-2 h-4 w-4" />
+              {isSubmitting ? "Saving..." : "Save Changes"}
             </Button>
           </div>
         )}
