@@ -84,6 +84,7 @@ const EmployeeModal = ({ employee, onClose }: EmployeeModalProps) => {
           initialData={initialFormData}
           onSubmit={handleSubmit}
           isSubmitting={isSubmitting}
+          onClose={onClose}
         />
       </div>
     </div>
