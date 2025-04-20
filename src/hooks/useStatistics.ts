@@ -5,7 +5,6 @@ import { useAttendance } from "@/contexts/AttendanceContext";
 
 interface DashboardStats {
   totalEmployees: number;
-  activeEmployees: number;
   presentToday: number;
   absentToday: number;
 }
@@ -15,16 +14,12 @@ export const useStatistics = () => {
   const { attendanceRecords } = useAttendance();
   const [stats, setStats] = useState<DashboardStats>({
     totalEmployees: 0,
-    activeEmployees: 0,
     presentToday: 0,
     absentToday: 0,
   });
 
   useEffect(() => {
     const today = new Date().toISOString().split("T")[0];
-    const activeEmployees = filteredEmployees.filter(
-      (employee) => employee.status === "Active"
-    ).length;
 
     const todayRecords = attendanceRecords.filter(
       (record) => record.date === today
@@ -34,7 +29,6 @@ export const useStatistics = () => {
 
     setStats({
       totalEmployees: filteredEmployees.length,
-      activeEmployees,
       presentToday,
       absentToday,
     });

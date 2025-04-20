@@ -24,18 +24,12 @@ const Dashboard = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         <StatsCard
           icon={User}
           title="Total Employees"
           value={stats.totalEmployees}
           colorClass="bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400"
-        />
-        <StatsCard
-          icon={BarChart3}
-          title="Active Employees"
-          value={stats.activeEmployees}
-          colorClass="bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-400"
         />
         <StatsCard
           icon={UserCheck}
