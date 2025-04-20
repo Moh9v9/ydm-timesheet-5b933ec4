@@ -76,6 +76,14 @@ export const useAuthOperations = () => {
 
   const updateProfile = async (userData: Partial<User>): Promise<void> => {
     try {
+      // Make sure we have a valid user ID
+      if (!userData.id) {
+        // Get current user ID if not provided
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) throw new Error("User not authenticated");
+        userData.id = user.id;
+      }
+
       // If password is provided, update it through Auth API
       if (userData.password) {
         const { error: passwordError } = await supabase.auth.updateUser({

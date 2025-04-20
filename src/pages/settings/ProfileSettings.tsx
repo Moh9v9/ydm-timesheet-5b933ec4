@@ -1,11 +1,10 @@
 
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { useNotification } from "@/components/ui/notification";
+import { toast } from "sonner";
 
 const ProfileSettings = () => {
   const { user, updateProfile } = useAuth();
-  const { success, error, NotificationContainer } = useNotification();
   
   const [formData, setFormData] = useState({
     fullName: user?.fullName || "",
@@ -29,22 +28,22 @@ const ProfileSettings = () => {
     
     // Validation
     if (!formData.fullName || !formData.email) {
-      error("Name and email are required");
+      toast.error("Name and email are required");
       return;
     }
     
     if (formData.newPassword && formData.newPassword.length < 6) {
-      error("Password must be at least 6 characters long");
+      toast.error("Password must be at least 6 characters long");
       return;
     }
     
     if (formData.newPassword && formData.newPassword !== formData.confirmPassword) {
-      error("New passwords do not match");
+      toast.error("New passwords do not match");
       return;
     }
     
     if (formData.newPassword && !formData.currentPassword) {
-      error("Current password is required to change your password");
+      toast.error("Current password is required to change your password");
       return;
     }
     
@@ -53,6 +52,7 @@ const ProfileSettings = () => {
     try {
       // Prepare data to update
       const updateData: any = {
+        id: user?.id, // Make sure to include the user ID
         fullName: formData.fullName,
         email: formData.email,
       };
@@ -67,7 +67,7 @@ const ProfileSettings = () => {
       }
       
       await updateProfile(updateData);
-      success("Profile updated successfully");
+      toast.success("Profile updated successfully");
       
       // Clear password fields
       setFormData({
@@ -78,7 +78,8 @@ const ProfileSettings = () => {
       });
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Failed to update profile";
-      error(errorMessage);
+      toast.error(errorMessage);
+      console.error("Profile update error:", err);
     } finally {
       setIsSubmitting(false);
     }
