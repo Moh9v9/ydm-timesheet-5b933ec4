@@ -41,6 +41,8 @@ const UsersSettings = () => {
   };
   
   const handleSubmit = async (formData: any) => {
+    console.log("Submit handler called with form data:", formData);
+    
     // Validation
     if (!formData.fullName || !formData.email) {
       toast.error("Name and email are required");
@@ -88,6 +90,7 @@ const UsersSettings = () => {
         
         console.log("Creating user with data:", userToAdd);
         try {
+          toast("Creating user...", { duration: 2000 });
           const result = await addUser(userToAdd);
           console.log("User creation result:", result);
           toast.success("User created successfully");

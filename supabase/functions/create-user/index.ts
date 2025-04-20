@@ -156,11 +156,7 @@ serve(async (req) => {
     }
     
     // Check if user with email already exists
-    const { data: existingUser, error: existingUserError } = await supabase.auth.admin.listUsers({
-      filter: {
-        email: email
-      }
-    });
+    const { data: existingUsers, error: existingUserError } = await supabase.auth.admin.listUsers({});
       
     if (existingUserError) {
       console.error("Error checking for existing user:", existingUserError);
@@ -173,7 +169,9 @@ serve(async (req) => {
       );
     }
     
-    if (existingUser && existingUser.users && existingUser.users.length > 0) {
+    // Check if user exists by email
+    const emailExists = existingUsers?.users?.some(user => user.email === email);
+    if (emailExists) {
       console.error("User with email already exists:", email);
       return new Response(
         JSON.stringify({ error: "Conflict", details: "A user with this email already exists" }),
@@ -217,16 +215,20 @@ serve(async (req) => {
     // Create the user with admin API
     console.log("Creating user with admin API...");
     try {
+      const userMetadata = {
+        full_name: fullName,  // For backwards compatibility
+        fullName: fullName,   // For newer code
+        role: userRole,
+        permissions: userPermissions
+      };
+      
+      console.log("User metadata:", JSON.stringify(userMetadata));
+      
       const { data: newUser, error: createError } = await supabase.auth.admin.createUser({
         email,
         password,
         email_confirm: true,
-        user_metadata: {
-          full_name: fullName,
-          fullName: fullName,
-          role: userRole,
-          permissions: userPermissions
-        }
+        user_metadata: userMetadata
       });
       
       if (createError) {
@@ -259,7 +261,26 @@ serve(async (req) => {
         
       if (profileFetchError) {
         console.error("Error fetching new user profile:", profileFetchError);
-        // Continue despite this error - the user is created, but we couldn't fetch the profile
+        
+        // Manually insert into profiles if the trigger didn't work
+        if (profileFetchError.code === 'PGRST116') { // Record not found
+          console.log("Profile not found, creating manually");
+          const { error: insertError } = await supabase
+            .from('profiles')
+            .insert({
+              id: newUser.user.id,
+              full_name: fullName,
+              email: email,
+              role: userRole,
+              permissions: userPermissions
+            });
+            
+          if (insertError) {
+            console.error("Error inserting profile:", insertError);
+          } else {
+            console.log("Manually created profile for user");
+          }
+        }
       } else {
         console.log("New user profile created:", profile);
       }

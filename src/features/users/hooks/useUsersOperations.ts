@@ -1,4 +1,3 @@
-
 import { User } from "@/lib/types";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -48,13 +47,15 @@ export const useUsersOperations = (
       const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
       
       try {
-        console.log("Sending payload:", {
+        const payload = {
           fullName: user.fullName,
           email: user.email,
           password: user.password,
           role: user.role,
           permissions: user.permissions
-        });
+        };
+        
+        console.log("Sending payload:", payload);
         
         const response = await fetch(functionUrl, {
           method: 'POST',
@@ -62,13 +63,7 @@ export const useUsersOperations = (
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${session.access_token}`
           },
-          body: JSON.stringify({
-            fullName: user.fullName,
-            email: user.email,
-            password: user.password,
-            role: user.role,
-            permissions: user.permissions
-          }),
+          body: JSON.stringify(payload),
           signal: controller.signal
         });
         
@@ -83,20 +78,23 @@ export const useUsersOperations = (
         try {
           responseText = await response.text();
           console.log("Raw response text:", responseText);
-          data = JSON.parse(responseText);
+          if (responseText) {
+            data = JSON.parse(responseText);
+            console.log("Edge function response data:", data);
+          } else {
+            throw new Error("Empty response from server");
+          }
         } catch (parseError) {
           console.error("Error parsing response:", parseError);
           throw new Error(`Invalid response from server: Could not parse JSON. Raw response: ${responseText}`);
         }
-        
-        console.log("Edge function response data:", data);
         
         if (!response.ok) {
           console.error("Edge function returned an error:", data);
           throw new Error(data.error || data.details || `Failed to create user: ${response.status} ${response.statusText}`);
         }
         
-        if (!data.user || !data.user.id) {
+        if (!data || !data.user || !data.user.id) {
           console.error("No user ID returned from edge function:", data);
           throw new Error("Invalid response from server: Missing user data");
         }
