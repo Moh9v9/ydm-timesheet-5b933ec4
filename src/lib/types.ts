@@ -45,6 +45,7 @@ export interface Employee {
 export interface AttendanceRecord {
   id: string;
   employeeId: string;
+  employeeName: string;
   date: string; // ISO date string
   present: boolean;
   startTime: string; // HH:MM format

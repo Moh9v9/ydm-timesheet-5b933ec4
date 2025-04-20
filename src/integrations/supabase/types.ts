@@ -14,6 +14,7 @@ export type Database = {
           created_at: string | null
           date: string
           employee_id: string | null
+          employee_name: string | null
           end_time: string | null
           id: string
           note: string | null
@@ -26,6 +27,7 @@ export type Database = {
           created_at?: string | null
           date: string
           employee_id?: string | null
+          employee_name?: string | null
           end_time?: string | null
           id?: string
           note?: string | null
@@ -38,6 +40,7 @@ export type Database = {
           created_at?: string | null
           date?: string
           employee_id?: string | null
+          employee_name?: string | null
           end_time?: string | null
           id?: string
           note?: string | null

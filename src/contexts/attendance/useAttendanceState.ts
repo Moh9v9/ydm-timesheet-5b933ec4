@@ -37,6 +37,7 @@ export const useAttendanceState = () => {
         const formattedRecords: AttendanceRecord[] = (data || []).map(record => ({
           id: record.id,
           employeeId: record.employee_id,
+          employeeName: record.employee_name || '',
           date: record.date,
           present: record.present,
           startTime: record.start_time || '',

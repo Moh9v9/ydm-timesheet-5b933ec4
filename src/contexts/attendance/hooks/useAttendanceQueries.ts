@@ -28,6 +28,7 @@ export const useAttendanceQueries = () => {
     return data ? {
       id: data.id,
       employeeId: data.employee_id,
+      employeeName: data.employee_name || '',
       date: data.date,
       present: data.present,
       startTime: data.start_time || '',
