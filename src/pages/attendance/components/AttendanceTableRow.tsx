@@ -1,3 +1,4 @@
+
 import { AttendanceRecord } from "@/lib/types";
 import { Employee } from "@/lib/types";
 import { Textarea } from "@/components/ui/textarea";
@@ -33,12 +34,12 @@ const AttendanceTableRow = ({
       <td className="p-3">
         <div className="flex items-center">
           <div 
-            className={`relative w-12 h-6 rounded-full cursor-pointer transition-colors ${
+            className={`relative w-12 h-6 rounded-full ${canEdit ? "cursor-pointer" : "cursor-not-allowed"} transition-colors ${
               record.present 
                 ? "bg-present" 
                 : "bg-absent"
             }`}
-            onClick={onToggleAttendance}
+            onClick={canEdit ? onToggleAttendance : undefined}
           >
             <div 
               className={`absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${
