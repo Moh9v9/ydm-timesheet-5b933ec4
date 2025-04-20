@@ -30,10 +30,10 @@ const AttendanceTable = ({
             <tr>
               <th className="text-left p-3 font-medium">Employee</th>
               <th className="text-left p-3 font-medium">Status</th>
-              <th className="text-left p-3 font-medium hidden sm:table-cell">Start Time</th>
-              <th className="text-left p-3 font-medium hidden sm:table-cell">End Time</th>
-              <th className="text-left p-3 font-medium hidden md:table-cell">Overtime Hours</th>
-              <th className="text-left p-3 font-medium hidden md:table-cell">Notes</th>
+              <th className="text-left p-3 font-medium">Start Time</th>
+              <th className="text-left p-3 font-medium">End Time</th>
+              <th className="text-left p-3 font-medium">Overtime Hours</th>
+              <th className="text-left p-3 font-medium">Notes</th>
             </tr>
           </thead>
           <tbody>

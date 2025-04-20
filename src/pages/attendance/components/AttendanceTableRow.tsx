@@ -53,7 +53,7 @@ const AttendanceTableRow = ({
         </div>
       </td>
 
-      <td className="p-3 hidden sm:table-cell">
+      <td className="p-3">
         {record.present ? (
           <input
             type="time"
@@ -67,7 +67,7 @@ const AttendanceTableRow = ({
         )}
       </td>
 
-      <td className="p-3 hidden sm:table-cell">
+      <td className="p-3">
         {record.present ? (
           <input
             type="time"
@@ -81,7 +81,7 @@ const AttendanceTableRow = ({
         )}
       </td>
 
-      <td className="p-3 hidden md:table-cell">
+      <td className="p-3">
         {record.present ? (
           <input
             type="number"
@@ -97,7 +97,7 @@ const AttendanceTableRow = ({
         )}
       </td>
 
-      <td className="p-3 hidden md:table-cell">
+      <td className="p-3">
         <Textarea
           value={record.note || ""}
           onChange={(e) => onNoteChange(e.target.value)}
