@@ -61,6 +61,28 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				ydm: {
+					DEFAULT: '#3b82f6', // Blue color for YDM brand
+					light: '#93c5fd',
+					dark: '#1d4ed8',
+					foreground: '#ffffff'
+				},
+				success: {
+					DEFAULT: '#22c55e',
+					foreground: '#ffffff'
+				},
+				warning: {
+					DEFAULT: '#f59e0b',
+					foreground: '#ffffff'
+				},
+				present: {
+					DEFAULT: '#22c55e',  // green
+					foreground: '#ffffff'
+				},
+				absent: {
+					DEFAULT: '#ef4444',  // red
+					foreground: '#ffffff'
 				}
 			},
 			borderRadius: {
@@ -84,11 +106,16 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				'fade-in': {
+					from: { opacity: '0' },
+					to: { opacity: '1' }
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'fade-in': 'fade-in 0.3s ease-out'
 			}
 		}
 	},
