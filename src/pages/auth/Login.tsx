@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -11,26 +12,39 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [redirectAttempted, setRedirectAttempted] = useState(false);
   const { login, user } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
 
   // Check if user is already logged in
   useEffect(() => {
-    if (user) {
+    if (user && !redirectAttempted) {
       console.log("User already logged in, redirecting to home");
-      navigate("/");
+      setRedirectAttempted(true);
+      
+      // Use timeout to ensure state updates complete
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 100);
     }
-  }, [user, navigate]);
+  }, [user, navigate, redirectAttempted]);
 
   // Additional check using Supabase directly
   useEffect(() => {
     const checkAuth = async () => {
       try {
+        if (redirectAttempted) return; // Skip if already attempted redirect
+        
         const { data } = await supabase.auth.getSession();
         if (data.session) {
           console.log("Session found, redirecting to home");
-          navigate("/");
+          setRedirectAttempted(true);
+          
+          // Use timeout to ensure state updates complete
+          setTimeout(() => {
+            window.location.href = "/";
+          }, 100);
         }
       } catch (error) {
         console.error("Auth check error:", error);
@@ -38,7 +52,7 @@ const Login = () => {
     };
     
     checkAuth();
-  }, [navigate]);
+  }, [redirectAttempted]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,8 +70,14 @@ const Login = () => {
       // Show success message
       toast.success("Login successful!");
       
-      // Force hard navigation to home page
-      window.location.href = "/";
+      // Set redirect flag to prevent multiple redirects
+      setRedirectAttempted(true);
+      
+      // Force hard navigation to home page with a small delay
+      setTimeout(() => {
+        console.log("Forcing navigation to home after successful login");
+        window.location.href = "/";
+      }, 300);
       
     } catch (err) {
       const errorMessage = err instanceof Error 
