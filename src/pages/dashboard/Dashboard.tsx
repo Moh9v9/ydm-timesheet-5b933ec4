@@ -6,26 +6,27 @@ import { StatsCard } from "@/components/dashboard/StatsCard";
 import { useStatistics } from "@/hooks/useStatistics";
 import Attendance from "@/pages/attendance/Attendance";
 import { useAttendance } from "@/contexts/AttendanceContext";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 const Dashboard = () => {
   const { user } = useAuth();
   const { setCurrentDate } = useAttendance();
   
-  // Always use current date, formatted correctly to ensure consistency
-  const today = new Date();
+  // Use state to ensure date is fresh on component mount and refreshes
+  const [today] = useState(() => new Date());
   const formattedToday = today.toISOString().split('T')[0]; // YYYY-MM-DD format
   
   // Get statistics for today's date
-  const stats = useStatistics(formattedToday);
+  const stats = useStatistics();
 
   // Always set to current day when Dashboard mounts
   useEffect(() => {
-    console.log("Dashboard - Setting current date to:", formattedToday);
+    const currentDate = new Date().toISOString().split('T')[0];
+    console.log("Dashboard - Setting current date to:", currentDate);
     if (setCurrentDate) {
-      setCurrentDate(formattedToday);
+      setCurrentDate(currentDate);
     }
-  }, [setCurrentDate, formattedToday]);
+  }, [setCurrentDate]);
 
   return (
     <div className="space-y-6 animate-fade-in">
