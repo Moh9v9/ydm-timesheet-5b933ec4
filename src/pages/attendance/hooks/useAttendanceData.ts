@@ -25,6 +25,7 @@ export const useAttendanceData = (canEdit: boolean) => {
             return {
               id: `temp_${employee.id}_${currentDate}`,
               employeeId: employee.id,
+              employeeName: employee.fullName,
               date: currentDate,
               present: false, // Changed default to false (absent)
               startTime: "",  // Empty start time for absent employees
@@ -102,4 +103,3 @@ export const useAttendanceData = (canEdit: boolean) => {
     handleNoteChange
   };
 };
-

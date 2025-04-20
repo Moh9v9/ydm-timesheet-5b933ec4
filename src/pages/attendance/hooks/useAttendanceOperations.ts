@@ -27,6 +27,7 @@ export const useAttendanceOperations = (canEdit: boolean) => {
       const cleanData = attendanceData.map(record => ({
         ...(record.id && !record.id.toString().includes('temp_') ? { id: record.id } : {}),
         employeeId: record.employeeId,
+        employeeName: record.employeeName,
         date: record.date,
         present: record.present,
         startTime: record.startTime,
