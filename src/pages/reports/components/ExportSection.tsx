@@ -3,8 +3,16 @@ import { useState } from "react";
 import { useEmployees } from "@/contexts/EmployeeContext";
 import { useAttendance } from "@/contexts/AttendanceContext";
 import { useNotification } from "@/components/ui/notification";
-import { Download, FileText } from "lucide-react";
+import { Download, FileText, Calendar, Filter } from "lucide-react";
 import { ExportFormat, ReportType } from "@/lib/types";
+import { Button } from "@/components/ui/button";
+import { 
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription
+} from "@/components/ui/card";
 import ReportSelectionForm from "./export/ReportSelectionForm";
 import AvailableReports from "./export/AvailableReports";
 
@@ -12,6 +20,7 @@ const ExportSection = () => {
   const [reportType, setReportType] = useState<ReportType>("daily");
   const [exportFormat, setExportFormat] = useState<ExportFormat>("csv");
   const [isGenerating, setIsGenerating] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
   
   const { filteredEmployees } = useEmployees();
   const { attendanceRecords, currentDate } = useAttendance();
@@ -55,33 +64,52 @@ const ExportSection = () => {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <div className="lg:col-span-2">
-        <div className="bg-white dark:bg-gray-800/50 rounded-lg border dark:border-gray-700 p-5 shadow-sm">
-          <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-xl font-medium dark:text-gray-200">Generate Report</h2>
-            <FileText className="text-gray-400 dark:text-gray-500" size={20} />
-          </div>
+        <Card>
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle>Attendance Report</CardTitle>
+                <CardDescription>Generate attendance data for selected time period</CardDescription>
+              </div>
+              <Calendar className="text-gray-400 dark:text-gray-500" size={20} />
+            </div>
+          </CardHeader>
           
-          <div className="border-t dark:border-gray-700 pt-4 mt-2">
-            <ReportSelectionForm
-              reportType={reportType}
-              setReportType={setReportType}
-              exportFormat={exportFormat}
-              setExportFormat={setExportFormat}
-              currentDate={currentDate}
-            />
-          </div>
-          
-          <div className="pt-6 mt-2">
-            <button
-              onClick={generateReport}
-              disabled={isGenerating}
-              className="px-4 py-2.5 bg-primary text-white rounded-md flex items-center hover:bg-primary/90 transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
-            >
-              <Download size={16} className="mr-2" />
-              {isGenerating ? "Generating..." : "Generate Report"}
-            </button>
-          </div>
-        </div>
+          <CardContent>
+            <div className="flex justify-between items-center mb-4">
+              <div className="flex-1">
+                <ReportSelectionForm
+                  reportType={reportType}
+                  setReportType={setReportType}
+                  exportFormat={exportFormat}
+                  setExportFormat={setExportFormat}
+                  currentDate={currentDate}
+                  showFilters={showFilters}
+                />
+              </div>
+              
+              <Button 
+                variant="outline" 
+                className="mt-8 ml-4 flex items-center gap-2 self-start"
+                onClick={() => setShowFilters(!showFilters)}
+              >
+                <Filter size={16} />
+                {showFilters ? "Hide Filters" : "More Filters"}
+              </Button>
+            </div>
+            
+            <div className="pt-4 mt-2 border-t">
+              <Button
+                onClick={generateReport}
+                disabled={isGenerating}
+                className="gap-2"
+              >
+                <Download size={16} />
+                {isGenerating ? "Generating..." : "Generate Report"}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       </div>
       
       <div className="lg:col-span-1">

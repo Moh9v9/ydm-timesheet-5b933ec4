@@ -4,17 +4,24 @@ import { Search } from "lucide-react";
 interface SearchBarProps {
   searchTerm: string;
   onSearchChange: (value: string) => void;
+  placeholder?: string;
+  className?: string;
 }
 
-export const SearchBar = ({ searchTerm, onSearchChange }: SearchBarProps) => {
+export const SearchBar = ({ 
+  searchTerm, 
+  onSearchChange, 
+  placeholder = "Search employees...",
+  className = ""
+}: SearchBarProps) => {
   return (
-    <div className="relative flex-1">
+    <div className={`relative flex-1 ${className}`}>
       <input
         type="text"
-        placeholder="Search employees..."
+        placeholder={placeholder}
         value={searchTerm}
         onChange={(e) => onSearchChange(e.target.value)}
-        className="pl-10 pr-4 py-2 w-full border border-input rounded-md"
+        className="pl-10 pr-4 py-2 w-full border border-input rounded-md dark:bg-gray-800/50 dark:border-gray-700"
       />
       <Search 
         size={18} 

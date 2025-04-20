@@ -1,9 +1,10 @@
 
-import { Download, Table, FileSpreadsheet, ChartBar } from "lucide-react";
+import { Download, Table, FileSpreadsheet, ChartBar, Users, Calendar } from "lucide-react";
 import { useNotification } from "@/components/ui/notification";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import ExportSection from "./components/ExportSection";
 import ViewsSection from "./components/ViewsSection";
+import EmployeeExportSection from "./components/EmployeeExportSection";
 
 const Reports = () => {
   const { NotificationContainer } = useNotification();
@@ -55,7 +56,33 @@ const Reports = () => {
           
           <div className="p-6">
             <TabsContent value="export" className="mt-0">
-              <ExportSection />
+              {/* New Tabs for Employees vs Attendance */}
+              <Tabs defaultValue="attendance" className="w-full">
+                <TabsList className="w-full mb-4 flex">
+                  <TabsTrigger 
+                    value="attendance" 
+                    className="flex-1 gap-2"
+                  >
+                    <Calendar size={16} />
+                    <span>Attendance Reports</span>
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="employees" 
+                    className="flex-1 gap-2"
+                  >
+                    <Users size={16} />
+                    <span>Employee Reports</span>
+                  </TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="attendance" className="mt-0 p-0">
+                  <ExportSection />
+                </TabsContent>
+                
+                <TabsContent value="employees" className="mt-0 p-0">
+                  <EmployeeExportSection />
+                </TabsContent>
+              </Tabs>
             </TabsContent>
             
             <TabsContent value="view" className="mt-0">
