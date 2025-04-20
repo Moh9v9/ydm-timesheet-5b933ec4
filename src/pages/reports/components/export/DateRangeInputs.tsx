@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { format } from "date-fns";
 import { ChevronDown } from "lucide-react";
@@ -71,10 +70,10 @@ const DateRangeInputs = ({ reportType, currentDate }: DateRangeInputsProps) => {
         <PopoverContent 
           className={cn(
             "w-auto p-0",
-            "border dark:border-gray-700/50",
+            "border dark:border-gray-700",
             "rounded-lg overflow-hidden",
             "shadow-lg dark:shadow-black/10",
-            "dark:bg-gray-800/95 backdrop-blur-sm"
+            "bg-white dark:bg-gray-800/95 backdrop-blur-sm"
           )} 
           align="start"
         >
@@ -94,7 +93,7 @@ const DateRangeInputs = ({ reportType, currentDate }: DateRangeInputsProps) => {
               nav: "flex items-center gap-1",
               nav_button: cn(
                 "inline-flex items-center justify-center rounded-md p-1.5",
-                "text-muted-foreground/70 hover:text-primary hover:bg-gray-100/50 dark:hover:bg-gray-700/50",
+                "text-muted-foreground hover:text-primary hover:bg-gray-100/50 dark:hover:bg-gray-700/50",
                 "transition-colors duration-200"
               ),
               table: "w-full border-collapse",
@@ -115,13 +114,13 @@ const DateRangeInputs = ({ reportType, currentDate }: DateRangeInputsProps) => {
                 "focus:outline-none focus:ring-2 focus:ring-primary/20"
               ),
               day_selected: cn(
-                "bg-primary text-primary-foreground",
+                "bg-primary text-primary-foreground dark:bg-primary dark:text-primary-foreground",
                 "hover:bg-primary hover:text-primary-foreground",
                 "focus:bg-primary focus:text-primary-foreground"
               ),
-              day_today: "bg-accent/50 text-accent-foreground",
-              day_outside: "text-muted-foreground/50",
-              day_disabled: "text-muted-foreground/50",
+              day_today: "bg-accent/50 text-accent-foreground dark:bg-accent/30 dark:text-white",
+              day_outside: "text-muted-foreground/50 dark:text-muted-foreground/30",
+              day_disabled: "text-muted-foreground/50 dark:text-muted-foreground/30",
               day_hidden: "invisible",
               day_range_end: "day-range-end",
               day_range_middle: "day-range-middle",
