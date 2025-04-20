@@ -17,6 +17,7 @@ export interface EmployeeFormProps {
   initialData: EmployeeFormData;
   onSubmit: (data: EmployeeFormData) => Promise<void>;
   isSubmitting: boolean;
+  onClose: () => void;
 }
 
 export interface EmployeeModalProps {

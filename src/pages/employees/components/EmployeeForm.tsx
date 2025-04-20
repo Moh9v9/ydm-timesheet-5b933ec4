@@ -1,8 +1,9 @@
 
+import { useState } from "react";
 import { EmployeeFormData, EmployeeFormProps } from "../types/employee-form";
 import { EmployeeFormField } from "./EmployeeFormField";
 
-export const EmployeeForm = ({ initialData, onSubmit, isSubmitting }: EmployeeFormProps) => {
+export const EmployeeForm = ({ initialData, onSubmit, isSubmitting, onClose }: EmployeeFormProps) => {
   const [formData, setFormData] = useState<EmployeeFormData>(initialData);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
