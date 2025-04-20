@@ -82,13 +82,39 @@ const UsersSettings = () => {
   
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
+    
+    if (name === "role") {
+      // If role is set to admin, automatically set full permissions
+      if (value === "admin") {
+        setFormData({
+          ...formData,
+          [name]: value,
+          permissions: {
+            view: true,
+            edit: true,
+            delete: true,
+          },
+        });
+      } else {
+        setFormData({
+          ...formData,
+          [name]: value,
+        });
+      }
+    } else {
+      setFormData({
+        ...formData,
+        [name]: value,
+      });
+    }
   };
   
   const handlePermissionChange = (permission: "view" | "edit" | "delete") => {
+    // Don't allow changing permissions if role is admin
+    if (formData.role === "admin") {
+      return;
+    }
+    
     setFormData({
       ...formData,
       permissions: {
@@ -121,7 +147,9 @@ const UsersSettings = () => {
           fullName: formData.fullName,
           email: formData.email,
           role: formData.role,
-          permissions: formData.permissions,
+          permissions: formData.role === "admin" 
+            ? { view: true, edit: true, delete: true } // Ensure admin always has full permissions
+            : formData.permissions,
         };
         
         // Only include password if it's provided
@@ -133,7 +161,15 @@ const UsersSettings = () => {
         success("User updated successfully");
       } else {
         // Create new user
-        await addUser(formData);
+        const newUserData = {
+          ...formData,
+          // Ensure admin always has full permissions
+          permissions: formData.role === "admin" 
+            ? { view: true, edit: true, delete: true } 
+            : formData.permissions,
+        };
+        
+        await addUser(newUserData);
         success("User added successfully");
       }
       
@@ -302,50 +338,57 @@ const UsersSettings = () => {
                 </select>
               </div>
               
-              {/* Permissions */}
-              <div>
-                <label className="block text-sm font-medium mb-2">
-                  Permissions
-                </label>
-                <div className="flex flex-wrap gap-4">
-                  <div className="flex items-center">
-                    <input
-                      type="checkbox"
-                      id="permissionView"
-                      checked={formData.permissions.view}
-                      onChange={() => handlePermissionChange("view")}
-                      className="mr-2"
-                    />
-                    <label htmlFor="permissionView" className="text-sm">
-                      View
-                    </label>
-                  </div>
-                  <div className="flex items-center">
-                    <input
-                      type="checkbox"
-                      id="permissionEdit"
-                      checked={formData.permissions.edit}
-                      onChange={() => handlePermissionChange("edit")}
-                      className="mr-2"
-                    />
-                    <label htmlFor="permissionEdit" className="text-sm">
-                      Edit
-                    </label>
-                  </div>
-                  <div className="flex items-center">
-                    <input
-                      type="checkbox"
-                      id="permissionDelete"
-                      checked={formData.permissions.delete}
-                      onChange={() => handlePermissionChange("delete")}
-                      className="mr-2"
-                    />
-                    <label htmlFor="permissionDelete" className="text-sm">
-                      Delete
-                    </label>
+              {/* Permissions - Only show if role is not admin */}
+              {formData.role !== "admin" && (
+                <div>
+                  <label className="block text-sm font-medium mb-2">
+                    Permissions
+                  </label>
+                  <div className="flex flex-wrap gap-4">
+                    <div className="flex items-center">
+                      <input
+                        type="checkbox"
+                        id="permissionView"
+                        checked={formData.permissions.view}
+                        onChange={() => handlePermissionChange("view")}
+                        className="mr-2"
+                      />
+                      <label htmlFor="permissionView" className="text-sm">
+                        View
+                      </label>
+                    </div>
+                    <div className="flex items-center">
+                      <input
+                        type="checkbox"
+                        id="permissionEdit"
+                        checked={formData.permissions.edit}
+                        onChange={() => handlePermissionChange("edit")}
+                        className="mr-2"
+                      />
+                      <label htmlFor="permissionEdit" className="text-sm">
+                        Edit
+                      </label>
+                    </div>
+                    <div className="flex items-center">
+                      <input
+                        type="checkbox"
+                        id="permissionDelete"
+                        checked={formData.permissions.delete}
+                        onChange={() => handlePermissionChange("delete")}
+                        className="mr-2"
+                      />
+                      <label htmlFor="permissionDelete" className="text-sm">
+                        Delete
+                      </label>
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
+              {formData.role === "admin" && (
+                <div className="bg-blue-50 text-blue-800 dark:bg-blue-900/20 dark:text-blue-300 p-3 rounded-md text-sm">
+                  Admin users automatically have full permissions
+                </div>
+              )}
               
               {/* Form Actions */}
               <div className="flex justify-end space-x-3 pt-4">
