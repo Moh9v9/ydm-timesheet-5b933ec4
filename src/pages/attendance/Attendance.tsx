@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useEmployees } from "@/contexts/EmployeeContext";
 import { useAttendance } from "@/contexts/AttendanceContext";
@@ -194,7 +193,7 @@ const Attendance = () => {
               className="flex items-center space-x-2 px-3 py-2 border rounded-md hover:bg-accent"
             >
               <Calendar size={16} />
-              <span>{format(parse(currentDate, "yyyy-MM-dd", new Date()), "MMMM d, yyyy")}</span>
+              <span>{format(parse(currentDate, "yyyy-MM-dd", new Date()), "EEEE, MMMM d, yyyy")}</span>
             </button>
             
             {showDatePicker && (
