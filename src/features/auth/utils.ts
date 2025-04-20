@@ -4,25 +4,45 @@ import { ProfileData } from "./types";
 import { Json } from "@/integrations/supabase/types";
 
 export const createUserFromProfile = (userId: string, profile: ProfileData): User => {
-  // Safely handle permissions
+  // For admin users, always return full permissions regardless of what's stored
+  if (profile.role === 'admin') {
+    return {
+      id: userId,
+      fullName: profile.full_name,
+      email: profile.email,
+      password: '', // We don't store passwords
+      role: 'admin',
+      permissions: {
+        employees: {
+          view: true,
+          edit: true,
+          delete: true
+        },
+        attendees: {
+          view: true,
+          edit: true
+        },
+        export: true
+      }
+    };
+  }
+
+  // For non-admin users, use stored permissions
   let permissionsObj: Record<string, unknown> = {};
   
-  // Check if permissions is an object and not null or an array
   if (typeof profile.permissions === 'object' && profile.permissions !== null && !Array.isArray(profile.permissions)) {
     permissionsObj = profile.permissions as Record<string, unknown>;
   }
   
-  // Safely convert role string to UserRole type
   const role: UserRole = (profile.role === 'admin' || profile.role === 'user') 
     ? profile.role 
     : 'user';
   
-  // Create the user with the updated permission structure
   return {
     id: userId,
     fullName: profile.full_name,
     email: profile.email,
-    password: '', // We don't store passwords
+    password: '',
     role: role,
     permissions: {
       employees: {
