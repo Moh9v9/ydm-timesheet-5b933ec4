@@ -1,8 +1,8 @@
 
 import { AttendanceRecord } from "@/lib/types";
-import { useAttendanceQueries } from "./hooks/useAttendanceQueries";
-import { useAttendanceMutations } from "./hooks/useAttendanceMutations";
-import { useBulkOperations } from "./hooks/useBulkOperations";
+import { useAttendanceQueries } from "./useAttendanceQueries";
+import { useAttendanceMutations } from "./useAttendanceMutations";
+import { useBulkOperations } from "./useBulkOperations";
 
 export const useAttendanceOperations = (
   attendanceRecords: AttendanceRecord[],
