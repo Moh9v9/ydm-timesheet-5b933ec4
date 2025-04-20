@@ -15,15 +15,26 @@ serve(async (req) => {
   }
   
   try {
+    console.log("Create user function called");
+    
     // Create Supabase client with service role key (has admin privileges)
     const supabaseUrl = Deno.env.get("SUPABASE_URL") || "";
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
+    
+    if (!supabaseUrl || !supabaseServiceKey) {
+      console.error("Missing Supabase URL or service key");
+      return new Response(
+        JSON.stringify({ error: "Server configuration error" }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
     
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
     
     // Only allow authenticated users to call this function
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
+      console.error("No authorization header");
       return new Response(
         JSON.stringify({ error: "Unauthorized" }),
         { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -35,11 +46,14 @@ serve(async (req) => {
     const { data: { user: caller }, error: authError } = await supabase.auth.getUser(token);
     
     if (authError || !caller) {
+      console.error("Auth error or no caller user:", authError);
       return new Response(
-        JSON.stringify({ error: "Unauthorized" }),
+        JSON.stringify({ error: "Unauthorized", details: authError?.message }),
         { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
+    
+    console.log("Caller authenticated:", caller.id);
     
     // Check if the caller is an admin by querying the profiles table
     const { data: callerProfile, error: profileError } = await supabase
@@ -48,18 +62,32 @@ serve(async (req) => {
       .eq('id', caller.id)
       .single();
       
-    if (profileError || !callerProfile || callerProfile.role !== 'admin') {
+    if (profileError) {
+      console.error("Profile error:", profileError);
+      return new Response(
+        JSON.stringify({ error: "Failed to verify permissions", details: profileError.message }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+    
+    if (!callerProfile || callerProfile.role !== 'admin') {
+      console.error("Caller is not admin:", callerProfile);
       return new Response(
         JSON.stringify({ error: "Forbidden: Only admins can create users" }),
         { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
     
+    console.log("Admin permissions verified");
+    
     // Get user data from request body
     const userData = await req.json();
     const { fullName, email, password, role, permissions } = userData;
     
+    console.log("User data received:", { fullName, email, role });
+    
     if (!fullName || !email || !password) {
+      console.error("Missing required fields");
       return new Response(
         JSON.stringify({ error: "Missing required fields" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -76,9 +104,16 @@ serve(async (req) => {
         fullName: fullName,
         role: role || 'user',
         permissions: permissions || {
-          view: true,
-          edit: false,
-          delete: false
+          employees: {
+            view: true,
+            edit: false,
+            delete: false
+          },
+          attendees: {
+            view: false,
+            edit: false
+          },
+          export: false
         }
       }
     });
@@ -91,6 +126,8 @@ serve(async (req) => {
       );
     }
     
+    console.log("User created successfully:", newUser.user.id);
+    
     return new Response(
       JSON.stringify({ 
         success: true, 
@@ -100,9 +137,16 @@ serve(async (req) => {
           fullName: fullName,
           role: role || 'user',
           permissions: permissions || {
-            view: true,
-            edit: false,
-            delete: false
+            employees: {
+              view: true,
+              edit: false,
+              delete: false
+            },
+            attendees: {
+              view: false,
+              edit: false
+            },
+            export: false
           }
         } 
       }),
@@ -112,7 +156,7 @@ serve(async (req) => {
   } catch (error) {
     console.error("Server error:", error);
     return new Response(
-      JSON.stringify({ error: "Internal server error" }),
+      JSON.stringify({ error: "Internal server error", details: error.message }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }

@@ -53,6 +53,8 @@ const UsersSettings = () => {
     setIsSubmitting(true);
     
     try {
+      console.log("Form data being submitted:", formData);
+      
       if (currentUser) {
         // Update existing user
         await updateUser(currentUser.id, {
@@ -68,22 +70,30 @@ const UsersSettings = () => {
           password: formData.password,
           role: formData.role,
           permissions: formData.role === "admin" ? {
-            view: true,
-            edit: true,
-            delete: true
+            employees: {
+              view: true,
+              edit: true,
+              delete: true
+            },
+            attendees: {
+              view: true,
+              edit: true
+            },
+            export: true
           } : formData.permissions
         };
         
         console.log("Creating user with data:", userToAdd);
-        await addUser(userToAdd);
+        const result = await addUser(userToAdd);
+        console.log("User creation result:", result);
         toast.success("User created successfully");
       }
       
       handleCloseModal();
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Failed to save user";
-      toast.error(errorMessage);
       console.error("Error in handleSubmit:", err);
+      toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }

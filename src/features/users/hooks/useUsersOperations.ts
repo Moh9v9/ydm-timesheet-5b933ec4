@@ -1,4 +1,3 @@
-
 import { User } from "@/lib/types";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -15,13 +14,26 @@ export const useUsersOperations = (
     setLoading(true);
     
     try {
+      console.log("Starting user creation process...");
+      
       if (users.some(existingUser => existingUser.email === user.email)) {
         throw new Error("A user with this email already exists");
       }
       
       // Get the current session token
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) throw new Error("Authentication required");
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError) {
+        console.error("Session error:", sessionError);
+        throw new Error("Authentication error: " + sessionError.message);
+      }
+      
+      if (!session) {
+        console.error("No active session found");
+        throw new Error("Authentication required: Please sign in to create users");
+      }
+      
+      console.log("Session acquired, proceeding with edge function call");
       
       // Use the imported URL directly from a hardcoded URL that matches what's in the client
       const supabaseUrl = "https://bkrfhlycvtmpoewlwpcc.supabase.co";
@@ -42,7 +54,9 @@ export const useUsersOperations = (
         })
       });
       
+      console.log("Edge function response status:", response.status);
       const data = await response.json();
+      console.log("Edge function response data:", data);
       
       if (!response.ok) {
         throw new Error(data.error || "Failed to create user");
