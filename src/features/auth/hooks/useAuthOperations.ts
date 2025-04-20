@@ -84,6 +84,18 @@ export const useAuthOperations = () => {
         userData.id = user.id;
       }
 
+      // Update user metadata in auth.users if fullName is provided
+      if (userData.fullName) {
+        const { error: metadataError } = await supabase.auth.updateUser({
+          data: {
+            full_name: userData.fullName,
+            fullName: userData.fullName, // Include both formats for compatibility
+          }
+        });
+        
+        if (metadataError) throw metadataError;
+      }
+
       // If password is provided, update it through Auth API
       if (userData.password) {
         const { error: passwordError } = await supabase.auth.updateUser({
