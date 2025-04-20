@@ -66,6 +66,11 @@ const Login = () => {
             <p className="text-sm text-muted-foreground mb-8">
               Manage employee attendance and timesheets
             </p>
+            
+            {/* New "Sign In" text */}
+            <h3 className="text-2xl font-bold text-foreground mb-6">
+              Sign In
+            </h3>
           </div>
           
           <div>
