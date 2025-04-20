@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -40,7 +39,7 @@ const Login = () => {
   return (
     <MainLayout requireAuth={false}>
       <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-md w-full space-y-8">
+        <div className="max-w-md w-full space-y-6">
           <div className="absolute top-4 right-4">
             <button 
               onClick={toggleTheme} 
@@ -55,21 +54,21 @@ const Login = () => {
             </button>
           </div>
           
-          <div className="text-center">
+          <div className="text-center mt-10">
             <img 
               src="https://i.ibb.co/DPfXmyDz/YDM-logo2-2.png" 
               alt="YDM Logo" 
-              className="h-16 w-auto mx-auto"
+              className="h-16 w-auto mx-auto mb-4"
             />
-            <h2 className="mt-6 text-3xl font-extrabold text-foreground">
-              Sign in to YDM TimeSheet
+            <h2 className="text-3xl font-extrabold text-foreground mb-2">
+              YDM TimeSheet
             </h2>
-            <p className="mt-2 text-sm text-muted-foreground">
+            <p className="text-sm text-muted-foreground mb-8">
               Manage employee attendance and timesheets
             </p>
           </div>
           
-          <div className="mt-8">
+          <div>
             <div className="bg-card shadow-md rounded-lg px-6 py-8">
               <form className="space-y-6" onSubmit={handleSubmit}>
                 <div>
@@ -122,7 +121,7 @@ const Login = () => {
                   </div>
                 </div>
 
-                <div>
+                <div className="mt-8">
                   <button
                     type="submit"
                     disabled={isSubmitting}
