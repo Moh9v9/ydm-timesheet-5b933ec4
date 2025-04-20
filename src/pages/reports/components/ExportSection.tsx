@@ -68,41 +68,41 @@ const ExportSection = () => {
         <div className="space-y-4">
           {/* Report Type */}
           <div>
-            <label htmlFor="reportType" className="block text-sm font-medium mb-1">
+            <label htmlFor="reportType" className="block text-sm font-medium mb-1 dark:text-gray-200">
               Report Type
             </label>
             <Select 
               value={reportType} 
               onValueChange={(value: ReportType) => setReportType(value)}
             >
-              <SelectTrigger className="w-full dark:bg-gray-800 dark:border-gray-700 dark:text-white">
+              <SelectTrigger className="w-full dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:hover:bg-gray-800 transition-colors">
                 <SelectValue placeholder="Select Report Type" />
               </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="daily">Daily Attendance</SelectItem>
-                <SelectItem value="weekly">Weekly Attendance</SelectItem>
-                <SelectItem value="monthly">Monthly Attendance</SelectItem>
-                <SelectItem value="employees">Full Employee List</SelectItem>
+              <SelectContent className="dark:bg-gray-900 dark:border-gray-700">
+                <SelectItem value="daily" className="dark:hover:bg-gray-800 dark:focus:bg-gray-800">Daily Attendance</SelectItem>
+                <SelectItem value="weekly" className="dark:hover:bg-gray-800 dark:focus:bg-gray-800">Weekly Attendance</SelectItem>
+                <SelectItem value="monthly" className="dark:hover:bg-gray-800 dark:focus:bg-gray-800">Monthly Attendance</SelectItem>
+                <SelectItem value="employees" className="dark:hover:bg-gray-800 dark:focus:bg-gray-800">Full Employee List</SelectItem>
               </SelectContent>
             </Select>
           </div>
           
           {/* Export Format */}
           <div>
-            <label htmlFor="exportFormat" className="block text-sm font-medium mb-1">
+            <label htmlFor="exportFormat" className="block text-sm font-medium mb-1 dark:text-gray-200">
               Export Format
             </label>
             <Select 
               value={exportFormat} 
               onValueChange={(value: ExportFormat) => setExportFormat(value)}
             >
-              <SelectTrigger className="w-full dark:bg-gray-800 dark:border-gray-700 dark:text-white">
+              <SelectTrigger className="w-full dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 dark:hover:bg-gray-800 transition-colors">
                 <SelectValue placeholder="Select Export Format" />
               </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="csv">CSV</SelectItem>
-                <SelectItem value="xlsx">Excel (XLSX)</SelectItem>
-                <SelectItem value="pdf">PDF</SelectItem>
+              <SelectContent className="dark:bg-gray-900 dark:border-gray-700">
+                <SelectItem value="csv" className="dark:hover:bg-gray-800 dark:focus:bg-gray-800">CSV</SelectItem>
+                <SelectItem value="xlsx" className="dark:hover:bg-gray-800 dark:focus:bg-gray-800">Excel (XLSX)</SelectItem>
+                <SelectItem value="pdf" className="dark:hover:bg-gray-800 dark:focus:bg-gray-800">PDF</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -110,40 +110,40 @@ const ExportSection = () => {
           {/* Additional options based on report type */}
           {reportType === "daily" && (
             <div>
-              <label htmlFor="date" className="block text-sm font-medium mb-1">
+              <label htmlFor="date" className="block text-sm font-medium mb-1 dark:text-gray-200">
                 Date
               </label>
               <input
                 type="date"
                 id="date"
                 value={currentDate}
-                className="w-full p-2 border border-input rounded-md dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+                className="w-full p-2 border border-input rounded-md dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 focus:ring-2 focus:ring-primary dark:focus:ring-offset-2"
               />
             </div>
           )}
           
           {reportType === "weekly" && (
             <div>
-              <label htmlFor="week" className="block text-sm font-medium mb-1">
+              <label htmlFor="week" className="block text-sm font-medium mb-1 dark:text-gray-200">
                 Week
               </label>
               <input
                 type="week"
                 id="week"
-                className="w-full p-2 border border-input rounded-md dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+                className="w-full p-2 border border-input rounded-md dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 focus:ring-2 focus:ring-primary dark:focus:ring-offset-2"
               />
             </div>
           )}
           
           {reportType === "monthly" && (
             <div>
-              <label htmlFor="month" className="block text-sm font-medium mb-1">
+              <label htmlFor="month" className="block text-sm font-medium mb-1 dark:text-gray-200">
                 Month
               </label>
               <input
                 type="month"
                 id="month"
-                className="w-full p-2 border border-input rounded-md dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+                className="w-full p-2 border border-input rounded-md dark:bg-gray-900 dark:border-gray-700 dark:text-gray-100 focus:ring-2 focus:ring-primary dark:focus:ring-offset-2"
               />
             </div>
           )}
