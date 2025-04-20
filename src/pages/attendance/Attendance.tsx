@@ -3,14 +3,13 @@ import { useEmployees } from "@/contexts/EmployeeContext";
 import { useAttendance } from "@/contexts/AttendanceContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNotification } from "@/components/ui/notification";
-import { Save } from "lucide-react";
+import { Save, RefreshCw } from "lucide-react"; // Combined import
 import { AttendanceRecord } from "@/lib/types";
 import DateNavigation from "./components/DateNavigation";
 import AttendanceTable from "./components/AttendanceTable";
 import BulkUpdateDialog from "./components/BulkUpdateDialog";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import { Button } from "@/components/ui/button"; // Import Button component
-import { Save, RefreshCw } from "lucide-react";
 
 const Attendance = () => {
   const { user } = useAuth();
