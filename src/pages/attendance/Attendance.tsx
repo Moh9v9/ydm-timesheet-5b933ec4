@@ -8,6 +8,7 @@ import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Save } from "lucid
 import { AttendanceRecord } from "@/lib/types";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import BulkUpdateDialog from "./components/BulkUpdateDialog";
 
 const Attendance = () => {
   const { user } = useAuth();
@@ -24,6 +25,7 @@ const Attendance = () => {
   const [attendanceData, setAttendanceData] = useState<AttendanceRecord[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showBulkUpdate, setShowBulkUpdate] = useState(false);
   
   const canEdit = user?.permissions.edit;
   
@@ -148,23 +150,36 @@ const Attendance = () => {
     }
   };
 
-  // Add new function to handle bulk update
+  // Update the handleUpdateAll function
   const handleUpdateAll = async () => {
     if (!canEdit) {
       error("You don't have permission to update attendance records");
       return;
     }
     
-    // Confirm update
-    if (!window.confirm("Are you sure you want to update all attendance records?")) {
-      return;
-    }
-    
+    setShowBulkUpdate(true);
+  };
+
+  const handleBulkUpdate = async (data: {
+    present: boolean;
+    startTime: string;
+    endTime: string;
+    overtimeHours: number;
+  }) => {
     setIsSubmitting(true);
     
     try {
-      await bulkSaveAttendance(attendanceData);
+      const updatedRecords = attendanceData.map(record => ({
+        ...record,
+        present: data.present,
+        startTime: data.startTime,
+        endTime: data.endTime,
+        overtimeHours: data.overtimeHours
+      }));
+      
+      await bulkSaveAttendance(updatedRecords);
       success("All attendance records updated successfully");
+      setShowBulkUpdate(false);
     } catch (err) {
       error("Failed to update attendance records");
       console.error(err);
@@ -399,6 +414,12 @@ const Attendance = () => {
           <li>Click 'Save Attendance' to save all records</li>
         </ul>
       </div>
+
+      <BulkUpdateDialog 
+        open={showBulkUpdate}
+        onClose={() => setShowBulkUpdate(false)}
+        onConfirm={handleBulkUpdate}
+      />
     </div>
   );
 };
