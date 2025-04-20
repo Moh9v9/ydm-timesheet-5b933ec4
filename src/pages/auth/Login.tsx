@@ -36,7 +36,7 @@ const Login = () => {
     
     checkSession();
     // Only run this effect once on mount
-  }, []);
+  }, [navigate, redirectAttempted]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -74,6 +74,7 @@ const Login = () => {
         : "Login failed. Please check your credentials.";
       
       toast.error(errorMessage);
+      console.error("Login error:", err);
     } finally {
       setIsSubmitting(false);
     }
