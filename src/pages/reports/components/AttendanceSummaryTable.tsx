@@ -16,13 +16,10 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { Download, Calendar, FileSpreadsheet, FileText, check, x as XIcon } from "lucide-react";
+import { Download, Calendar, FileSpreadsheet, FileText, Check, X } from "lucide-react";
 import { useAttendance } from "@/contexts/AttendanceContext";
 import { useEmployees } from "@/contexts/EmployeeContext";
 import { format } from "date-fns";
-
-// Import lucide icons as components
-import { Check, X } from "lucide-react";
 
 interface AttendanceSummaryTableProps {
   view: "daily" | "weekly" | "monthly";
@@ -94,8 +91,8 @@ const AttendanceSummaryTable = ({ view, currentDate }: AttendanceSummaryTablePro
             {view === "daily" && (
               <span className="ml-3 flex items-center gap-1">
                 {hasAttendanceForDate 
-                  ? <Check size={16} className="text-green-600" title="Attendance exists" /> 
-                  : <X size={16} className="text-red-500" title="No attendance record" />
+                  ? <Check size={16} className="text-green-600" aria-label="Attendance exists" /> 
+                  : <X size={16} className="text-red-500" aria-label="No attendance record" />
                 }
                 <span className="text-xs text-muted-foreground">
                   {formatDate(currentDate)}
