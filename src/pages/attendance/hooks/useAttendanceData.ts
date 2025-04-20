@@ -11,47 +11,48 @@ export const useAttendanceData = (canEdit: boolean) => {
   const [isLoading, setIsLoading] = useState(true);
   const [lastFetchedDate, setLastFetchedDate] = useState<string>('');
 
+  // Force data refresh when component mounts or date changes
   useEffect(() => {
-    // Force refresh when date changes
-    if (currentDate !== lastFetchedDate) {
-      const fetchAttendanceData = async () => {
-        setIsLoading(true);
-        const activeEmployees = filteredEmployees.filter(emp => emp.status === "Active");
-        
-        try {
-          const attendancePromises = activeEmployees.map(async (employee) => {
-            const existingRecord = await getRecordsByEmployeeAndDate(employee.id, currentDate);
-            
-            if (existingRecord) {
-              return existingRecord;
-            } else {
-              return {
-                id: `temp_${employee.id}_${currentDate}`,
-                employeeId: employee.id,
-                employeeName: employee.fullName,
-                date: currentDate,
-                present: false,
-                startTime: "",
-                endTime: "",
-                overtimeHours: 0,
-                note: ''
-              };
-            }
-          });
-          
-          const results = await Promise.all(attendancePromises);
-          setAttendanceData(results);
-          setLastFetchedDate(currentDate); // Update last fetched date
-        } catch (error) {
-          console.error("Error fetching attendance data:", error);
-        } finally {
-          setIsLoading(false);
-        }
-      };
+    const fetchAttendanceData = async () => {
+      console.log("Fetching attendance data for date:", currentDate);
+      setIsLoading(true);
+      const activeEmployees = filteredEmployees.filter(emp => emp.status === "Active");
       
-      fetchAttendanceData();
-    }
-  }, [filteredEmployees, currentDate, getRecordsByEmployeeAndDate, lastFetchedDate]);
+      try {
+        const attendancePromises = activeEmployees.map(async (employee) => {
+          const existingRecord = await getRecordsByEmployeeAndDate(employee.id, currentDate);
+          
+          if (existingRecord) {
+            return existingRecord;
+          } else {
+            return {
+              id: `temp_${employee.id}_${currentDate}`,
+              employeeId: employee.id,
+              employeeName: employee.fullName,
+              date: currentDate,
+              present: false,
+              startTime: "",
+              endTime: "",
+              overtimeHours: 0,
+              note: ''
+            };
+          }
+        });
+        
+        const results = await Promise.all(attendancePromises);
+        setAttendanceData(results);
+        setLastFetchedDate(currentDate); // Update last fetched date
+      } catch (error) {
+        console.error("Error fetching attendance data:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    // Always fetch on mount or when date changes
+    fetchAttendanceData();
+    
+  }, [filteredEmployees, currentDate, getRecordsByEmployeeAndDate]);
 
   const toggleAttendance = (index: number) => {
     if (!canEdit) return;
