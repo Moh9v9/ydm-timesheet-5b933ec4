@@ -1,9 +1,8 @@
-
+import { useState } from "react";
 import { AttendanceRecord } from "@/lib/types";
 import { Employee } from "@/lib/types";
 import AttendanceTableRow from "./AttendanceTableRow";
 import { ArrowDown, ArrowUp } from "lucide-react";
-import { useState } from "react";
 
 interface AttendanceTableProps {
   attendanceData: AttendanceRecord[];
@@ -80,9 +79,9 @@ const AttendanceTable = ({
   const SortIcon = ({ field }: { field: SortField }) => {
     if (sortField !== field) return null;
     return sortDirection === "asc" ? (
-      <ArrowUp className="inline-block ml-1 h-4 w-4" />
-    ) : (
       <ArrowDown className="inline-block ml-1 h-4 w-4" />
+    ) : (
+      <ArrowUp className="inline-block ml-1 h-4 w-4" />
     );
   };
 
