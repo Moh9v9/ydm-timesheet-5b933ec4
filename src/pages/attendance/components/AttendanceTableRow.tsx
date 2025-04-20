@@ -102,7 +102,7 @@ const AttendanceTableRow = ({
           value={record.note || ""}
           onChange={(e) => onNoteChange(e.target.value)}
           placeholder="Add a note..."
-          className="min-h-[60px] resize-none w-full"
+          className="min-h-[80px] w-full max-w-[250px] resize-y"
           disabled={!canEdit}
         />
       </td>
