@@ -1,139 +1,201 @@
 
-import React, { createContext, useContext } from "react";
-import { v4 as uuidv4 } from "uuid";
+import { createContext, useContext, useState, ReactNode } from "react";
 import { AttendanceRecord, AttendanceFilters } from "@/lib/types";
-import { AttendanceContextType } from "./attendance/types";
-import { useAttendanceState } from "./attendance/useAttendanceState";
-import { 
-  filterAttendanceRecords, 
-  findAttendanceRecord, 
-  findRecordByEmployeeAndDate 
-} from "./attendance/operations";
+import { format, parseISO } from "date-fns";
 
-const AttendanceContext = createContext<AttendanceContextType | null>(null);
+// Generate today's date in ISO format
+const TODAY = new Date().toISOString().split('T')[0];
 
-export const AttendanceProvider = ({ children }: { children: React.ReactNode }) => {
-  const {
-    attendanceRecords,
-    setAttendanceRecords,
-    currentDate,
-    setCurrentDate,
-    filters,
-    setFilters,
-    loading,
-    setLoading
-  } = useAttendanceState();
+// Mock data for attendance records
+const MOCK_ATTENDANCE: AttendanceRecord[] = [
+  {
+    id: "1",
+    employeeId: "1",
+    date: TODAY, // Today's date
+    present: true,
+    startTime: "07:00",
+    endTime: "17:00",
+    overtimeHours: 0
+  },
+  {
+    id: "2",
+    employeeId: "2",
+    date: TODAY,
+    present: true,
+    startTime: "07:30",
+    endTime: "17:30",
+    overtimeHours: 0.5
+  },
+  {
+    id: "3",
+    employeeId: "3",
+    date: TODAY,
+    present: false,
+    startTime: "", // Empty for absent
+    endTime: "",
+    overtimeHours: 0
+  },
+  {
+    id: "4",
+    employeeId: "4",
+    date: TODAY,
+    present: true,
+    startTime: "07:00",
+    endTime: "17:00",
+    overtimeHours: 0
+  },
+  {
+    id: "5",
+    employeeId: "5",
+    date: TODAY,
+    present: true,
+    startTime: "07:15",
+    endTime: "18:30",
+    overtimeHours: 1.5
+  }
+];
 
-  // Filter records based on current filters
-  const filteredRecords = filterAttendanceRecords(attendanceRecords, filters);
+interface AttendanceContextType {
+  attendanceRecords: AttendanceRecord[];
+  filteredRecords: AttendanceRecord[];
+  currentDate: string; // ISO date string
+  setCurrentDate: (date: string) => void;
+  filters: AttendanceFilters;
+  setFilters: (filters: AttendanceFilters) => void;
+  addAttendanceRecord: (record: Omit<AttendanceRecord, "id">) => Promise<AttendanceRecord>;
+  updateAttendanceRecord: (id: string, record: Partial<AttendanceRecord>) => Promise<AttendanceRecord>;
+  deleteAttendanceRecord: (id: string) => Promise<void>;
+  getAttendanceRecord: (id: string) => AttendanceRecord | undefined;
+  getRecordsByEmployeeAndDate: (employeeId: string, date: string) => AttendanceRecord | undefined;
+  bulkSaveAttendance: (records: (Omit<AttendanceRecord, "id"> | AttendanceRecord)[]) => Promise<AttendanceRecord[]>;
+  loading: boolean;
+}
 
-  // Get a specific attendance record by ID
-  const getAttendanceRecord = (id: string): AttendanceRecord | undefined => {
-    return findAttendanceRecord(attendanceRecords, id);
+const AttendanceContext = createContext<AttendanceContextType | undefined>(undefined);
+
+export const AttendanceProvider = ({ children }: { children: ReactNode }) => {
+  const [attendanceRecords, setAttendanceRecords] = useState<AttendanceRecord[]>(MOCK_ATTENDANCE);
+  const [currentDate, setCurrentDate] = useState<string>(TODAY);
+  const [filters, setFilters] = useState<AttendanceFilters>({
+    date: currentDate
+  });
+  const [loading, setLoading] = useState(false);
+
+  // Filter attendance records based on current filters
+  const filteredRecords = attendanceRecords.filter(record => {
+    if (filters.date && record.date !== filters.date) return false;
+    if (filters.employeeId && record.employeeId !== filters.employeeId) return false;
+    if (filters.present !== undefined && record.present !== filters.present) return false;
+    return true;
+  });
+
+  // Get attendance record by ID
+  const getAttendanceRecord = (id: string) => {
+    return attendanceRecords.find(record => record.id === id);
   };
 
-  // Get record by employee and date
-  const getRecordsByEmployeeAndDate = (employeeId: string, date: string): AttendanceRecord | undefined => {
-    return findRecordByEmployeeAndDate(attendanceRecords, employeeId, date);
+  // Get attendance record by employee ID and date
+  const getRecordsByEmployeeAndDate = (employeeId: string, date: string) => {
+    return attendanceRecords.find(
+      record => record.employeeId === employeeId && record.date === date
+    );
   };
 
-  // Create new attendance record
+  // Add new attendance record
   const addAttendanceRecord = async (record: Omit<AttendanceRecord, "id">): Promise<AttendanceRecord> => {
     setLoading(true);
-    try {
-      const newRecord = {
-        ...record,
-        id: uuidv4()
-      };
-      setAttendanceRecords([...attendanceRecords, newRecord]);
-      return newRecord;
-    } finally {
-      setLoading(false);
-    }
+    
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 600));
+    
+    // Generate new ID
+    const newRecord: AttendanceRecord = {
+      ...record,
+      id: `${Date.now()}`,
+    };
+    
+    setAttendanceRecords([...attendanceRecords, newRecord]);
+    setLoading(false);
+    return newRecord;
   };
 
-  // Update an existing attendance record
-  const updateAttendanceRecord = async (id: string, record: Partial<AttendanceRecord>): Promise<AttendanceRecord> => {
+  // Update attendance record
+  const updateAttendanceRecord = async (
+    id: string,
+    recordData: Partial<AttendanceRecord>
+  ): Promise<AttendanceRecord> => {
     setLoading(true);
-    try {
-      const existingRecord = getAttendanceRecord(id);
-      if (!existingRecord) {
-        throw new Error(`Attendance record with ID ${id} not found`);
+    
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 600));
+    
+    const updatedRecords = attendanceRecords.map(record => {
+      if (record.id === id) {
+        return { ...record, ...recordData };
       }
-
-      const updatedRecord = {
-        ...existingRecord,
-        ...record
-      };
-
-      setAttendanceRecords(
-        attendanceRecords.map(rec => (rec.id === id ? updatedRecord : rec))
-      );
-
-      return updatedRecord;
-    } finally {
-      setLoading(false);
+      return record;
+    });
+    
+    setAttendanceRecords(updatedRecords);
+    setLoading(false);
+    
+    const updatedRecord = updatedRecords.find(record => record.id === id);
+    if (!updatedRecord) {
+      throw new Error("Attendance record not found");
     }
+    
+    return updatedRecord;
   };
 
-  // Delete an attendance record
+  // Delete attendance record
   const deleteAttendanceRecord = async (id: string): Promise<void> => {
     setLoading(true);
-    try {
-      setAttendanceRecords(attendanceRecords.filter(rec => rec.id !== id));
-    } finally {
-      setLoading(false);
-    }
+    
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 600));
+    
+    setAttendanceRecords(attendanceRecords.filter(record => record.id !== id));
+    setLoading(false);
   };
 
-  // Bulk save attendance records (create or update)
+  // Bulk save attendance records
   const bulkSaveAttendance = async (
     records: (Omit<AttendanceRecord, "id"> | AttendanceRecord)[]
   ): Promise<AttendanceRecord[]> => {
     setLoading(true);
-    try {
-      const savedRecords: AttendanceRecord[] = [];
-      const newAttendanceRecords = [...attendanceRecords];
-      
-      for (const record of records) {
-        // If the record has an ID and it's not temporary
-        if ('id' in record && !record.id.startsWith('temp_')) {
-          // Update existing record
-          const index = newAttendanceRecords.findIndex(r => r.id === record.id);
-          if (index !== -1) {
-            newAttendanceRecords[index] = { ...record } as AttendanceRecord;
-            savedRecords.push(newAttendanceRecords[index]);
-          }
+    
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 800));
+    
+    const newRecords: AttendanceRecord[] = [];
+    
+    // Process each record
+    for (const record of records) {
+      if ("id" in record) {
+        // Update existing record
+        const existingIndex = attendanceRecords.findIndex(r => r.id === record.id);
+        if (existingIndex !== -1) {
+          attendanceRecords[existingIndex] = record;
         } else {
-          // Check if there's already a record for this employee and date
-          const existingRecord = findRecordByEmployeeAndDate(
-            newAttendanceRecords,
-            record.employeeId,
-            record.date
-          );
-          
-          if (existingRecord) {
-            // Update existing record
-            const index = newAttendanceRecords.findIndex(r => r.id === existingRecord.id);
-            if (index !== -1) {
-              const updatedRecord = { ...existingRecord, ...record, id: existingRecord.id };
-              newAttendanceRecords[index] = updatedRecord;
-              savedRecords.push(updatedRecord);
-            }
-          } else {
-            // Create new record
-            const newRecord = { ...record, id: uuidv4() } as AttendanceRecord;
-            newAttendanceRecords.push(newRecord);
-            savedRecords.push(newRecord);
-          }
+          newRecords.push(record);
         }
+      } else {
+        // Add new record
+        const newRecord: AttendanceRecord = {
+          ...record,
+          id: `new_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
+        };
+        newRecords.push(newRecord);
       }
-      
-      setAttendanceRecords(newAttendanceRecords);
-      return savedRecords;
-    } finally {
-      setLoading(false);
     }
+    
+    // Update state with new records
+    setAttendanceRecords([...attendanceRecords.filter(r => 
+      !records.some(newR => "id" in newR && newR.id === r.id)
+    ), ...newRecords]);
+    
+    setLoading(false);
+    return newRecords;
   };
 
   return (
@@ -159,9 +221,9 @@ export const AttendanceProvider = ({ children }: { children: React.ReactNode }) 
   );
 };
 
-export const useAttendance = (): AttendanceContextType => {
+export const useAttendance = () => {
   const context = useContext(AttendanceContext);
-  if (!context) {
+  if (context === undefined) {
     throw new Error("useAttendance must be used within an AttendanceProvider");
   }
   return context;

@@ -6,7 +6,7 @@ import { useAttendance } from "@/contexts/AttendanceContext";
 
 export const useAttendanceData = (canEdit: boolean) => {
   const { filteredEmployees } = useEmployees();
-  const { currentDate, getRecordsByEmployeeAndDate, attendanceRecords } = useAttendance();
+  const { currentDate, getRecordsByEmployeeAndDate } = useAttendance();
   const [attendanceData, setAttendanceData] = useState<AttendanceRecord[]>([]);
 
   useEffect(() => {
@@ -31,7 +31,7 @@ export const useAttendanceData = (canEdit: boolean) => {
     });
     
     setAttendanceData(initialAttendanceData);
-  }, [filteredEmployees, currentDate, getRecordsByEmployeeAndDate, attendanceRecords]);
+  }, [filteredEmployees, currentDate, getRecordsByEmployeeAndDate]);
 
   const toggleAttendance = (index: number) => {
     if (!canEdit) return;
