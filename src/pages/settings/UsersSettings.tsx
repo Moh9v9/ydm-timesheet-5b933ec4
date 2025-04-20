@@ -32,7 +32,7 @@ const UsersSettings = () => {
       fullName: "",
       email: "",
       password: "",
-      role: "user",
+      role: "user" as UserRole,
       permissions: {
         view: true,
         edit: false,
@@ -84,11 +84,14 @@ const UsersSettings = () => {
     const { name, value } = e.target;
     
     if (name === "role") {
+      // Fix the type error by explicitly casting the value to UserRole
+      const roleValue = value as UserRole;
+      
       // If role is set to admin, automatically set full permissions
-      if (value === "admin") {
+      if (roleValue === "admin") {
         setFormData({
           ...formData,
-          [name]: value,
+          role: roleValue,
           permissions: {
             view: true,
             edit: true,
@@ -98,7 +101,7 @@ const UsersSettings = () => {
       } else {
         setFormData({
           ...formData,
-          [name]: value,
+          role: roleValue,
         });
       }
     } else {
