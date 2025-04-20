@@ -1,10 +1,12 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
-import { toast } from "sonner";  // Using only Sonner toast
+import { toast } from "sonner";
 import MainLayout from "@/components/layout/MainLayout";
 import { Moon, Sun } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -13,6 +15,23 @@ const Login = () => {
   const { login } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
+
+  // Handle successful auth - check if user is already logged in
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const { data } = await supabase.auth.getSession();
+        if (data.session) {
+          // User is already logged in, redirect to home
+          navigate("/");
+        }
+      } catch (error) {
+        console.error("Auth check error:", error);
+      }
+    };
+    
+    checkAuth();
+  }, [navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,18 +46,17 @@ const Login = () => {
     try {
       await login(email, password);
       
-      // Show success message and immediately redirect
+      // Show success message
       toast.success("Login successful!");
       
-      // Immediately redirect to dashboard
-      navigate("/");
+      // Force a hard redirect to ensure navigation works
+      window.location.href = "/";
       
     } catch (err) {
       const errorMessage = err instanceof Error 
         ? err.message 
         : "Login failed. Please check your credentials.";
       
-      // Use only Sonner toast for login errors
       toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
