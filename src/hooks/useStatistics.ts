@@ -28,7 +28,7 @@ const calculateAttendanceCounts = (records: AttendanceRecord[]) => {
   };
 };
 
-export const useStatistics = (selectedDate?: string) => {
+export const useStatistics = () => {
   const { filteredEmployees } = useEmployees();
   const { attendanceRecords } = useAttendance();
   const [stats, setStats] = useState<DashboardStats>({
@@ -37,13 +37,12 @@ export const useStatistics = (selectedDate?: string) => {
     absentToday: 0,
   });
 
-  // Always get a fresh date for today whenever the hook is run or refreshed
-  const today = new Date().toISOString().split('T')[0];
-
   useEffect(() => {
     const fetchDirectFromDatabase = async () => {
       try {
-        console.log("useStatistics - Fetching data for current date:", today);
+        // Always get a fresh date for today
+        const today = new Date().toISOString().split('T')[0];
+        console.log("useStatistics - Fetching data for fresh current date:", today);
         
         // Get records directly from Supabase for today's date
         const { data, error } = await supabase
@@ -81,6 +80,8 @@ export const useStatistics = (selectedDate?: string) => {
         console.error("Error fetching attendance stats:", error);
         
         // Fallback to using context records if database fetch fails
+        // Always get a fresh date here too
+        const today = new Date().toISOString().split('T')[0];
         const records = attendanceRecords || [];
         const todayRecords = getTodayAttendanceRecords(records, today);
         const { presentCount, absentCount } = calculateAttendanceCounts(todayRecords);
@@ -93,15 +94,15 @@ export const useStatistics = (selectedDate?: string) => {
       }
     };
 
-    // Call immediately
+    // Initial fetch
     fetchDirectFromDatabase();
     
-    // Set up a refresh interval to fetch data every minute
-    const intervalId = setInterval(fetchDirectFromDatabase, 60000);
+    // Set up a refresh interval to fetch data every 30 seconds
+    const intervalId = setInterval(fetchDirectFromDatabase, 30000);
     
     // Clean up the interval on component unmount
     return () => clearInterval(intervalId);
-  }, [filteredEmployees, attendanceRecords, today]); // Include today in deps to refresh when date changes
+  }, [filteredEmployees, attendanceRecords]); // Remove any date dependency to avoid stale renders
 
   return stats;
 };

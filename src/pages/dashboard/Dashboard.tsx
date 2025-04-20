@@ -6,25 +6,25 @@ import { StatsCard } from "@/components/dashboard/StatsCard";
 import { useStatistics } from "@/hooks/useStatistics";
 import Attendance from "@/pages/attendance/Attendance";
 import { useAttendance } from "@/contexts/AttendanceContext";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 const Dashboard = () => {
   const { user } = useAuth();
   const { setCurrentDate } = useAttendance();
   
-  // Use state to ensure date is fresh on component mount and refreshes
-  const [today] = useState(() => new Date());
-  const formattedToday = today.toISOString().split('T')[0]; // YYYY-MM-DD format
+  // Get a fresh date whenever the component renders
+  const today = new Date();
+  const formattedDate = format(today, "EEEE, MMMM d, yyyy");
   
-  // Get statistics for today's date
+  // Get statistics (our hook now always uses the current date)
   const stats = useStatistics();
 
-  // Always set to current day when Dashboard mounts
+  // Always set to current day when Dashboard mounts or refreshes
   useEffect(() => {
-    const currentDate = new Date().toISOString().split('T')[0];
-    console.log("Dashboard - Setting current date to:", currentDate);
+    const currentDateISO = new Date().toISOString().split('T')[0];
+    console.log("Dashboard - Setting current date to:", currentDateISO);
     if (setCurrentDate) {
-      setCurrentDate(currentDate);
+      setCurrentDate(currentDateISO);
     }
   }, [setCurrentDate]);
 
@@ -38,7 +38,7 @@ const Dashboard = () => {
           </p>
         </div>
         <div className="mt-2 md:mt-0 text-sm font-medium text-muted-foreground">
-          {format(today, "EEEE, MMMM d, yyyy")}
+          {formattedDate}
         </div>
       </div>
 

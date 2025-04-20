@@ -5,12 +5,12 @@ import { useAttendanceState } from "./attendance/useAttendanceState";
 import { useAttendanceOperations } from "./attendance/useAttendanceOperations";
 
 // Create a context with a default value to prevent the "must be used within Provider" error
-const defaultContextValue: AttendanceContextType = {
+const AttendanceContext = createContext<AttendanceContextType>({
   attendanceRecords: [],
   filteredRecords: [],
-  currentDate: new Date().toISOString().split('T')[0],
+  currentDate: new Date().toISOString().split('T')[0], // Always use fresh date
   setCurrentDate: () => {},
-  filters: { date: new Date().toISOString().split('T')[0] },
+  filters: { date: new Date().toISOString().split('T')[0] }, // Always use fresh date
   setFilters: () => {},
   loading: false,
   // Default implementations that will never be used but satisfy TypeScript
@@ -20,9 +20,7 @@ const defaultContextValue: AttendanceContextType = {
   getAttendanceRecord: () => undefined,
   getRecordsByEmployeeAndDate: async () => null,
   bulkSaveAttendance: async () => [],
-};
-
-const AttendanceContext = createContext<AttendanceContextType>(defaultContextValue);
+});
 
 export const AttendanceProvider = ({ children }: { children: ReactNode }) => {
   const {
