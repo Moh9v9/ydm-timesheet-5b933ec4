@@ -36,7 +36,17 @@ export const EmployeeForm = ({ initialData, onSubmit, isSubmitting, onClose }: E
           name="fullName"
           value={formData.fullName}
           onChange={handleChange}
-          className="w-full p-2 border border-input rounded-md dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+          className="w-full p-2 border border-input rounded-md 
+            bg-background 
+            dark:bg-gray-900 
+            dark:border-gray-700 
+            dark:text-white 
+            dark:placeholder-gray-500
+            focus:ring-2 
+            focus:ring-primary 
+            dark:focus:ring-primary/70 
+            transition-all 
+            duration-300"
           required
         />
       </EmployeeFormField>
