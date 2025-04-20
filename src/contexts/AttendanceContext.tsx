@@ -114,7 +114,7 @@ export const AttendanceProvider = ({ children }: { children: ReactNode }) => {
       id: `${Date.now()}`,
     };
     
-    setAttendanceRecords([...attendanceRecords, newRecord]);
+    setAttendanceRecords(prev => [...prev, newRecord]);
     setLoading(false);
     return newRecord;
   };
@@ -154,7 +154,7 @@ export const AttendanceProvider = ({ children }: { children: ReactNode }) => {
     // Simulate API delay
     await new Promise(resolve => setTimeout(resolve, 600));
     
-    setAttendanceRecords(attendanceRecords.filter(record => record.id !== id));
+    setAttendanceRecords(prev => prev.filter(record => record.id !== id));
     setLoading(false);
   };
 
@@ -167,35 +167,49 @@ export const AttendanceProvider = ({ children }: { children: ReactNode }) => {
     // Simulate API delay
     await new Promise(resolve => setTimeout(resolve, 800));
     
-    const newRecords: AttendanceRecord[] = [];
+    const savedRecords: AttendanceRecord[] = [];
+    const updatedAllRecords = [...attendanceRecords];
     
     // Process each record
     for (const record of records) {
-      if ("id" in record) {
+      if ("id" in record && record.id && !record.id.startsWith('temp_')) {
         // Update existing record
-        const existingIndex = attendanceRecords.findIndex(r => r.id === record.id);
+        const existingIndex = updatedAllRecords.findIndex(r => r.id === record.id);
         if (existingIndex !== -1) {
-          attendanceRecords[existingIndex] = record;
-        } else {
-          newRecords.push(record);
+          updatedAllRecords[existingIndex] = record as AttendanceRecord;
+          savedRecords.push(updatedAllRecords[existingIndex]);
         }
       } else {
-        // Add new record
-        const newRecord: AttendanceRecord = {
-          ...record,
-          id: `new_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
-        };
-        newRecords.push(newRecord);
+        // Find if we already have a record for this employee and date
+        const existingRecordIndex = updatedAllRecords.findIndex(
+          r => r.employeeId === record.employeeId && r.date === record.date
+        );
+        
+        if (existingRecordIndex !== -1) {
+          // Update the existing record
+          updatedAllRecords[existingRecordIndex] = {
+            ...updatedAllRecords[existingRecordIndex],
+            ...record,
+            id: updatedAllRecords[existingRecordIndex].id
+          };
+          savedRecords.push(updatedAllRecords[existingRecordIndex]);
+        } else {
+          // Add new record
+          const newRecord: AttendanceRecord = {
+            ...record,
+            id: `new_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
+          };
+          updatedAllRecords.push(newRecord);
+          savedRecords.push(newRecord);
+        }
       }
     }
     
     // Update state with new records
-    setAttendanceRecords([...attendanceRecords.filter(r => 
-      !records.some(newR => "id" in newR && newR.id === r.id)
-    ), ...newRecords]);
+    setAttendanceRecords(updatedAllRecords);
     
     setLoading(false);
-    return newRecords;
+    return savedRecords;
   };
 
   return (

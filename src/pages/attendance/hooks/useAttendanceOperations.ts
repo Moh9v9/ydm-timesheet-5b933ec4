@@ -23,7 +23,14 @@ export const useAttendanceOperations = (canEdit: boolean) => {
     setIsSubmitting(true);
     
     try {
-      await bulkSaveAttendance(attendanceData);
+      // Filter out records that might be temporary and ensure proper structure
+      const recordsToSave = attendanceData.map(record => ({
+        ...record,
+        // Make sure we don't have temp IDs in the final saved records
+        id: record.id.startsWith('temp_') ? undefined : record.id
+      }));
+      
+      await bulkSaveAttendance(recordsToSave);
       success("Attendance data saved successfully");
       setShowSaveConfirm(false);
     } catch (err) {
@@ -61,7 +68,9 @@ export const useAttendanceOperations = (canEdit: boolean) => {
         startTime: data.startTime,
         endTime: data.endTime,
         overtimeHours: data.overtimeHours,
-        note: data.note
+        note: data.note,
+        // Make sure we don't have temp IDs in the final saved records
+        id: record.id.startsWith('temp_') ? undefined : record.id
       }));
       
       await bulkSaveAttendance(updatedRecords);
