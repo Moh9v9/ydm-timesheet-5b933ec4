@@ -87,8 +87,6 @@ const ProfileSettings = () => {
 
   return (
     <div>
-      <NotificationContainer />
-      
       <h2 className="text-xl font-medium mb-6">Profile Settings</h2>
       
       <form onSubmit={handleSubmit} className="space-y-6 max-w-md">
