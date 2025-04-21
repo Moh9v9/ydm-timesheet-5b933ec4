@@ -1,15 +1,20 @@
 
 import { useState } from "react";
 import { useUsers } from "@/contexts/UsersContext";
-import { toast } from "@/components/ui/sonner";
 import { Plus } from "lucide-react";
 import { User } from "@/lib/types";
 import { UserModal } from "./components/UserModal";
 import { UsersTable } from "./components/UsersTable";
 import { Button } from "@/components/ui/button";
+import { useModernNotification } from "@/hooks/useModernNotification";
 
 const UsersSettings = () => {
   const { users, addUser, updateUser, deleteUser, loading } = useUsers();
+
+  const {
+    showNotification,
+    NotificationContainer,
+  } = useModernNotification();
   
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -32,40 +37,35 @@ const UsersSettings = () => {
     
     try {
       await deleteUser(id);
-      toast.success("User deleted successfully");
+      showNotification("success", "User deleted successfully");
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Failed to delete user";
-      toast.error(errorMessage);
+      showNotification("error", errorMessage);
       console.error("Delete user error details:", err);
     }
   };
   
   const handleSubmit = async (formData: any) => {
-    console.log("Submit handler called with form data:", formData);
-    
     // Validation
     if (!formData.fullName || !formData.email) {
-      toast.error("Name and email are required");
+      showNotification("error", "Name and email are required");
       return;
     }
-    
     if (!currentUser && !formData.password) {
-      toast.error("Password is required for new users");
+      showNotification("error", "Password is required for new users");
       return;
     }
     
     setIsSubmitting(true);
     
     try {
-      console.log("Form data being submitted:", formData);
-      
       if (currentUser) {
         // Update existing user
         await updateUser(currentUser.id, {
           ...formData,
           password: formData.password || undefined
         });
-        toast.success("User updated successfully");
+        showNotification("success", "User updated successfully");
         handleCloseModal();
       } else {
         // Create new user - with both full_name and fullName for trigger compatibility
@@ -87,26 +87,21 @@ const UsersSettings = () => {
             export: true
           } : formData.permissions
         };
-        
-        console.log("Creating user with data:", userToAdd);
         try {
-          toast("Creating user...", { duration: 2000 });
-          const result = await addUser(userToAdd);
-          console.log("User creation result:", result);
-          toast.success("User created successfully");
+          showNotification("info", "Creating user...");
+          await addUser(userToAdd);
+          showNotification("success", "User created successfully");
           handleCloseModal();
         } catch (addError: any) {
-          console.error("Error in addUser:", addError);
           const errorMsg = addError instanceof Error ? addError.message : 
             (typeof addError === 'string' ? addError : "Failed to create user");
-          toast.error(errorMsg);
+          showNotification("error", errorMsg);
         }
       }
     } catch (err: any) {
       const errorMessage = err instanceof Error ? err.message : 
         (typeof err === 'string' ? err : "Failed to save user");
-      console.error("Error in handleSubmit:", err);
-      toast.error(errorMessage);
+      showNotification("error", errorMessage);
     } finally {
       setIsSubmitting(false);
     }
@@ -114,6 +109,8 @@ const UsersSettings = () => {
 
   return (
     <div>
+      {/* NotificationContainer at the top of this section so it shows above modals */}
+      <NotificationContainer />
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-medium">User Management</h2>
         <Button
@@ -145,3 +142,4 @@ const UsersSettings = () => {
 };
 
 export default UsersSettings;
+
