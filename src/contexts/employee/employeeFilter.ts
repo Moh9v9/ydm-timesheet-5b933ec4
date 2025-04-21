@@ -19,6 +19,7 @@ export async function employeeMatchesFilters(
       return false;
     }
   }
+  // For "All" status, skip the status filter - we'll show both Active and Archived
   
   // Apply other filters
   if (filters.project && filters.project !== "All" && employee.project !== filters.project) {
@@ -31,13 +32,11 @@ export async function employeeMatchesFilters(
     return false;
   }
   
-  // Fix the TypeScript errors by checking if paymentType filter exists and is not "All" using string comparison
   if (filters.paymentType && filters.paymentType !== "All" && employee.paymentType !== filters.paymentType) {
     console.log(`Employee ${employee.id} filtered out - payment type doesn't match: ${employee.paymentType} != ${filters.paymentType}`);
     return false;
   }
   
-  // Fix the TypeScript errors by checking if sponsorship filter exists and is not "All" using string comparison
   if (filters.sponsorship && filters.sponsorship !== "All" && employee.sponsorship !== filters.sponsorship) {
     console.log(`Employee ${employee.id} filtered out - sponsorship doesn't match: ${employee.sponsorship} != ${filters.sponsorship}`);
     return false;

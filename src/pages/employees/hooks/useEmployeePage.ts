@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useEmployees } from "@/contexts/EmployeeContext";
 import { Employee } from "@/lib/types";
@@ -32,23 +31,23 @@ export const useEmployeePage = () => {
   const handleFilterChange = (key: keyof typeof filters, value: string) => {
     console.log(`Filter changed: ${key} = ${value}`);
     
-    // Special handling for "All" value - remove the filter
+    const newFilters = { ...filters };
+    
+    // Handle "All" value specifically - we still want to keep it in the filters
+    // so the UI shows the correct dropdown selection
     if (value === "All") {
-      const newFilters = { ...filters };
-      delete newFilters[key];
+      newFilters[key] = "All";
       setFilters(newFilters);
-      console.log(`Removed ${key} filter, now using all ${key}s`);
+      console.log(`Set ${key} filter to All`);
     } else {
       // Set the specific filter value
-      setFilters({ ...filters, [key]: value });
+      newFilters[key] = value;
+      setFilters(newFilters);
       console.log(`Set ${key} filter to ${value}`);
     }
     
     // Log updated filters for debugging
-    const updatedFilters = value === "All" 
-      ? { ...filters, [key]: undefined }
-      : { ...filters, [key]: value };
-    console.log("Updated filters:", updatedFilters);
+    console.log("Updated filters:", newFilters);
   };
 
   const handleDeleteClick = (id: string) => {
