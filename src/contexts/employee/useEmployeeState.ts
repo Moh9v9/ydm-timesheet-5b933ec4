@@ -33,9 +33,13 @@ export const useEmployeeState = (
 
       // Use the formatEmployee utility to properly type the data from the database
       const formattedEmployees: Employee[] = data.map(employee => formatEmployee(employee));
-
+      
       setEmployees(formattedEmployees);
       setDataFetched(true);
+      
+      console.log("Fetched employees: ", formattedEmployees.length, 
+                  "Active:", formattedEmployees.filter(e => e.status === "Active").length,
+                  "Archived:", formattedEmployees.filter(e => e.status === "Archived").length);
     } catch (error) {
       console.error('Error fetching employees:', error);
       setError(error as Error);
@@ -55,7 +59,16 @@ export const useEmployeeState = (
         })
       );
       
-      setFilteredEmployees(filtered.filter(({ passes }) => passes).map(({ employee }) => employee));
+      const newFilteredEmployees = filtered
+        .filter(({ passes }) => passes)
+        .map(({ employee }) => employee);
+      
+      setFilteredEmployees(newFilteredEmployees);
+      
+      console.log("Filtered employees: ", newFilteredEmployees.length, 
+                  "Active:", newFilteredEmployees.filter(e => e.status === "Active").length,
+                  "Archived:", newFilteredEmployees.filter(e => e.status === "Archived").length,
+                  "Applied filters:", JSON.stringify(filters));
     } catch (error) {
       console.error('Error filtering employees:', error);
       setError(error as Error);
