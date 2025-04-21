@@ -55,6 +55,14 @@ export const useEmployeeState = (
       const filtered = await Promise.all(
         employees.map(async (employee) => {
           const passes = await filterFunction(employee, filters, currentAttendanceDate);
+          
+          // Add debug log for each employee filtering
+          if (!passes && employee.status === "Archived") {
+            console.log(`Archived employee ${employee.id} (${employee.fullName}) filtered out with filters:`, 
+                        JSON.stringify(filters), 
+                        "current attendance date:", currentAttendanceDate);
+          }
+          
           return { employee, passes };
         })
       );
@@ -63,12 +71,13 @@ export const useEmployeeState = (
         .filter(({ passes }) => passes)
         .map(({ employee }) => employee);
       
-      setFilteredEmployees(newFilteredEmployees);
-      
       console.log("Filtered employees: ", newFilteredEmployees.length, 
                   "Active:", newFilteredEmployees.filter(e => e.status === "Active").length,
                   "Archived:", newFilteredEmployees.filter(e => e.status === "Archived").length,
-                  "Applied filters:", JSON.stringify(filters));
+                  "Applied filters:", JSON.stringify(filters),
+                  "Is on employees page:", !currentAttendanceDate);
+      
+      setFilteredEmployees(newFilteredEmployees);
     } catch (error) {
       console.error('Error filtering employees:', error);
       setError(error as Error);

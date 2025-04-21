@@ -80,7 +80,7 @@ export const EmployeeFiltersSection = ({
           onValueChange={(value) => onFilterChange("status", value)}
           placeholder="Select Status"
           options={[
-            { value: "All", label: "All Status" },
+            { value: "All", label: "All Statuses" },
             { value: "Active", label: "Active Only" },
             { value: "Archived", label: "Archived Only" }
           ]}

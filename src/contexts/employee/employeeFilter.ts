@@ -15,6 +15,7 @@ export async function employeeMatchesFilters(
       return false;
     }
   }
+  
   // Apply other filters
   if (filters.project && filters.project !== "All" && employee.project !== filters.project) return false;
   if (filters.location && filters.location !== "All" && employee.location !== filters.location) return false;
