@@ -21,7 +21,7 @@ export const useStatistics = () => {
     absentToday: 0,
   });
   
-  // State to track refreshes
+  // State to track manual refreshes
   const [refreshCount, setRefreshCount] = useState(0);
 
   useEffect(() => {
@@ -67,15 +67,8 @@ export const useStatistics = () => {
     // Initial fetch
     fetchDirectFromDatabase();
     
-    // Set up a refresh interval to fetch data every 15 seconds
-    const intervalId = setInterval(() => {
-      setRefreshCount(prev => prev + 1);
-      fetchDirectFromDatabase();
-    }, 15000);
-    
-    // Clean up the interval on component unmount
-    return () => clearInterval(intervalId);
-  }, [filteredEmployees, refreshCount]); // Include refreshCount to trigger refresh
+    // No more automatic refresh
+  }, [filteredEmployees, refreshCount]); // Include refreshCount to enable manual refreshes
 
   return stats;
 };

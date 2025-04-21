@@ -12,7 +12,7 @@ export const useAttendanceData = (canEdit: boolean, refreshTrigger: number = 0) 
   const [lastFetchedDate, setLastFetchedDate] = useState<string>('');
   const [retryCount, setRetryCount] = useState(0);
 
-  // Effect to fetch attendance data when either date changes, employees load, or refresh is triggered
+  // Effect to fetch attendance data only when date changes, employees load, or explicit refresh is triggered
   useEffect(() => {
     // Only fetch if we have employees
     if (filteredEmployees.length > 0) {

@@ -43,10 +43,11 @@ const Attendance = () => {
     handleSave,
     confirmSave,
     handleUpdateAll,
-    handleBulkUpdate
+    handleBulkUpdate,
+    refreshData
   } = useAttendanceOperations(canEdit);
 
-  // Fetch the actual record count from Supabase
+  // Fetch the actual record count from Supabase once on initial load
   useEffect(() => {
     const fetchActualRecordCount = async () => {
       setRecordsLoading(true);
@@ -77,15 +78,16 @@ const Attendance = () => {
       }
     };
 
-    // Always fetch count when component mounts or currentDate changes
+    // Fetch count when component mounts or currentDate changes
     fetchActualRecordCount();
     
-    // Set up a refresh timer to periodically check the count
-    const timerId = setInterval(fetchActualRecordCount, 15000);
-    
-    // Clean up interval on unmount
-    return () => clearInterval(timerId);
+    // No more refresh timer
   }, [currentDate, filteredEmployees.length]);
+
+  // Refresh attendance data after successful save
+  const handleSuccessfulSave = () => {
+    setDataRefreshTrigger(prev => prev + 1);
+  };
 
   // Combined loading state
   const combinedLoading = isLoading || recordsLoading || employeesLoading;
@@ -99,6 +101,7 @@ const Attendance = () => {
         isSubmitting={isSubmitting}
         onUpdateAll={handleUpdateAll}
         onSave={handleSave}
+        onRefresh={() => setDataRefreshTrigger(prev => prev + 1)}
       />
 
       <div className="flex items-center mb-2">
@@ -126,7 +129,10 @@ const Attendance = () => {
       <ConfirmDialog
         open={showSaveConfirm}
         onOpenChange={setShowSaveConfirm}
-        onConfirm={() => confirmSave(attendanceData)}
+        onConfirm={() => {
+          confirmSave(attendanceData);
+          handleSuccessfulSave();
+        }}
         title="Save Attendance Records"
         description="Are you sure you want to save these attendance records? This action cannot be undone."
         confirmText={isSubmitting ? "Saving..." : "Save Records"}

@@ -37,11 +37,7 @@ const Dashboard = () => {
     // Set date when component mounts
     getCurrentDate();
     
-    // Set up an interval to refresh the date every minute
-    // This is to ensure the date is always current, even if the user leaves the page open overnight
-    const intervalId = setInterval(getCurrentDate, 60000);
-    
-    return () => clearInterval(intervalId);
+    // No more automatic refresh for date
   }, [setCurrentDate]);
 
   return (

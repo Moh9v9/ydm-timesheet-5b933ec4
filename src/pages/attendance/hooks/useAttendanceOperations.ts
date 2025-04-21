@@ -90,6 +90,11 @@ export const useAttendanceOperations = (canEdit: boolean) => {
     }
   };
 
+  // Add a function to manually refresh data
+  const refreshData = () => {
+    // This function is a placeholder that will trigger a refresh in the parent component
+  };
+
   return {
     isSubmitting,
     showBulkUpdate,
@@ -99,6 +104,7 @@ export const useAttendanceOperations = (canEdit: boolean) => {
     handleSave,
     confirmSave,
     handleUpdateAll,
-    handleBulkUpdate
+    handleBulkUpdate,
+    refreshData
   };
 };
