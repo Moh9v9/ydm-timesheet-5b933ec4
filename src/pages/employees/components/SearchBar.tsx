@@ -1,5 +1,7 @@
 
 import { Search } from "lucide-react";
+import { useEmployees } from "@/contexts/EmployeeContext";
+import { StyledSelect } from "@/components/ui/styled-select";
 
 interface SearchBarProps {
   searchTerm: string;
@@ -14,18 +16,28 @@ export const SearchBar = ({
   placeholder = "Search employees...",
   className = ""
 }: SearchBarProps) => {
+  const { employees } = useEmployees();
+  
+  // Create employee options for the select
+  const employeeOptions = [
+    { value: "", label: "All Employees" },
+    ...employees.map(emp => ({
+      value: emp.fullName,
+      label: emp.fullName
+    }))
+  ];
+
   return (
     <div className={`relative flex-1 ${className}`}>
-      <input
-        type="text"
-        placeholder={placeholder}
+      <StyledSelect
         value={searchTerm}
-        onChange={(e) => onSearchChange(e.target.value)}
-        className="pl-10 pr-4 py-2 w-full border border-input rounded-md dark:bg-gray-800/50 dark:border-gray-700"
+        onValueChange={onSearchChange}
+        placeholder={placeholder}
+        options={employeeOptions}
       />
       <Search 
         size={18} 
-        className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" 
+        className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground pointer-events-none" 
       />
     </div>
   );
