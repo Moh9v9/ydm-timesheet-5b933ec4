@@ -5,19 +5,28 @@ import { useEmployeeState } from "./employee/useEmployeeState";
 import { useEmployeeOperations } from "./employee/useEmployeeOperations";
 import { useAttendance } from "@/contexts/AttendanceContext";
 import { employeeMatchesAttendanceFilters } from "./employee/employeeAttendanceFilter";
+import { employeeMatchesFilters } from "./employee/employeeFilter";
 
 const EmployeeContext = createContext<EmployeeContextType | undefined>(undefined);
 
 export const EmployeeProvider = ({ children }: { children: ReactNode }) => {
-  // Get current attendance date from AttendanceContext if available
+  // Determine if we're in attendance context or regular employees context
+  let isAttendanceView = false;
   let currentAttendanceDate: string | undefined = undefined;
+  
   try {
     const attendanceContext = useAttendance();
-    currentAttendanceDate = attendanceContext?.currentDate;
-    console.log("EmployeeContext - Got attendance date for filtering:", currentAttendanceDate);
+    if (attendanceContext) {
+      isAttendanceView = true;
+      currentAttendanceDate = attendanceContext.currentDate;
+      console.log("EmployeeContext - Got attendance date for filtering:", currentAttendanceDate);
+    }
   } catch (error) {
     console.log("EmployeeContext - No AttendanceContext available, using regular employee filters");
   }
+
+  // Use the appropriate filter function based on context
+  const filterFunction = isAttendanceView ? employeeMatchesAttendanceFilters : employeeMatchesFilters;
 
   const {
     employees,
@@ -30,7 +39,10 @@ export const EmployeeProvider = ({ children }: { children: ReactNode }) => {
     error,
     dataFetched,
     refreshEmployees
-  } = useEmployeeState(currentAttendanceDate, employeeMatchesAttendanceFilters);
+  } = useEmployeeState(
+    isAttendanceView ? currentAttendanceDate : undefined,
+    filterFunction
+  );
 
   const operations = useEmployeeOperations(
     employees,
@@ -46,10 +58,10 @@ export const EmployeeProvider = ({ children }: { children: ReactNode }) => {
         filters,
         setFilters,
         loading,
-        // Fix #1: Convert Error object to string if it exists
+        // Convert Error object to string if it exists
         error: error ? error.message : null,
         dataFetched,
-        // Fix #2: Make refreshEmployees return a Promise
+        // Make refreshEmployees return a Promise
         refreshEmployees: async () => {
           return Promise.resolve(refreshEmployees());
         },

@@ -1,13 +1,20 @@
 
 import { useState, useEffect } from "react";
-import { Employee, EmployeeFilters, PaymentType, SponsorshipType, EmployeeStatus } from "@/lib/types";
+import { Employee, EmployeeFilters } from "@/lib/types";
 import { supabase } from "@/integrations/supabase/client";
 import { employeeMatchesFilters } from "./employeeFilter";
 import { formatEmployee } from "./formatEmployee";
 
+// Use a type for the filter function to improve clarity
+type EmployeeFilterFunction = (
+  employee: Employee, 
+  filters: EmployeeFilters,
+  currentAttendanceDate?: string
+) => Promise<boolean>;
+
 export const useEmployeeState = (
   currentAttendanceDate?: string,
-  filterFunction = employeeMatchesFilters
+  filterFunction: EmployeeFilterFunction = employeeMatchesFilters
 ) => {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [filteredEmployees, setFilteredEmployees] = useState<Employee[]>([]);
@@ -37,7 +44,7 @@ export const useEmployeeState = (
     }
   };
 
-  // Function to filter employees
+  // Function to filter employees using the provided filter function
   const filterEmployees = async () => {
     try {
       setLoading(true);

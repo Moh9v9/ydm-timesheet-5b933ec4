@@ -3,7 +3,7 @@ import { Employee, EmployeeFilters } from "@/lib/types";
 import { supabase } from "@/integrations/supabase/client";
 
 /**
- * Returns true if employee passes all filters, including creation date vs. attendance date.
+ * ATTENDANCE-SPECIFIC FILTER: Returns true if employee should be shown in attendance view.
  * For archived employees, only includes them if they have an attendance record for the selected date.
  */
 export async function employeeMatchesAttendanceFilters(
@@ -20,7 +20,7 @@ export async function employeeMatchesAttendanceFilters(
     }
   }
 
-  // For archived employees, ONLY include them if they have a record for the selected date
+  // Special rule for attendance view: For archived employees, ONLY include them if they have a record for the selected date
   if (employee.status === "Archived") {
     if (!currentAttendanceDate) {
       console.log(`Archived employee ${employee.id} (${employee.fullName}) filtered out - no attendance date specified`);
@@ -43,7 +43,7 @@ export async function employeeMatchesAttendanceFilters(
     return true;
   }
 
-  // Status filter handling for non-archived employees
+  // Apply regular filters
   if (filters.status && filters.status !== "All" && employee.status !== filters.status) {
     console.log(`Employee ${employee.id} (${employee.fullName}) filtered out - status doesn't match: ${employee.status} != ${filters.status}`);
     return false;
