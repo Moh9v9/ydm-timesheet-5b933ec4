@@ -16,7 +16,6 @@ export const useEmployeePage = () => {
     refreshEmployees
   } = useEmployees();
 
-  const [searchTerm, setSearchTerm] = useState("");
   const [showFilters, setShowFilters] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentEmployee, setCurrentEmployee] = useState<Employee | null>(null);
@@ -91,24 +90,12 @@ export const useEmployeePage = () => {
     toast.success("Employee data refreshed");
   };
 
-  // Filter employees by search term
-  const searchedEmployees = filteredEmployees.filter(employee => 
-    employee.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (employee.iqamaNo && employee.iqamaNo.toString().includes(searchTerm.toLowerCase())) ||
-    employee.project.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    employee.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    employee.jobTitle.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
   return {
-    searchTerm,
-    setSearchTerm,
     showFilters,
     setShowFilters,
     isModalOpen,
     currentEmployee,
     deleteDialogOpen,
-    searchedEmployees,
     loading,
     error,
     filterOptions,

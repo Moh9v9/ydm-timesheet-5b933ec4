@@ -8,14 +8,11 @@ import DeleteConfirmationDialog from "@/components/DeleteConfirmationDialog";
 
 const Employees = () => {
   const {
-    searchTerm,
-    setSearchTerm,
     showFilters,
     setShowFilters,
     isModalOpen,
     currentEmployee,
     deleteDialogOpen,
-    searchedEmployees,
     loading,
     error,
     filterOptions,
@@ -40,8 +37,6 @@ const Employees = () => {
       
       <div className="bg-card dark:bg-gray-900/50 shadow-sm rounded-lg border dark:border-gray-800 overflow-hidden">
         <EmployeeFiltersContainer
-          searchTerm={searchTerm}
-          onSearchChange={setSearchTerm}
           showFilters={showFilters}
           setShowFilters={setShowFilters}
           filters={filters}
@@ -63,7 +58,7 @@ const Employees = () => {
         )}
         
         <EmployeesTable 
-          employees={searchedEmployees}
+          employees={filteredEmployees}
           loading={loading}
           onEdit={handleEdit}
           onDelete={handleDeleteClick}
