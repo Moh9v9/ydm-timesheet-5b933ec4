@@ -8,18 +8,16 @@ import { useAttendance } from "@/contexts/AttendanceContext"; // for attendance 
 const EmployeeContext = createContext<EmployeeContextType | undefined>(undefined);
 
 export const EmployeeProvider = ({ children }: { children: ReactNode }) => {
-  // Only try get attendance date if inside a page that provides it (Attendance)
+  // Get current attendance date from AttendanceContext if available
   let currentAttendanceDate: string | undefined = undefined;
   try {
-    // Will fail if AttendanceContext doesn't exist, swallow error silently
     const attendanceContext = useAttendance();
-    currentAttendanceDate = attendanceContext.currentDate;
+    currentAttendanceDate = attendanceContext?.currentDate;
     console.log("EmployeeContext - Got attendance date for filtering:", currentAttendanceDate);
   } catch (error) {
     console.log("EmployeeContext - No AttendanceContext available, continuing without date filtering");
   }
 
-  // --- Pass currentAttendanceDate into hook so employee filtering is correct ---
   const {
     employees,
     setEmployees,

@@ -40,26 +40,39 @@ const AttendanceTable = ({
   const hasData = attendanceData.length > 0 && filteredEmployees.length > 0;
   const sortedData = getSortedData();
 
-  // Log employee IDs to help debug which employees are available
+  // Enhanced debugging - log employee status to help track archived employees
   useEffect(() => {
     // Debug log to trace employee IDs and check if archived employees are included
     const employeeIds = filteredEmployees.map(e => e.id);
     console.log("Filtered employees IDs:", employeeIds);
-    console.log("Looking for archived employees with IDs: 1fdd63f7-a399-4341-8c16-d72b0ab3ca8f and 07ea4c39-8033-439c-89e9-2361833e906d");
+    
+    // Check for archived employees in the filtered list
+    const archivedEmployees = filteredEmployees.filter(e => e.status === "Archived");
+    console.log(`Found ${archivedEmployees.length} archived employees in filtered list:`, 
+      archivedEmployees.map(e => ({id: e.id, name: e.fullName})));
     
     // Check if specific archived employees are in the filtered list
-    const hasFirstArchivedEmployee = employeeIds.includes("1fdd63f7-a399-4341-8c16-d72b0ab3ca8f");
-    const hasSecondArchivedEmployee = employeeIds.includes("07ea4c39-8033-439c-89e9-2361833e906d");
+    const targetIds = ["1fdd63f7-a399-4341-8c16-d72b0ab3ca8f", "07ea4c39-8033-439c-89e9-2361833e906d"];
     
-    console.log("First archived employee in list:", hasFirstArchivedEmployee);
-    console.log("Second archived employee in list:", hasSecondArchivedEmployee);
+    targetIds.forEach(id => {
+      const employee = filteredEmployees.find(e => e.id === id);
+      if (employee) {
+        console.log(`Found target archived employee: ${employee.fullName} (${id})`);
+      }
+    });
     
-    // Log attendance records for these employees
-    const firstEmployeeAttendance = attendanceData.filter(record => record.employeeId === "1fdd63f7-a399-4341-8c16-d72b0ab3ca8f");
-    const secondEmployeeAttendance = attendanceData.filter(record => record.employeeId === "07ea4c39-8033-439c-89e9-2361833e906d");
+    // Log attendance records for archived employees
+    const archivedRecords = attendanceData.filter(record => 
+      archivedEmployees.some(emp => emp.id === record.employeeId)
+    );
     
-    console.log("First archived employee attendance records:", firstEmployeeAttendance);
-    console.log("Second archived employee attendance records:", secondEmployeeAttendance);
+    console.log(`Found ${archivedRecords.length} attendance records for archived employees:`, archivedRecords);
+    
+    // Check if records exist for the target archived employees
+    targetIds.forEach(id => {
+      const records = attendanceData.filter(record => record.employeeId === id);
+      console.log(`Found ${records.length} attendance records for employee ID ${id}:`, records);
+    });
   }, [filteredEmployees, attendanceData]);
 
   // Debug log just in case
