@@ -1,7 +1,6 @@
 
 import { User as SupabaseUser, Session } from "@supabase/supabase-js";
-import { UserRole, UserPermissions, User } from "@/lib/types";
-import { Json } from "@/integrations/supabase/types";
+import { User } from "@/lib/types";
 
 export interface AuthContextType {
   user: User | null;
@@ -11,7 +10,7 @@ export interface AuthContextType {
   logout: () => Promise<void>;
   forgotPassword: (email: string) => Promise<void>;
   resetPassword: (token: string, password: string) => Promise<void>;
-  updateProfile: (userData: Partial<User>) => Promise<void>;
+  updateProfile: (userData: UpdateProfileParams) => Promise<void>;
 }
 
 export interface ProfileData {
@@ -19,5 +18,10 @@ export interface ProfileData {
   full_name: string;
   email: string;
   role: string;
-  permissions: Json;
+  permissions: any;
+}
+
+// Add this new interface for updateProfile parameters
+export interface UpdateProfileParams extends Partial<User> {
+  currentPassword?: string; // Add this property for password verification
 }

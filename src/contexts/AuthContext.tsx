@@ -1,6 +1,6 @@
 
 import { createContext, useContext, ReactNode } from "react";
-import { AuthContextType } from "@/features/auth/types";
+import { AuthContextType, UpdateProfileParams } from "@/features/auth/types";
 import { useAuthState } from "@/features/auth/hooks/useAuthState";
 import { useAuthOperations } from "@/features/auth/hooks/useAuthOperations";
 
@@ -39,7 +39,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         throw error;
       }
     },
-    updateProfile: async (userData) => {
+    updateProfile: async (userData: UpdateProfileParams) => {
       try {
         await operations.updateProfile(userData);
         

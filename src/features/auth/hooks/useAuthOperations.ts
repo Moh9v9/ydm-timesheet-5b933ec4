@@ -1,5 +1,5 @@
-
 import { User } from "@/lib/types";
+import { UpdateProfileParams } from "@/features/auth/types";
 import { supabase } from "@/integrations/supabase/client";
 
 export const useAuthOperations = () => {
@@ -97,14 +97,14 @@ export const useAuthOperations = () => {
         throw new Error(error.message || "Failed to reset password");
       }
     },
-    updateProfile: async (userData: Partial<User>): Promise<void> => {
+    updateProfile: async (userData: UpdateProfileParams): Promise<void> => {
       try {
         // Make sure we have a valid user ID
         if (!userData.id) {
           // Get current user ID if not provided
-          const { data: { user } } = await supabase.auth.getUser();
-          if (!user) throw new Error("User not authenticated");
-          userData.id = user.id;
+          const { data: { user: currentUser } } = await supabase.auth.getUser();
+          if (!currentUser) throw new Error("User not authenticated");
+          userData.id = currentUser.id;
         }
 
         // Update user metadata in auth.users if fullName is provided
@@ -122,8 +122,9 @@ export const useAuthOperations = () => {
         // If password change is requested, handle it properly
         if (userData.password && userData.currentPassword) {
           // First verify the current password by attempting to sign in
+          const { data: { user: currentUser } } = await supabase.auth.getUser();
           const { error: signInError } = await supabase.auth.signInWithPassword({
-            email: userData.email || user?.email || '',
+            email: userData.email || currentUser?.email || '',
             password: userData.currentPassword,
           });
           
