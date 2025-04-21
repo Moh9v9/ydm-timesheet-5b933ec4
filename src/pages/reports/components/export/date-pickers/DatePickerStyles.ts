@@ -20,20 +20,20 @@ export const datePickerStyles = {
     "bg-white dark:bg-gray-800/95 backdrop-blur-sm"
   ),
   select: cn(
-    "appearance-none pl-2 pr-6 py-1.5 rounded-md",
+    "appearance-none pl-3 pr-8 py-1.5 rounded-md",
     "text-sm font-medium transition-colors duration-200",
-    "bg-background border border-input",
-    "text-foreground hover:bg-accent",
+    "bg-transparent border border-gray-700",
+    "text-gray-100 hover:bg-gray-700/50",
     "dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100",
     "dark:hover:bg-gray-700/80",
     "focus:outline-none focus:ring-2 focus:ring-primary/20",
     "dark:focus:ring-primary/40",
-    "cursor-pointer relative"
+    "cursor-pointer relative min-w-[100px]"
   ),
   navigation: {
     button: cn(
       "p-1.5 rounded-md",
-      "text-muted-foreground hover:text-primary hover:bg-gray-100/50 dark:hover:bg-gray-700/50",
+      "text-muted-foreground hover:text-primary hover:bg-gray-700/50",
       "transition-colors duration-200"
     )
   },
@@ -51,21 +51,22 @@ export const datePickerStyles = {
     wrapper: cn("p-4 pointer-events-auto select-none"),
     nav_button: cn(
       "inline-flex items-center justify-center rounded-md p-1.5",
-      "text-muted-foreground hover:text-primary hover:bg-gray-100/50 dark:hover:bg-gray-700/50",
+      "text-muted-foreground hover:text-primary hover:bg-gray-700/50",
       "transition-colors duration-200"
     ),
     head_cell: cn(
-      "text-muted-foreground rounded-md w-9 font-normal text-xs",
-      "uppercase tracking-wide"
+      "text-muted-foreground rounded-md w-9 font-normal text-[0.8rem]",
+      "uppercase tracking-wide text-gray-400"
     ),
     day: cn(
       "h-9 w-9 p-0 font-normal",
+      "text-sm text-gray-200",
       "rounded-md transition-colors duration-200",
-      "hover:bg-primary/10 dark:hover:bg-primary/20",
+      "hover:bg-gray-700/50",
       "focus:outline-none focus:ring-2 focus:ring-primary/20"
     ),
     day_selected: cn(
-      "bg-primary text-primary-foreground dark:bg-primary dark:text-primary-foreground",
+      "bg-primary text-primary-foreground",
       "hover:bg-primary hover:text-primary-foreground",
       "focus:bg-primary focus:text-primary-foreground"
     )

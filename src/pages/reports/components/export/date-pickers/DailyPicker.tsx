@@ -17,7 +17,7 @@ interface DailyPickerProps {
   setSelectedDate: (date: Date) => void;
   open: boolean;
   setOpen: (open: boolean) => void;
-  yearMonthCaptionLayout?: any; // Make this prop optional
+  yearMonthCaptionLayout?: any;
 }
 
 const DailyPicker = ({ selectedDate, setSelectedDate, open, setOpen }: DailyPickerProps) => {
@@ -35,7 +35,7 @@ const DailyPicker = ({ selectedDate, setSelectedDate, open, setOpen }: DailyPick
     components: {
       Dropdown: ({ value, onChange, children, ...props }: any) => {
         return (
-          <div className="relative inline-flex items-center">
+          <div className="relative inline-flex items-center mx-1">
             <select
               value={value}
               onChange={onChange}
@@ -46,7 +46,7 @@ const DailyPicker = ({ selectedDate, setSelectedDate, open, setOpen }: DailyPick
             </select>
             <ChevronRight className={cn(
               "w-4 h-4 absolute right-2",
-              "text-muted-foreground/70 dark:text-gray-400",
+              "text-gray-400",
               "pointer-events-none rotate-90"
             )} />
           </div>
@@ -88,8 +88,8 @@ const DailyPicker = ({ selectedDate, setSelectedDate, open, setOpen }: DailyPick
             classNames={{
               months: "space-y-4",
               month: "space-y-4",
-              caption: "relative flex items-center justify-center pt-1 pb-2",
-              caption_label: "flex items-center gap-1 text-sm font-medium",
+              caption: "relative flex items-center justify-center pt-3 pb-2",
+              caption_label: "flex items-center gap-2 text-sm font-medium text-gray-200",
               nav: "flex items-center gap-1",
               nav_button: datePickerStyles.calendar.nav_button,
               table: "w-full border-collapse",
