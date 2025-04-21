@@ -1,5 +1,6 @@
 
 import { LucideIcon } from "lucide-react";
+import ValueUpdater from "./ValueUpdater";
 
 interface StatsCardProps {
   icon: LucideIcon;
@@ -15,13 +16,11 @@ export const StatsCard = ({ icon: Icon, title, value, colorClass }: StatsCardPro
         <div className={`p-2 rounded-full ${colorClass} flex-shrink-0`}>
           <Icon className="h-6 w-6" />
         </div>
-        <div className="ml-4 flex-grow">
+        <div className="ml-4 flex-grow flex flex-col justify-center">
           <div className="text-sm font-medium text-muted-foreground">
             {title}
           </div>
-          <div className="mt-1 text-2xl font-semibold">
-            {value}
-          </div>
+          <ValueUpdater value={value} />
         </div>
       </div>
     </div>
