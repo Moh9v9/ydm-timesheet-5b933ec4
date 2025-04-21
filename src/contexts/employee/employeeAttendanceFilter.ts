@@ -20,8 +20,17 @@ export async function employeeMatchesAttendanceFilters(
     }
   }
 
+  // Status filter handling first - if specific status is requested, apply it
+  if (filters.status && filters.status !== "All") {
+    if (employee.status !== filters.status) {
+      console.log(`Employee ${employee.id} (${employee.fullName}) filtered out - status doesn't match: ${employee.status} != ${filters.status}`);
+      return false;
+    }
+  }
+  
   // Special rule for attendance view: For archived employees, ONLY include them if they have a record for the selected date
-  if (employee.status === "Archived") {
+  // This only applies when no specific status filter is set (i.e., showing "All" statuses)
+  if (employee.status === "Archived" && (!filters.status || filters.status === "All")) {
     if (!currentAttendanceDate) {
       console.log(`Archived employee ${employee.id} (${employee.fullName}) filtered out - no attendance date specified`);
       return false;
@@ -40,20 +49,28 @@ export async function employeeMatchesAttendanceFilters(
     }
 
     console.log(`Archived employee ${employee.id} (${employee.fullName}) included - has record for date: ${currentAttendanceDate}`);
-    return true;
-  }
-
-  // Apply regular filters
-  if (filters.status && filters.status !== "All" && employee.status !== filters.status) {
-    console.log(`Employee ${employee.id} (${employee.fullName}) filtered out - status doesn't match: ${employee.status} != ${filters.status}`);
-    return false;
   }
 
   // Apply other filters
-  if (filters.project && employee.project !== filters.project) return false;
-  if (filters.location && employee.location !== filters.location) return false;
-  if (filters.paymentType && employee.paymentType !== filters.paymentType) return false;
-  if (filters.sponsorship && employee.sponsorship !== filters.sponsorship) return false;
+  if (filters.project && filters.project !== "All" && employee.project !== filters.project) {
+    console.log(`Employee ${employee.id} filtered out - project doesn't match: ${employee.project} != ${filters.project}`);
+    return false;
+  }
+  
+  if (filters.location && filters.location !== "All" && employee.location !== filters.location) {
+    console.log(`Employee ${employee.id} filtered out - location doesn't match: ${employee.location} != ${filters.location}`);
+    return false;
+  }
+  
+  if (filters.paymentType && filters.paymentType !== "All" && employee.paymentType !== filters.paymentType) {
+    console.log(`Employee ${employee.id} filtered out - payment type doesn't match: ${employee.paymentType} != ${filters.paymentType}`);
+    return false;
+  }
+  
+  if (filters.sponsorship && filters.sponsorship !== "All" && employee.sponsorship !== filters.sponsorship) {
+    console.log(`Employee ${employee.id} filtered out - sponsorship doesn't match: ${employee.sponsorship} != ${filters.sponsorship}`);
+    return false;
+  }
 
   return true;
 }
