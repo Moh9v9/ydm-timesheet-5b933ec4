@@ -22,12 +22,13 @@ export async function employeeMatchesFilters(
     }
   }
   
-  // CRITICAL: In attendance view (when currentAttendanceDate exists), NEVER filter by status
-  // We must include ALL employees (active or archived) that existed on that date
-  if (!currentAttendanceDate && filters.status) {
-    // Only apply status filter when not in attendance view
-    console.log(`Employee ${employee.id} (${employee.fullName}) status: ${employee.status}, filter status: ${filters.status}`);
+  // Status filter handling - Critical fix
+  if (filters.status) {
+    console.log(`Checking status filter for ${employee.fullName}: employee status=${employee.status}, filter status=${filters.status}`);
+    
+    // Always apply status filter regardless of attendance date
     if (employee.status !== filters.status) {
+      console.log(`Employee ${employee.id} (${employee.fullName}) filtered out - status doesn't match: ${employee.status} != ${filters.status}`);
       return false;
     }
   }
@@ -48,7 +49,6 @@ export async function employeeMatchesFilters(
     }
     
     console.log(`Archived employee ${employee.id} (${employee.fullName}) included - has record for date: ${currentAttendanceDate} with present=${data.present}`);
-    return true; // Include archived employees in attendance view only if they have a record
   }
   
   if (filters.project && employee.project !== filters.project) return false;
