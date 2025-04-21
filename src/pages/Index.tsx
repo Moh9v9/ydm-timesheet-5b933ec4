@@ -1,11 +1,9 @@
-
 import { useAuth } from "@/contexts/AuthContext";
 import { format } from "date-fns";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CardInformation } from "@/components/dashboard/CardInformation";
 import DailyAttendance from "@/components/dashboard/DailyAttendance";
 import { useStatistics } from "@/hooks/useStatistics";
-import { RecentEmployees } from "@/components/dashboard/RecentEmployees";
 
 const Index = () => {
   const { user } = useAuth();
@@ -45,12 +43,6 @@ const Index = () => {
           presentToday={stats.presentToday}
           absentToday={stats.absentToday}
         />
-      )}
-
-      {user && (
-        <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
-          <RecentEmployees />
-        </div>
       )}
 
       <div className="mt-6">
