@@ -1,8 +1,9 @@
 
 import { useState, useEffect } from "react";
-import { Employee, EmployeeFilters } from "@/lib/types";
+import { Employee, EmployeeFilters, PaymentType, SponsorshipType, EmployeeStatus } from "@/lib/types";
 import { supabase } from "@/integrations/supabase/client";
 import { employeeMatchesFilters } from "./employeeFilter";
+import { formatEmployee } from "./formatEmployee";
 
 export const useEmployeeState = (
   currentAttendanceDate?: string,
@@ -23,19 +24,8 @@ export const useEmployeeState = (
       
       if (error) throw error;
 
-      const formattedEmployees: Employee[] = data.map(employee => ({
-        id: employee.id,
-        fullName: employee.full_name,
-        iqamaNo: employee.iqama_no,
-        project: employee.project,
-        location: employee.location,
-        jobTitle: employee.job_title,
-        paymentType: employee.payment_type,
-        rateOfPayment: employee.rate_of_payment,
-        sponsorship: employee.sponsorship,
-        status: employee.status,
-        created_at: employee.created_at
-      }));
+      // Use the formatEmployee utility to properly type the data from the database
+      const formattedEmployees: Employee[] = data.map(employee => formatEmployee(employee));
 
       setEmployees(formattedEmployees);
       setDataFetched(true);

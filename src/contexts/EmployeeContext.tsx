@@ -46,9 +46,13 @@ export const EmployeeProvider = ({ children }: { children: ReactNode }) => {
         filters,
         setFilters,
         loading,
-        error,
+        // Fix #1: Convert Error object to string if it exists
+        error: error ? error.message : null,
         dataFetched,
-        refreshEmployees,
+        // Fix #2: Make refreshEmployees return a Promise
+        refreshEmployees: async () => {
+          return Promise.resolve(refreshEmployees());
+        },
         ...operations
       }}
     >
