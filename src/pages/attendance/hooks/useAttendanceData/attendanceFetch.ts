@@ -47,13 +47,19 @@ export function useAttendanceFetch(
         fetchingRef.current = true;
         const fetchAttendanceData = async () => {
           setIsLoading(true);
-          const activeEmployees = filteredEmployees.filter(emp => emp.status === "Active");
           try {
-            const attendancePromises = activeEmployees.map(async (employee) => {
+            // Get attendance records for all employees (active and archived)
+            // The filtering was already done in employeeFilter.ts to include only
+            // archived employees with records for this date
+            const attendancePromises = filteredEmployees.map(async (employee) => {
               const existingRecord = await getRecordsByEmployeeAndDate(employee.id, currentDate);
+              
               if (existingRecord) {
+                console.log(`Found existing record for ${employee.fullName} (${employee.status}) with present=${existingRecord.present}`);
                 return existingRecord;
               } else {
+                // Create placeholder records only for active employees
+                // Archived employees should only be included if they have records (handled in employeeFilter.ts)
                 return {
                   id: `temp_${employee.id}_${currentDate}`,
                   employeeId: employee.id,

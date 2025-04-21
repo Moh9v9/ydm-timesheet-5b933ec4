@@ -50,10 +50,8 @@ const AttendanceTable = ({
         archivedEmployees.map(e => ({id: e.id, name: e.fullName})));
     }
 
-    // Only include employees that are:
-    // 1. Active, OR
-    // 2. Archived WITH an existing attendance record
-    return filteredEmployees.map((employee, idx) => {
+    // Map each employee to their attendance record
+    return filteredEmployees.map((employee) => {
       // Check if we already have a record for this employee
       const existingRecord = attendanceByEmployeeId.get(employee.id);
       
@@ -64,7 +62,9 @@ const AttendanceTable = ({
           employee
         };
       } else {
-        // Create a placeholder record for employees that don't have one
+        // If an archived employee has made it this far, it means they SHOULD have a record
+        // (they were filtered in employeeMatchesFilters)
+        // But if they don't, create a placeholder
         console.log(`Creating placeholder record for ${employee.fullName} (${employee.id}), status: ${employee.status}`);
         return {
           record: {

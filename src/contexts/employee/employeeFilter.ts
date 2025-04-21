@@ -34,7 +34,7 @@ export async function employeeMatchesFilters(
     // Check if this archived employee has an attendance record for the selected date
     const { data } = await supabase
       .from('attendance_records')
-      .select('id')
+      .select('id, present')
       .eq('employee_uuid', employee.id)
       .eq('date', currentAttendanceDate)
       .maybeSingle();
@@ -44,7 +44,7 @@ export async function employeeMatchesFilters(
       return false;
     }
     
-    console.log(`Archived employee ${employee.id} (${employee.fullName}) included - has record for date: ${currentAttendanceDate}`);
+    console.log(`Archived employee ${employee.id} (${employee.fullName}) included - has record for date: ${currentAttendanceDate} with present=${data.present}`);
     return true; // Include archived employees in attendance view only if they have a record
   }
   
