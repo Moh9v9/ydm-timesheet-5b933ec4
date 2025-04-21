@@ -19,6 +19,11 @@ export const useEmployeeState = (currentAttendanceDate?: string) => {
   const [initialized, setInitialized] = useState(false);
   const [dataFetched, setDataFetched] = useState(false);
 
+  // Log when the hook is initialized with attendance date
+  useEffect(() => {
+    console.log("🔍 useEmployeeState initialized with attendance date:", currentAttendanceDate);
+  }, [currentAttendanceDate]);
+
   useEffect(() => {
     if (!initialized) {
       fetchEmployees();
@@ -60,20 +65,23 @@ export const useEmployeeState = (currentAttendanceDate?: string) => {
 
   // --- FILTERING STEP ---
   const filteredEmployees = employees.filter(employee => {
-    // Add specific debugging for the employee we're having trouble with
+    // Add detailed debugging for the date comparison
     if (employee.id === "c015e513-e1ed-4403-b699-6fb1a37a2dbc") {
-      console.log("Target employee found:", employee);
+      console.log("Found target employee:", employee.fullName);
       console.log("Creation date:", employee.created_at);
       console.log("Current attendance date:", currentAttendanceDate);
+      
       const matches = employeeMatchesFilters(employee, filters, currentAttendanceDate);
-      console.log("Should show in table:", matches);
+      console.log("Should show in table:", matches ? "YES" : "NO");
       return matches;
     }
+    
+    // For all other employees, just apply the filters
     return employeeMatchesFilters(employee, filters, currentAttendanceDate);
   });
 
   console.log("🔍 useEmployeeState - filtered employees:", filteredEmployees.length, 
-    "of", employees.length, "total. Attendance date:", currentAttendanceDate);
+    "of", employees.length, "total with attendance date:", currentAttendanceDate);
 
   return {
     employees,

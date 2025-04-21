@@ -18,14 +18,15 @@ const DailyAttendance = () => {
   }, []); 
 
   // Only render Attendance component when initialized, and wrap it with necessary providers
+  // IMPORTANT: EmployeeProvider must be INSIDE AttendanceProvider so it can access the attendance date
   return (
     <div className="mt-2">
       {initialized && (
-        <EmployeeProvider>
-          <AttendanceProvider>
+        <AttendanceProvider>
+          <EmployeeProvider>
             <Attendance />
-          </AttendanceProvider>
-        </EmployeeProvider>
+          </EmployeeProvider>
+        </AttendanceProvider>
       )}
     </div>
   );

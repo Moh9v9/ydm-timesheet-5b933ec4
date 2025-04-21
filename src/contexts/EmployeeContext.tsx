@@ -1,5 +1,5 @@
 
-import { createContext, useContext, ReactNode } from "react";
+import { createContext, useContext, ReactNode, useEffect } from "react";
 import { EmployeeContextType } from "./employee/types";
 import { useEmployeeState } from "./employee/useEmployeeState";
 import { useEmployeeOperations } from "./employee/useEmployeeOperations";
@@ -14,9 +14,9 @@ export const EmployeeProvider = ({ children }: { children: ReactNode }) => {
     // Will fail if AttendanceContext doesn't exist, swallow error silently
     const attendanceContext = useAttendance();
     currentAttendanceDate = attendanceContext.currentDate;
-    console.log("EmployeeContext - Current attendance date:", currentAttendanceDate);
+    console.log("EmployeeContext - Got attendance date for filtering:", currentAttendanceDate);
   } catch (error) {
-    console.log("No AttendanceContext available, continuing without attendance date filtering");
+    console.log("EmployeeContext - No AttendanceContext available, continuing without date filtering");
   }
 
   // --- Pass currentAttendanceDate into hook so employee filtering is correct ---

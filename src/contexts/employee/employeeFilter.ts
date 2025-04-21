@@ -14,9 +14,9 @@ export function employeeMatchesFilters(
     // Extract just the date part from the ISO timestamp for proper comparison
     const employeeCreationDate = employee.created_at.split('T')[0];
     
-    // Now compare the date parts only - employee should not appear if created AFTER attendance date
+    // Compare dates as strings - employee should NOT appear in attendance lists for dates BEFORE their creation
     if (employeeCreationDate > currentAttendanceDate) {
-      console.log(`Filtering out employee ${employee.id} created on ${employeeCreationDate} for attendance date ${currentAttendanceDate}`);
+      console.log(`Employee ${employee.id} (${employee.fullName}) filtered out - created on ${employeeCreationDate}, attendance date: ${currentAttendanceDate}`);
       return false;
     }
   }
