@@ -21,6 +21,7 @@ const Attendance = () => {
   const { NotificationContainer } = useNotification();
   const [actualRecordCount, setActualRecordCount] = useState(0);
   const [recordsLoading, setRecordsLoading] = useState(true);
+  const [dataRefreshTrigger, setDataRefreshTrigger] = useState(0);
   
   const canEdit = user?.permissions.attendees.edit;
   
@@ -31,7 +32,7 @@ const Attendance = () => {
     handleTimeChange,
     handleOvertimeChange,
     handleNoteChange
-  } = useAttendanceData(canEdit);
+  } = useAttendanceData(canEdit, dataRefreshTrigger);
 
   const {
     isSubmitting,
@@ -64,6 +65,11 @@ const Attendance = () => {
         
         console.log(`Attendance - Found ${count || 0} records for date ${currentDate}`);
         setActualRecordCount(count || 0);
+        
+        // If we have records or employees have loaded, trigger a refresh of the attendance data
+        if ((count && count > 0) || filteredEmployees.length > 0) {
+          setDataRefreshTrigger(prev => prev + 1);
+        }
       } catch (err) {
         console.error('Failed to fetch attendance count:', err);
       } finally {
@@ -79,7 +85,7 @@ const Attendance = () => {
     
     // Clean up interval on unmount
     return () => clearInterval(timerId);
-  }, [currentDate]);
+  }, [currentDate, filteredEmployees.length]);
 
   // Combined loading state
   const combinedLoading = isLoading || recordsLoading || employeesLoading;
