@@ -5,7 +5,7 @@ export const datePickerStyles = {
   container: "block",
   label: "block text-sm font-medium mb-1.5 dark:text-gray-200",
   trigger: cn(
-    "w-full flex items-center px-4 py-2.5 text-left",
+    "w-full flex items-center justify-between px-4 py-2.5 text-left",
     "border rounded-lg dark:bg-gray-800/50 dark:border-gray-700 dark:text-gray-100",
     "text-sm font-medium transition-all duration-200",
     "hover:border-primary/50 dark:hover:border-primary/50",
