@@ -20,10 +20,11 @@ export async function employeeMatchesFilters(
     }
   }
   
-  // Special behavior for attendance view (when currentAttendanceDate is provided)
+  // Special behavior for attendance view vs. employee list view
   if (currentAttendanceDate) {
-    // For archived employees in attendance view, ONLY include them if they have a record for the selected date
+    // We're in attendance view - special filtering for archived employees
     if (employee.status === "Archived") {
+      // For archived employees in attendance view, ONLY include them if they have a record for the selected date
       const { data } = await supabase
         .from('attendance_records')
         .select('id, present')
@@ -38,19 +39,20 @@ export async function employeeMatchesFilters(
       
       console.log(`Archived employee ${employee.id} (${employee.fullName}) included - has record for date: ${currentAttendanceDate} with present=${data.present}`);
     }
-  }
-  
-  // Status filter handling - Only apply when a specific status is selected (not "All")
-  if (filters.status && filters.status !== "All") {
-    console.log(`Checking status filter for ${employee.fullName}: employee status=${employee.status}, filter status=${filters.status}`);
-    
-    if (employee.status !== filters.status) {
-      console.log(`Employee ${employee.id} (${employee.fullName}) filtered out - status doesn't match: ${employee.status} != ${filters.status}`);
-      return false;
+  } else {
+    // We're in employee list view - use standard status filtering
+    // Status filter handling - Only apply when a specific status is selected (not "All")
+    if (filters.status && filters.status !== "All") {
+      console.log(`Employee list view: Checking status filter for ${employee.fullName}: employee status=${employee.status}, filter status=${filters.status}`);
+      
+      if (employee.status !== filters.status) {
+        console.log(`Employee list view: Employee ${employee.id} (${employee.fullName}) filtered out - status doesn't match: ${employee.status} != ${filters.status}`);
+        return false;
+      }
     }
   }
   
-  // Apply other filters
+  // Apply other filters for both views
   if (filters.project && employee.project !== filters.project) return false;
   if (filters.location && employee.location !== filters.location) return false;
   if (filters.paymentType && employee.paymentType !== filters.paymentType) return false;
