@@ -1,5 +1,5 @@
 
-import { createContext, useContext, ReactNode, useEffect } from "react";
+import { createContext, useContext, ReactNode } from "react";
 import { EmployeeContextType } from "./employee/types";
 import { useEmployeeState } from "./employee/useEmployeeState";
 import { useEmployeeOperations } from "./employee/useEmployeeOperations";
