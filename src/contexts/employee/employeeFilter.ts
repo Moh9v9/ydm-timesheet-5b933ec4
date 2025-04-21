@@ -23,7 +23,7 @@ export async function employeeMatchesFilters(
   }
   
   // Status filter handling - Only apply when a specific status is selected
-  if (filters.status && filters.status !== "All" as string) {
+  if (filters.status && filters.status !== "All") {
     console.log(`Checking status filter for ${employee.fullName}: employee status=${employee.status}, filter status=${filters.status}`);
     
     // Apply status filter
@@ -35,8 +35,9 @@ export async function employeeMatchesFilters(
   
   // For archived employees in attendance view, check if they have a record for the selected date
   // ONLY apply this check if we're in attendance view (currentAttendanceDate is provided)
-  if (employee.status === "Archived" && currentAttendanceDate && filters.status !== "Archived") {
-    // This check should only run in attendance view when we're not explicitly filtering for archived employees
+  // AND we're not explicitly viewing all employees (filters.status !== "All")
+  if (employee.status === "Archived" && currentAttendanceDate && filters.status !== "Archived" && filters.status !== "All") {
+    // This check should only run in attendance view when we're not explicitly filtering for archived or all employees
     const { data } = await supabase
       .from('attendance_records')
       .select('id, present')
