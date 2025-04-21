@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { X } from "lucide-react";
 import { Employee, EmployeeStatus, PaymentType, SponsorshipType } from "@/lib/types";
@@ -41,13 +40,19 @@ const EmployeeModal = ({ employee, onClose }: EmployeeModalProps) => {
     console.log("Submitting form data:", formData);
 
     try {
+      // Ensure created_at is set before passing to addEmployee/updateEmployee
+      const dataWithCreatedAt = {
+        ...formData,
+        created_at: formData.created_at || new Date().toISOString()
+      };
+
       if (employee) {
         // Update existing employee
-        await updateEmployee(employee.id, formData);
+        await updateEmployee(employee.id, dataWithCreatedAt);
         toast.success("Employee updated successfully");
       } else {
         // Create new employee
-        await addEmployee(formData);
+        await addEmployee(dataWithCreatedAt);
         toast.success("Employee added successfully");
       }
       onClose();
