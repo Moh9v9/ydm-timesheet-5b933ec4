@@ -1,23 +1,24 @@
 
+// Dashboard.tsx
 import { useAuth } from "@/contexts/AuthContext";
 import { format } from "date-fns";
 import { useStatistics } from "@/hooks/useStatistics";
-import { useAttendance } from "@/contexts/AttendanceContext";
+// Removed useAttendance import here since we won't use currentDate from it now
 import { Skeleton } from "@/components/ui/skeleton";
 import { CardInformation } from "@/components/dashboard/CardInformation";
 import DailyAttendance from "@/components/dashboard/DailyAttendance";
 
 const Dashboard = () => {
   const { user } = useAuth();
-  const { currentDate } = useAttendance();
 
-  // Format the selected date for display
-  const formattedDate = currentDate ? format(new Date(currentDate), "EEEE, MMMM d, yyyy") : "Loading...";
+  // Use today's actual date to display on dashboard, independent from Attendance context
+  const today = new Date();
+  const formattedDate = format(today, "EEEE, MMMM d, yyyy"); 
   
-  // Get statistics - will now use the current date from context
+  // Get statistics - will now use the current date from context as before (no change)
   const stats = useStatistics();
 
-  console.log("Dashboard render - Current date:", currentDate, "Stats:", stats);
+  console.log("Dashboard render - Displaying today's date:", formattedDate, "Stats:", stats);
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -55,3 +56,4 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
+
