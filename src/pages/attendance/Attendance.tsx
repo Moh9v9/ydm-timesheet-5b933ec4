@@ -15,9 +15,9 @@ import { useState } from "react";
 
 const Attendance = () => {
   const { user } = useAuth();
-  const { filteredEmployees, loading: employeesLoading, dataFetched } = useEmployees();
+  const { filteredEmployees, loading: employeesLoading, dataFetched, refreshEmployees } = useEmployees();
   const { currentDate, setCurrentDate } = useAttendance();
-  const { NotificationContainer } = useNotification();
+  const { NotificationContainer, success } = useNotification();
 
   const canEdit = user?.permissions.attendees.edit;
   const canViewAttendance = user?.permissions.attendees.view;
@@ -44,6 +44,16 @@ const Attendance = () => {
 
   const combinedLoading = isLoading || recordsLoading;
 
+  // Enhanced refresh function that also refreshes employee data
+  const handleFullRefresh = () => {
+    console.log("🔍 Performing full refresh");
+    // First refresh employees
+    refreshEmployees();
+    // Then refresh attendance data
+    handleRefresh();
+    success("Data refreshed");
+  };
+
   const handleSuccessfulSave = () => {
     setDataRefreshTrigger((prev: number) => prev + 1);
   };
@@ -58,7 +68,7 @@ const Attendance = () => {
         isSubmitting={false}
         onUpdateAll={() => {}}
         onSave={() => {}}
-        onRefresh={handleRefresh}
+        onRefresh={handleFullRefresh} // Use the enhanced refresh function
       />
 
       <div className="flex items-center mb-2">

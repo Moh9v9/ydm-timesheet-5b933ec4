@@ -3,7 +3,7 @@ import { useState } from "react";
 import { AttendanceRecord } from "@/lib/types";
 import { Employee } from "@/lib/types";
 import AttendanceTableRow from "./AttendanceTableRow";
-import { ArrowDown, ArrowUp } from "lucide-react";
+import { ArrowDown, ArrowUp, AlertCircle } from "lucide-react";
 
 interface AttendanceTableProps {
   attendanceData: AttendanceRecord[];
@@ -91,7 +91,76 @@ const AttendanceTable = ({
   // Check if we have both attendance data AND employee data
   const hasData = attendanceData.length > 0 && filteredEmployees.length > 0;
 
-  console.log("AttendanceTable render - Loading:", isLoading, "Employees Loaded:", employeesLoaded, "Filtered Employees:", filteredEmployees.length);
+  console.log("🔍 AttendanceTable render - Loading:", isLoading, 
+    "Employees Loaded:", employeesLoaded, 
+    "Filtered Employees:", filteredEmployees.length,
+    "Attendance Data:", attendanceData.length);
+
+  // Enhanced empty state message
+  const getEmptyStateMessage = () => {
+    if (isLoading) {
+      return (
+        <tr>
+          <td colSpan={6} className="text-center py-6">
+            <div className="flex justify-center items-center">
+              <div className="animate-spin h-5 w-5 mr-3 border-t-2 border-b-2 border-primary rounded-full"></div>
+              Loading attendance records...
+            </div>
+          </td>
+        </tr>
+      );
+    }
+    
+    if (!employeesLoaded) {
+      return (
+        <tr>
+          <td colSpan={6} className="text-center py-6">
+            <div className="flex justify-center items-center">
+              <div className="animate-spin h-5 w-5 mr-3 border-t-2 border-b-2 border-primary rounded-full"></div>
+              Loading employee data...
+            </div>
+          </td>
+        </tr>
+      );
+    }
+    
+    if (filteredEmployees.length === 0) {
+      return (
+        <tr>
+          <td colSpan={6} className="text-center py-8">
+            <div className="flex flex-col items-center space-y-2">
+              <AlertCircle size={24} className="text-amber-500" />
+              <div className="text-muted-foreground font-medium">No employees found</div>
+              <div className="text-sm text-center max-w-md">
+                You need to add employees first before you can manage attendance. 
+                Please navigate to the Employees section and add some employees.
+              </div>
+            </div>
+          </td>
+        </tr>
+      );
+    }
+    
+    if (attendanceData.length === 0) {
+      return (
+        <tr>
+          <td colSpan={6} className="text-center py-4">
+            <div className="text-muted-foreground">
+              No attendance records found for this date
+            </div>
+          </td>
+        </tr>
+      );
+    }
+    
+    return (
+      <tr>
+        <td colSpan={6} className="text-center py-4">
+          No matching employees found with current filters
+        </td>
+      </tr>
+    );
+  };
 
   return (
     <div className="bg-card shadow-sm rounded-lg border overflow-hidden">
@@ -138,33 +207,7 @@ const AttendanceTable = ({
             </tr>
           </thead>
           <tbody>
-            {isLoading ? (
-              <tr>
-                <td colSpan={6} className="text-center py-6">
-                  <div className="flex justify-center items-center">
-                    <div className="animate-spin h-5 w-5 mr-3 border-t-2 border-b-2 border-primary rounded-full"></div>
-                    Loading attendance records...
-                  </div>
-                </td>
-              </tr>
-            ) : !employeesLoaded ? (
-              <tr>
-                <td colSpan={6} className="text-center py-6">
-                  <div className="flex justify-center items-center">
-                    <div className="animate-spin h-5 w-5 mr-3 border-t-2 border-b-2 border-primary rounded-full"></div>
-                    Loading employee data...
-                  </div>
-                </td>
-              </tr>
-            ) : filteredEmployees.length === 0 ? (
-              <tr>
-                <td colSpan={6} className="text-center py-4">
-                  <div className="text-muted-foreground">
-                    No employees found. Please add employees in the Employees section.
-                  </div>
-                </td>
-              </tr>
-            ) : hasData && getSortedData().some(({ record }) => filteredEmployees.find(emp => emp.id === record.employeeId)) ? (
+            {hasData && getSortedData().some(({ record }) => filteredEmployees.find(emp => emp.id === record.employeeId)) ? (
               getSortedData().map(({ record, originalIndex }) => {
                 const employee = filteredEmployees.find(
                   emp => emp.id === record.employeeId
@@ -185,18 +228,8 @@ const AttendanceTable = ({
                   />
                 );
               })
-            ) : attendanceData.length > 0 ? (
-              <tr>
-                <td colSpan={6} className="text-center py-4">
-                  No matching employees found with current filters
-                </td>
-              </tr>
             ) : (
-              <tr>
-                <td colSpan={6} className="text-center py-4">
-                  No attendance records found for this date
-                </td>
-              </tr>
+              getEmptyStateMessage()
             )}
           </tbody>
         </table>

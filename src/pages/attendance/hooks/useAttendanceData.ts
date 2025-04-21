@@ -14,23 +14,27 @@ export const useAttendanceData = (canEdit: boolean, refreshTrigger: number = 0) 
   const fetchingRef = useRef(false);
   const initAttemptedRef = useRef(false);
 
-  // Log relevant state for debugging
-  console.log("useAttendanceData - employees:", filteredEmployees.length, 
-    "loading:", employeesLoading, 
-    "dataFetched:", dataFetched, 
-    "hasAttempted:", hasAttemptedFetch, 
-    "lastFetched:", lastFetchedDate, 
-    "current:", currentDate);
+  // Enhanced debugging logs
+  console.log("🔍 useAttendanceData - DEBUG", { 
+    employeeCount: filteredEmployees.length, 
+    employeesLoading, 
+    dataFetched, 
+    hasAttemptedFetch, 
+    lastFetchedDate, 
+    currentDate,
+    employees: filteredEmployees.map(e => ({ id: e.id, name: e.fullName, status: e.status }))
+  });
 
   // Effect to fetch attendance data only when date changes, employees load, or explicit refresh is triggered
   useEffect(() => {
     // Handle the case where we have no employees but they're not loading anymore
     if (!employeesLoading && dataFetched && !initAttemptedRef.current) {
-      console.log("Employee data loaded. Ready to process attendance data.");
+      console.log("🔍 Employee data loaded. Ready to process attendance data.");
       initAttemptedRef.current = true;
       
       if (filteredEmployees.length === 0) {
         // No employees available, no need to load attendance
+        console.log("🔍 No employees found. Setting loading to false.");
         setHasAttemptedFetch(true);
         setIsLoading(false);
         return;
@@ -46,12 +50,13 @@ export const useAttendanceData = (canEdit: boolean, refreshTrigger: number = 0) 
         !hasAttemptedFetch;
       
       if (shouldFetch) {
-        console.log(`Fetching attendance data: date=${currentDate}, employees=${filteredEmployees.length}, lastFetch=${lastFetchedDate}, refreshTrigger=${refreshTrigger}, hasAttempted=${hasAttemptedFetch}`);
+        console.log(`🔍 Fetching attendance data: date=${currentDate}, employees=${filteredEmployees.length}, lastFetch=${lastFetchedDate}, refreshTrigger=${refreshTrigger}, hasAttempted=${hasAttemptedFetch}`);
         fetchingRef.current = true;
         
         const fetchAttendanceData = async () => {
           setIsLoading(true);
           const activeEmployees = filteredEmployees.filter(emp => emp.status === "Active");
+          console.log(`🔍 Found ${activeEmployees.length} active employees out of ${filteredEmployees.length} total`);
           
           try {
             const attendancePromises = activeEmployees.map(async (employee) => {
@@ -75,7 +80,7 @@ export const useAttendanceData = (canEdit: boolean, refreshTrigger: number = 0) 
             });
             
             const results = await Promise.all(attendancePromises);
-            console.log(`Loaded ${results.length} attendance records for ${currentDate}`);
+            console.log(`🔍 Loaded ${results.length} attendance records for ${currentDate}`);
             setAttendanceData(results);
             setLastFetchedDate(currentDate); // Update last fetched date
             setHasAttemptedFetch(true); // Mark that we've attempted to fetch
@@ -91,6 +96,7 @@ export const useAttendanceData = (canEdit: boolean, refreshTrigger: number = 0) 
       }
     } else if (dataFetched && !employeesLoading && filteredEmployees.length === 0 && !hasAttemptedFetch) {
       // If we have no employees but data is fetched, mark as attempted
+      console.log("🔍 No employees but data fetched. Setting loading to false.");
       setHasAttemptedFetch(true);
       setIsLoading(false);
     }

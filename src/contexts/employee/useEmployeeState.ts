@@ -27,7 +27,7 @@ export const useEmployeeState = () => {
     setError(null);
     
     try {
-      console.log("Fetching employees from Supabase...");
+      console.log("🔍 Fetching employees from Supabase...");
       const { data, error } = await supabase
         .from('employees')
         .select('*');
@@ -36,7 +36,7 @@ export const useEmployeeState = () => {
         throw error;
       }
 
-      console.log("Employees data received:", data);
+      console.log("🔍 Employees data received:", data);
       
       if (data && data.length > 0) {
         const formattedEmployees: Employee[] = data.map(emp => ({
@@ -52,11 +52,11 @@ export const useEmployeeState = () => {
           status: emp.status as EmployeeStatus,
         }));
         
-        console.log("Formatted employees:", formattedEmployees);
+        console.log("🔍 Formatted employees:", formattedEmployees);
         setEmployees(formattedEmployees);
       } else {
         // Make sure we set an empty array even if no data returns
-        console.log("No employees found in the database");
+        console.log("🔍 No employees found in the database");
         setEmployees([]);
       }
       
@@ -85,7 +85,7 @@ export const useEmployeeState = () => {
     return true;
   });
 
-  console.log("useEmployeeState - filtered employees:", filteredEmployees.length, "loading:", loading, "dataFetched:", dataFetched);
+  console.log("🔍 useEmployeeState - filtered employees:", filteredEmployees.length, "loading:", loading, "dataFetched:", dataFetched);
 
   return {
     employees,
