@@ -6,20 +6,27 @@ interface ValueUpdaterProps {
 }
 
 export default function ValueUpdater({ value }: ValueUpdaterProps) {
-  const ref = useRef<HTMLDivElement>(null);
+  const ref = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
     if (!ref.current) return;
-    // Add a quick highlight effect when number changes
-    ref.current.classList.add("bg-accent", "transition", "duration-150");
+    // Animate opacity for a smooth number transition
+    ref.current.style.opacity = "0.4";
+    ref.current.style.transition = "opacity 0.25s";
     setTimeout(() => {
-      ref.current && ref.current.classList.remove("bg-accent");
-    }, 180);
+      if (ref.current) {
+        ref.current.style.opacity = "1";
+      }
+    }, 10);
   }, [value]);
 
   return (
-    <div ref={ref} className="mt-1 text-2xl font-semibold px-2 rounded">
+    <span
+      ref={ref}
+      className="mt-1 text-2xl font-semibold px-2 rounded inline-block"
+      style={{ transition: "opacity 0.25s", opacity: 1 }}
+    >
       {value}
-    </div>
+    </span>
   );
 }
