@@ -6,7 +6,6 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { cn } from "@/lib/utils";
 import { datePickerStyles } from './DatePickerStyles';
 import { useTheme } from "@/contexts/ThemeContext";
-
 interface DailyPickerProps {
   selectedDate: Date;
   setSelectedDate: (date: Date) => void;
@@ -15,7 +14,6 @@ interface DailyPickerProps {
   yearMonthCaptionLayout?: any;
   showCalendarView?: boolean;
 }
-
 const DailyPicker = ({
   selectedDate,
   setSelectedDate,
@@ -23,137 +21,84 @@ const DailyPicker = ({
   setOpen,
   showCalendarView = true
 }: DailyPickerProps) => {
-  const { theme } = useTheme();
-
+  const {
+    theme
+  } = useTheme();
   const handleSelect = (date: Date | undefined) => {
     if (date) {
       setSelectedDate(date);
       setOpen(false);
     }
   };
-
-  return (
-    <div className={datePickerStyles.container}>
+  return <div className={datePickerStyles.container}>
       <label className={datePickerStyles.label}>
         Select Date
       </label>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
-          <button className={cn(
-            datePickerStyles.trigger, 
-            "flex items-center justify-between gap-4 px-4 py-2.5 rounded-lg"
-          )}>
+          <button className={cn(datePickerStyles.trigger, "flex items-center justify-between gap-4 px-4 py-2.5 rounded-lg")}>
             <span>{format(selectedDate, showCalendarView ? "PPP" : "MMMM yyyy")}</span>
             <ChevronRight className="w-4 h-4 text-gray-500 dark:text-gray-300" />
           </button>
         </PopoverTrigger>
-        <PopoverContent 
-          className={cn(
-            datePickerStyles.popoverContent, 
-            "w-[280px] p-4 rounded-xl shadow-lg dark:bg-gray-800/95 dark:border-gray-700"
-          )} 
-          align="start"
-        >
-          {!showCalendarView && (
-            <div className="space-y-4">
+        <PopoverContent align="start" className="">
+          {!showCalendarView && <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <h3 className="text-lg font-semibold dark:text-gray-100">
                   {format(selectedDate, "MMMM yyyy")}
                 </h3>
                 <div className="flex space-x-2">
-                  <button 
-                    onClick={() => {
-                      const prevMonth = new Date(selectedDate);
-                      prevMonth.setMonth(prevMonth.getMonth() - 1);
-                      setSelectedDate(prevMonth);
-                    }} 
-                    className={cn(
-                      datePickerStyles.navigation.button, 
-                      "p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700"
-                    )}
-                  >
+                  <button onClick={() => {
+                const prevMonth = new Date(selectedDate);
+                prevMonth.setMonth(prevMonth.getMonth() - 1);
+                setSelectedDate(prevMonth);
+              }} className={cn(datePickerStyles.navigation.button, "p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700")}>
                     <ChevronLeft className="h-4 w-4 text-gray-600 dark:text-gray-300" />
                   </button>
-                  <button 
-                    onClick={() => {
-                      const nextMonth = new Date(selectedDate);
-                      nextMonth.setMonth(nextMonth.getMonth() + 1);
-                      setSelectedDate(nextMonth);
-                    }} 
-                    className={cn(
-                      datePickerStyles.navigation.button, 
-                      "p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700"
-                    )}
-                  >
+                  <button onClick={() => {
+                const nextMonth = new Date(selectedDate);
+                nextMonth.setMonth(nextMonth.getMonth() + 1);
+                setSelectedDate(nextMonth);
+              }} className={cn(datePickerStyles.navigation.button, "p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700")}>
                     <ChevronRight className="h-4 w-4 text-gray-600 dark:text-gray-300" />
                   </button>
                 </div>
               </div>
               
               <div className="grid grid-cols-2 gap-4">
-                <select 
-                  value={selectedDate.getFullYear()} 
-                  onChange={e => {
-                    const newDate = new Date(selectedDate);
-                    newDate.setFullYear(parseInt(e.target.value));
-                    setSelectedDate(newDate);
-                  }}
-                  className={cn(
-                    datePickerStyles.select, 
-                    "w-full px-3 py-2 rounded-lg border dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
-                  )}
-                >
-                  {Array.from({ length: 11 }, (_, i) => 2020 + i).map(year => (
-                    <option key={year} value={year} className="dark:bg-gray-800">
+                <select value={selectedDate.getFullYear()} onChange={e => {
+              const newDate = new Date(selectedDate);
+              newDate.setFullYear(parseInt(e.target.value));
+              setSelectedDate(newDate);
+            }} className={cn(datePickerStyles.select, "w-full px-3 py-2 rounded-lg border dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100")}>
+                  {Array.from({
+                length: 11
+              }, (_, i) => 2020 + i).map(year => <option key={year} value={year} className="dark:bg-gray-800">
                       {year}
-                    </option>
-                  ))}
+                    </option>)}
                 </select>
                 
-                <select 
-                  value={selectedDate.getMonth()} 
-                  onChange={e => {
-                    const newDate = new Date(selectedDate);
-                    newDate.setMonth(parseInt(e.target.value));
-                    setSelectedDate(newDate);
-                  }}
-                  className={cn(
-                    datePickerStyles.select, 
-                    "w-full px-3 py-2 rounded-lg border dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
-                  )}
-                >
-                  {Array.from({ length: 12 }, (_, i) => i).map(month => (
-                    <option key={month} value={month} className="dark:bg-gray-800">
+                <select value={selectedDate.getMonth()} onChange={e => {
+              const newDate = new Date(selectedDate);
+              newDate.setMonth(parseInt(e.target.value));
+              setSelectedDate(newDate);
+            }} className={cn(datePickerStyles.select, "w-full px-3 py-2 rounded-lg border dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100")}>
+                  {Array.from({
+                length: 12
+              }, (_, i) => i).map(month => <option key={month} value={month} className="dark:bg-gray-800">
                       {format(new Date(2000, month, 1), "MMMM")}
-                    </option>
-                  ))}
+                    </option>)}
                 </select>
               </div>
               
               <div className="mt-4 flex justify-end">
-                <button 
-                  onClick={() => setOpen(false)} 
-                  className={cn(
-                    datePickerStyles.actions.button, 
-                    "px-4 py-2 rounded-lg text-sm font-medium"
-                  )}
-                >
+                <button onClick={() => setOpen(false)} className={cn(datePickerStyles.actions.button, "px-4 py-2 rounded-lg text-sm font-medium")}>
                   Select
                 </button>
               </div>
-            </div>
-          )}
+            </div>}
 
-          {showCalendarView && (
-            <Calendar 
-              mode="single" 
-              selected={selectedDate} 
-              onSelect={handleSelect} 
-              initialFocus 
-              captionLayout="dropdown-buttons" 
-              fromYear={2020} 
-              toYear={2030} 
-              classNames={{
+          {showCalendarView && <Calendar mode="single" selected={selectedDate} onSelect={handleSelect} initialFocus captionLayout="dropdown-buttons" fromYear={2020} toYear={2030} classNames={{
           months: "space-y-4",
           month: "space-y-4",
           caption: "relative flex items-center justify-center pt-3 pb-2",
@@ -170,13 +115,9 @@ const DailyPicker = ({
           day_outside: "text-muted-foreground/50 dark:text-muted-foreground/30",
           day_disabled: "text-muted-foreground/50 dark:text-muted-foreground/30",
           day_hidden: "invisible"
-        }}
-            />
-          )}
+        }} />}
         </PopoverContent>
       </Popover>
-    </div>
-  );
+    </div>;
 };
-
 export default DailyPicker;
