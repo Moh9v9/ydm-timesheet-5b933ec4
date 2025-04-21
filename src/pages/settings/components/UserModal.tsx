@@ -2,8 +2,7 @@
 import { User } from "@/lib/types";
 import { UserForm } from "./UserForm";
 import { X } from "lucide-react";
-import { useEffect } from "react";
-import { useModernNotification } from "@/hooks/useModernNotification";
+import { useEscapeKey } from "../hooks/useEscapeKey";
 
 interface UserModalProps {
   isOpen: boolean;
@@ -14,22 +13,7 @@ interface UserModalProps {
 }
 
 export const UserModal = ({ isOpen, currentUser, onClose, onSubmit, isSubmitting }: UserModalProps) => {
-  // Close modal with Escape key
-  useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && !isSubmitting) {
-        onClose();
-      }
-    };
-    
-    if (isOpen) {
-      document.addEventListener("keydown", handleEscape);
-    }
-    
-    return () => {
-      document.removeEventListener("keydown", handleEscape);
-    };
-  }, [isOpen, isSubmitting, onClose]);
+  useEscapeKey(isOpen, onClose, isSubmitting);
 
   if (!isOpen) return null;
 
