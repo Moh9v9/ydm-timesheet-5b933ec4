@@ -1,11 +1,13 @@
 
 import { useState, useEffect } from "react";
-import { Employee, EmployeeFilters, PaymentType, SponsorshipType, EmployeeStatus } from "@/lib/types";
+import { Employee, EmployeeFilters } from "@/lib/types";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { employeeMatchesFilters } from "./employeeFilter";
+import { formatEmployee } from "./formatEmployee";
 
 /**
- * Added new optional param (currentAttendanceDate as ISO string)
+ * Manages employee state and filtering, optionally by attendance date.
  */
 export const useEmployeeState = (currentAttendanceDate?: string) => {
   const [employees, setEmployees] = useState<Employee[]>([]);
@@ -33,33 +35,17 @@ export const useEmployeeState = (currentAttendanceDate?: string) => {
         .from('employees')
         .select('*');
 
-      if (error) {
-        throw error;
-      }
-
+      if (error) throw error;
       console.log("🔍 Employees data received:", data);
 
       if (data && data.length > 0) {
-        const formattedEmployees: Employee[] = data.map(emp => ({
-          id: emp.id,
-          fullName: emp.full_name,
-          iqamaNo: emp.iqama_no !== null ? Number(emp.iqama_no) : 0,
-          project: emp.project,
-          location: emp.location,
-          jobTitle: emp.job_title,
-          paymentType: emp.payment_type as PaymentType,
-          rateOfPayment: emp.rate_of_payment,
-          sponsorship: emp.sponsorship as SponsorshipType,
-          status: emp.status as EmployeeStatus,
-          created_at: emp.created_at // Pass through created_at for filtering
-        }));
+        const formattedEmployees: Employee[] = data.map(formatEmployee);
         console.log("🔍 Formatted employees:", formattedEmployees);
         setEmployees(formattedEmployees);
       } else {
         console.log("🔍 No employees found in the database");
         setEmployees([]);
       }
-
       setDataFetched(true);
     } catch (err: any) {
       console.error('Error fetching employees:', err);
@@ -73,19 +59,9 @@ export const useEmployeeState = (currentAttendanceDate?: string) => {
   };
 
   // --- FILTERING STEP ---
-  const filteredEmployees = employees.filter(employee => {
-    // Must be created on or before currentAttendanceDate if provided
-    if (currentAttendanceDate && employee.created_at) {
-      // string compare should be safe for ISO
-      if (employee.created_at > currentAttendanceDate) return false;
-    }
-    if (filters.status && employee.status !== filters.status) return false;
-    if (filters.project && employee.project !== filters.project) return false;
-    if (filters.location && employee.location !== filters.location) return false;
-    if (filters.paymentType && employee.paymentType !== filters.paymentType) return false;
-    if (filters.sponsorship && employee.sponsorship !== filters.sponsorship) return false;
-    return true;
-  });
+  const filteredEmployees = employees.filter(employee =>
+    employeeMatchesFilters(employee, filters, currentAttendanceDate)
+  );
 
   console.log("🔍 useEmployeeState - filtered employees:", filteredEmployees.length, "loading:", loading, "dataFetched:", dataFetched);
 
