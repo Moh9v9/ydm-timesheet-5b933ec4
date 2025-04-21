@@ -19,6 +19,20 @@ export const useEmployeeExport = () => {
   const { employees, filteredEmployees } = useEmployees();
   const { success, error } = useNotification();
 
+  // Define getUniqueValues first, before it's used
+  const getUniqueValues = (field: keyof EmployeeFilters) => {
+    // Make sure we include values from ALL employees, not just filtered ones
+    return Array.from(new Set(employees.map(employee => employee[field] as string))).filter(Boolean);
+  };
+
+  // Now we can use getUniqueValues to define uniqueValues
+  const uniqueValues = {
+    projects: ["all", ...getUniqueValues("project")],
+    locations: ["all", ...getUniqueValues("location")],
+    paymentTypes: ["all", ...getUniqueValues("paymentType")],
+    sponsorships: ["all", ...getUniqueValues("sponsorship")]
+  };
+
   const handleFilterChange = (key: keyof EmployeeFilters, value: string | undefined) => {
     if (!value || value === "all") {
       const newFilters = { ...filters };
@@ -80,18 +94,6 @@ export const useEmployeeExport = () => {
         setIsGenerating(false);
       }
     }, 1200);
-  };
-
-  const uniqueValues = {
-    projects: ["all", ...getUniqueValues("project")],
-    locations: ["all", ...getUniqueValues("location")],
-    paymentTypes: ["all", ...getUniqueValues("paymentType")],
-    sponsorships: ["all", ...getUniqueValues("sponsorship")]
-  };
-
-  const getUniqueValues = (field: keyof EmployeeFilters) => {
-    // Make sure we include values from ALL employees, not just filtered ones
-    return Array.from(new Set(employees.map(employee => employee[field] as string))).filter(Boolean);
   };
 
   return {
