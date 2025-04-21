@@ -11,7 +11,7 @@ interface StatsCardProps {
 
 export const StatsCard = ({ icon: Icon, title, value, colorClass }: StatsCardProps) => {
   return (
-    <div className="bg-card shadow-sm rounded-lg p-6 border h-24">
+    <div className="bg-card shadow-sm rounded-lg p-6 border h-24" style={{ transition: "none" }}>
       <div className="flex items-center w-full">
         <div className={`p-2 rounded-full ${colorClass} flex-shrink-0`}>
           <Icon className="h-6 w-6" />
