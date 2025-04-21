@@ -1,7 +1,8 @@
+
 import { useAuth } from "@/contexts/AuthContext";
 import { useAttendance } from "@/contexts/AttendanceContext";
 import { useEmployees } from "@/contexts/EmployeeContext";
-import { useNotification } from "@/components/ui/notification";
+import { useModernNotification } from "@/hooks/useModernNotification";
 import DateNavigation from "./components/DateNavigation";
 import AttendanceTable from "./components/table/AttendanceTable";
 import AttendanceHeader from "./components/AttendanceHeader";
@@ -12,11 +13,19 @@ import AttendanceDialogsContainer from "./components/AttendanceDialogsContainer"
 import { useAttendanceLoading } from "./hooks/useAttendanceLoading";
 import { useEffect, useRef, useState } from "react";
 
+// Use ModernNotification instead of the old notification system
 const Attendance = () => {
   const { user } = useAuth();
   const { filteredEmployees, loading: employeesLoading, dataFetched, refreshEmployees } = useEmployees();
   const { currentDate, setCurrentDate } = useAttendance();
-  const { NotificationContainer, success } = useNotification();
+  const {
+    NotificationContainer,
+    showNotification,
+    success,
+    error,
+    info,
+    warning,
+  } = useModernNotification();
   const hasRefreshedRef = useRef(false);
   const lastDateRef = useRef(currentDate);
   
@@ -91,6 +100,7 @@ const Attendance = () => {
 
   const handleSuccessfulSave = () => {
     setDataRefreshTrigger((prev) => prev + 1);
+    success("Attendance saved successfully");
   };
 
   return (

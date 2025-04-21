@@ -1,12 +1,12 @@
 
 import { Download, Calendar, Users } from "lucide-react";
-import { useNotification } from "@/components/ui/notification";
+import { useModernNotification } from "@/hooks/useModernNotification";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import ExportSection from "./components/ExportSection";
 import EmployeeExportSection from "./components/EmployeeExportSection";
 
 const Reports = () => {
-  const { NotificationContainer } = useNotification();
+  const { NotificationContainer } = useModernNotification();
 
   return (
     <div className="space-y-6 animate-fade-in">
