@@ -37,6 +37,16 @@ export const datePickerStyles = {
       "transition-colors duration-200"
     )
   },
+  actions: {
+    button: cn(
+      "px-3 py-1.5 rounded-md text-sm font-medium",
+      "bg-primary text-primary-foreground",
+      "hover:bg-primary/90 dark:hover:bg-primary/80",
+      "transition-colors duration-200",
+      "focus:outline-none focus:ring-2 focus:ring-primary/20",
+      "active:scale-[0.98]"
+    )
+  },
   calendar: {
     wrapper: cn("p-4 pointer-events-auto select-none"),
     nav_button: cn(

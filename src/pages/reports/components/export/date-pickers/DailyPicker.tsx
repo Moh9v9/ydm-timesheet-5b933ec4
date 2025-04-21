@@ -17,7 +17,7 @@ interface DailyPickerProps {
   setSelectedDate: (date: Date) => void;
   open: boolean;
   setOpen: (open: boolean) => void;
-  yearMonthCaptionLayout: any;
+  yearMonthCaptionLayout?: any; // Make this prop optional
 }
 
 const DailyPicker = ({ selectedDate, setSelectedDate, open, setOpen }: DailyPickerProps) => {
