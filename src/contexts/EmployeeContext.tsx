@@ -1,32 +1,22 @@
 
-import { createContext, useContext, ReactNode } from "react";
+import { createContext, useContext, ReactNode, useEffect } from "react";
 import { EmployeeContextType } from "./employee/types";
 import { useEmployeeState } from "./employee/useEmployeeState";
 import { useEmployeeOperations } from "./employee/useEmployeeOperations";
-import { useAttendance } from "@/contexts/AttendanceContext";
-import { employeeMatchesAttendanceFilters } from "./employee/employeeAttendanceFilter";
-import { employeeMatchesFilters } from "./employee/employeeFilter";
+import { useAttendance } from "@/contexts/AttendanceContext"; // for attendance date context
 
 const EmployeeContext = createContext<EmployeeContextType | undefined>(undefined);
 
 export const EmployeeProvider = ({ children }: { children: ReactNode }) => {
-  // Determine if we're in attendance context or regular employees context
-  let isAttendanceView = false;
+  // Get current attendance date from AttendanceContext if available
   let currentAttendanceDate: string | undefined = undefined;
-  
   try {
     const attendanceContext = useAttendance();
-    if (attendanceContext) {
-      isAttendanceView = true;
-      currentAttendanceDate = attendanceContext.currentDate;
-      console.log("EmployeeContext - Got attendance date for filtering:", currentAttendanceDate);
-    }
+    currentAttendanceDate = attendanceContext?.currentDate;
+    console.log("EmployeeContext - Got attendance date for filtering:", currentAttendanceDate);
   } catch (error) {
-    console.log("EmployeeContext - No AttendanceContext available, using regular employee filters");
+    console.log("EmployeeContext - No AttendanceContext available, continuing without date filtering");
   }
-
-  // Use the appropriate filter function based on context
-  const filterFunction = isAttendanceView ? employeeMatchesAttendanceFilters : employeeMatchesFilters;
 
   const {
     employees,
@@ -39,10 +29,7 @@ export const EmployeeProvider = ({ children }: { children: ReactNode }) => {
     error,
     dataFetched,
     refreshEmployees
-  } = useEmployeeState(
-    isAttendanceView ? currentAttendanceDate : undefined,
-    filterFunction
-  );
+  } = useEmployeeState(currentAttendanceDate);
 
   const operations = useEmployeeOperations(
     employees,
@@ -50,6 +37,7 @@ export const EmployeeProvider = ({ children }: { children: ReactNode }) => {
     setLoading
   );
 
+  // Export loading state to consumers to help with synchronization
   return (
     <EmployeeContext.Provider
       value={{
@@ -58,13 +46,9 @@ export const EmployeeProvider = ({ children }: { children: ReactNode }) => {
         filters,
         setFilters,
         loading,
-        // Convert Error object to string if it exists
-        error: error ? error.message : null,
+        error,
         dataFetched,
-        // Make refreshEmployees return a Promise
-        refreshEmployees: async () => {
-          return Promise.resolve(refreshEmployees());
-        },
+        refreshEmployees,
         ...operations
       }}
     >

@@ -1,48 +1,61 @@
 
 import { Employee, EmployeeFilters } from "@/lib/types";
+import { supabase } from "@/integrations/supabase/client";
 
 /**
- * EMPLOYEE-PAGE-SPECIFIC FILTER: Returns true if employee matches all filters.
- * Used only on the Employees page, not affected by attendance filtering.
+ * Returns true if employee passes all filters, including creation date vs. attendance date.
  */
 export async function employeeMatchesFilters(
   employee: Employee,
-  filters: EmployeeFilters
+  filters: EmployeeFilters,
+  currentAttendanceDate?: string
 ): Promise<boolean> {
-  console.log(`Checking employee ${employee.id} (${employee.fullName}) with status ${employee.status} against filters:`, JSON.stringify(filters));
-  
-  // Status filter handling - correctly handle "All" or undefined status filter
-  if (filters.status && filters.status !== "All") {
-    console.log(`Checking if employee ${employee.id} status ${employee.status} matches filter ${filters.status}`);
-    if (employee.status !== filters.status) {
-      console.log(`Employee ${employee.id} filtered out - status doesn't match: ${employee.status} != ${filters.status}`);
+  // Filter out employees who were not created yet on the selected attendance date
+  if (currentAttendanceDate && employee.created_at) {
+    // Extract just the date part from the ISO timestamp for proper comparison
+    const employeeCreationDate = employee.created_at.split('T')[0];
+    
+    // Compare dates as strings - employee should NOT appear in attendance lists for dates BEFORE their creation
+    if (employeeCreationDate > currentAttendanceDate) {
+      console.log(`Employee ${employee.id} (${employee.fullName}) filtered out - created on ${employeeCreationDate}, attendance date: ${currentAttendanceDate}`);
       return false;
     }
   }
-  // For "All" status, skip the status filter - we'll show both Active and Archived
   
-  // Apply other filters
-  if (filters.project && filters.project !== "All" && employee.project !== filters.project) {
-    console.log(`Employee ${employee.id} filtered out - project doesn't match: ${employee.project} != ${filters.project}`);
-    return false;
+  // Status filter handling
+  if (filters.status) {
+    console.log(`Checking status filter for ${employee.fullName}: employee status=${employee.status}, filter status=${filters.status}`);
+    
+    // Apply status filter
+    if (employee.status !== filters.status) {
+      console.log(`Employee ${employee.id} (${employee.fullName}) filtered out - status doesn't match: ${employee.status} != ${filters.status}`);
+      return false;
+    }
   }
   
-  if (filters.location && filters.location !== "All" && employee.location !== filters.location) {
-    console.log(`Employee ${employee.id} filtered out - location doesn't match: ${employee.location} != ${filters.location}`);
-    return false;
+  // For archived employees in attendance view, check if they have a record for the selected date
+  // ONLY apply this check if we're in attendance view (currentAttendanceDate is provided)
+  if (employee.status === "Archived" && currentAttendanceDate && filters.status !== "Archived") {
+    // This check should only run in attendance view when we're not explicitly filtering for archived employees
+    const { data } = await supabase
+      .from('attendance_records')
+      .select('id, present')
+      .eq('employee_uuid', employee.id)
+      .eq('date', currentAttendanceDate)
+      .maybeSingle();
+    
+    if (!data) {
+      console.log(`Archived employee ${employee.id} (${employee.fullName}) filtered out - no record for date: ${currentAttendanceDate}`);
+      return false;
+    }
+    
+    console.log(`Archived employee ${employee.id} (${employee.fullName}) included - has record for date: ${currentAttendanceDate} with present=${data.present}`);
   }
   
-  if (filters.paymentType && filters.paymentType !== "All" && employee.paymentType !== filters.paymentType) {
-    console.log(`Employee ${employee.id} filtered out - payment type doesn't match: ${employee.paymentType} != ${filters.paymentType}`);
-    return false;
-  }
+  if (filters.project && employee.project !== filters.project) return false;
+  if (filters.location && employee.location !== filters.location) return false;
+  if (filters.paymentType && employee.paymentType !== filters.paymentType) return false;
+  if (filters.sponsorship && employee.sponsorship !== filters.sponsorship) return false;
   
-  if (filters.sponsorship && filters.sponsorship !== "All" && employee.sponsorship !== filters.sponsorship) {
-    console.log(`Employee ${employee.id} filtered out - sponsorship doesn't match: ${employee.sponsorship} != ${filters.sponsorship}`);
-    return false;
-  }
-  
-  // If all filters pass, return true
-  console.log(`Employee ${employee.id} passed all filters`);
   return true;
 }

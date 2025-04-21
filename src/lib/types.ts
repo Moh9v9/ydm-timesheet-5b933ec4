@@ -1,4 +1,3 @@
-
 // Authentication & User Management Types
 export type UserRole = "admin" | "user";
 
@@ -64,9 +63,9 @@ export type ReportType = "daily" | "monthly";
 export interface EmployeeFilters {
   project?: string;
   location?: string;
-  paymentType?: PaymentType | string; // Modified to allow "All" string
-  sponsorship?: SponsorshipType | string; // Modified to allow "All" string
-  status?: EmployeeStatus | "All";
+  paymentType?: PaymentType;
+  sponsorship?: SponsorshipType;
+  status?: EmployeeStatus;
 }
 
 export interface AttendanceFilters {

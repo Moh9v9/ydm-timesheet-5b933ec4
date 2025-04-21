@@ -2,102 +2,101 @@
 import { useState, useEffect } from "react";
 import { Employee, EmployeeFilters } from "@/lib/types";
 import { supabase } from "@/integrations/supabase/client";
-import { employeeMatchesFilters } from "./employeeFilter";
 import { formatEmployee } from "./formatEmployee";
+import { employeeMatchesFilters } from "./employeeFilter";
 
-// Use a type for the filter function to improve clarity
-type EmployeeFilterFunction = (
-  employee: Employee, 
-  filters: EmployeeFilters,
-  currentAttendanceDate?: string
-) => Promise<boolean>;
-
-export const useEmployeeState = (
-  currentAttendanceDate?: string,
-  filterFunction: EmployeeFilterFunction = employeeMatchesFilters
-) => {
+export const useEmployeeState = (currentAttendanceDate?: string) => {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [filteredEmployees, setFilteredEmployees] = useState<Employee[]>([]);
   const [filters, setFilters] = useState<EmployeeFilters>({});
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
-  const [dataFetched, setDataFetched] = useState(false);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const [dataFetched, setDataFetched] = useState<boolean>(false);
 
-  // Function to fetch employees
+  // Function to fetch employees from Supabase
   const fetchEmployees = async () => {
+    setLoading(true);
+    setError(null);
     try {
-      setLoading(true);
-      const { data, error } = await supabase.from('employees').select('*');
-      
+      const { data, error } = await supabase
+        .from('employees')
+        .select('*')
+        .order('full_name');
+
       if (error) throw error;
 
-      // Use the formatEmployee utility to properly type the data from the database
-      const formattedEmployees: Employee[] = data.map(employee => formatEmployee(employee));
-      
+      const formattedEmployees = data.map(formatEmployee);
       setEmployees(formattedEmployees);
       setDataFetched(true);
       
-      console.log("Fetched employees: ", formattedEmployees.length, 
-                  "Active:", formattedEmployees.filter(e => e.status === "Active").length,
-                  "Archived:", formattedEmployees.filter(e => e.status === "Archived").length);
-    } catch (error) {
-      console.error('Error fetching employees:', error);
-      setError(error as Error);
+      console.log(`Fetched ${formattedEmployees.length} employees from database`);
+      console.log(`Active: ${formattedEmployees.filter(e => e.status === "Active").length}, Archived: ${formattedEmployees.filter(e => e.status === "Archived").length}`);
+
+      // Apply filters to employees
+      await applyFilters(formattedEmployees, filters);
+    } catch (err) {
+      console.error('Error fetching employees:', err);
+      setError(err instanceof Error ? err.message : 'An unknown error occurred');
     } finally {
       setLoading(false);
     }
   };
 
-  // Function to filter employees using the provided filter function
-  const filterEmployees = async () => {
+  // Function to apply filters to employees
+  const applyFilters = async (emps: Employee[], filts: EmployeeFilters) => {
+    setLoading(true);
     try {
-      setLoading(true);
+      console.log("Applying filters:", filts);
       
-      console.log("Current filters before applying:", JSON.stringify(filters));
-      console.log("Is attendance view:", !!currentAttendanceDate);
-      console.log("Total employees before filtering:", employees.length);
+      if (filts.status === "Archived") {
+        console.log(`Archived status filter active - should show ${emps.filter(e => e.status === "Archived").length} employees`);
+      } else if (filts.status) {
+        console.log(`Status filter active: ${filts.status}`);
+        console.log(`Employees before status filter: ${emps.length}`);
+        console.log(`Employees with status ${filts.status}: ${emps.filter(e => e.status === filts.status).length}`);
+      }
       
-      const filtered = await Promise.all(
-        employees.map(async (employee) => {
-          const passes = await filterFunction(employee, filters, currentAttendanceDate);
-          return { employee, passes };
-        })
+      // Map each employee through the filter function (now async)
+      const filterPromises = emps.map(emp => 
+        employeeMatchesFilters(emp, filts, currentAttendanceDate)
+          .then(passes => passes ? emp : null)
       );
       
-      const newFilteredEmployees = filtered
-        .filter(({ passes }) => passes)
-        .map(({ employee }) => employee);
+      // Wait for all filter promises to resolve
+      const filterResults = await Promise.all(filterPromises);
       
-      console.log("Filtered employees: ", newFilteredEmployees.length, 
-                  "Active:", newFilteredEmployees.filter(e => e.status === "Active").length,
-                  "Archived:", newFilteredEmployees.filter(e => e.status === "Archived").length,
-                  "Applied filters:", JSON.stringify(filters),
-                  "Is on employees page:", !currentAttendanceDate);
+      // Filter out null values (employees that didn't pass)
+      const filtered = filterResults.filter(emp => emp !== null) as Employee[];
       
-      setFilteredEmployees(newFilteredEmployees);
-    } catch (error) {
-      console.error('Error filtering employees:', error);
-      setError(error as Error);
+      setFilteredEmployees(filtered);
+      console.log(`🔍 useEmployeeState - filtered employees: ${filtered.length} of ${emps.length} total with attendance date: ${currentAttendanceDate || 'none'}`);
+      
+      if (filts.status) {
+        console.log(`After filtering - employees with status ${filts.status}: ${filtered.filter(e => e.status === filts.status).length}`);
+      }
+    } catch (err) {
+      console.error('Error applying filters:', err);
     } finally {
       setLoading(false);
     }
   };
 
-  // Fetch employees on mount
-  useEffect(() => {
-    fetchEmployees();
-  }, []);
-
-  // Filter employees when filters or employees change
+  // Apply filters whenever employees or filters change
   useEffect(() => {
     if (employees.length > 0) {
-      filterEmployees();
+      applyFilters(employees, filters);
     }
   }, [employees, filters, currentAttendanceDate]);
 
-  const refreshEmployees = () => {
-    fetchEmployees();
+  // Function to refresh employees - modified to return a Promise
+  const refreshEmployees = async (): Promise<void> => {
+    return await fetchEmployees();
   };
+
+  // Fetch employees on component mount
+  useEffect(() => {
+    fetchEmployees();
+  }, []);
 
   return {
     employees,

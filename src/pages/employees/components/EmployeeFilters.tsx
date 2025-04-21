@@ -1,6 +1,5 @@
 
 import { EmployeeFilters } from "@/lib/types";
-import { StyledSelect } from "@/components/ui/styled-select";
 
 interface EmployeeFiltersProps {
   filters: EmployeeFilters;
@@ -23,68 +22,71 @@ export const EmployeeFiltersSection = ({
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
       <div>
         <label className="block text-sm font-medium mb-1">Project</label>
-        <StyledSelect
+        <select
           value={filters.project || "All"}
-          onValueChange={(value) => onFilterChange("project", value)}
-          placeholder="Select Project"
-          options={[
-            { value: "All", label: "All Projects" },
-            ...projects.map(project => ({ value: project, label: project }))
-          ]}
-        />
+          onChange={(e) => onFilterChange("project", e.target.value)}
+          className="w-full border border-input rounded-md p-2 bg-background dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:focus:ring-primary"
+        >
+          <option value="All">All Projects</option>
+          {projects.map((project) => (
+            <option key={project} value={project}>{project}</option>
+          ))}
+        </select>
       </div>
       
       <div>
         <label className="block text-sm font-medium mb-1">Location</label>
-        <StyledSelect
+        <select
           value={filters.location || "All"}
-          onValueChange={(value) => onFilterChange("location", value)}
-          placeholder="Select Location"
-          options={[
-            { value: "All", label: "All Locations" },
-            ...locations.map(location => ({ value: location, label: location }))
-          ]}
-        />
+          onChange={(e) => onFilterChange("location", e.target.value)}
+          className="w-full border border-input rounded-md p-2 bg-background dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:focus:ring-primary"
+        >
+          <option value="All">All Locations</option>
+          {locations.map((location) => (
+            <option key={location} value={location}>{location}</option>
+          ))}
+        </select>
       </div>
       
       <div>
         <label className="block text-sm font-medium mb-1">Payment Type</label>
-        <StyledSelect
+        <select
           value={filters.paymentType || "All"}
-          onValueChange={(value) => onFilterChange("paymentType", value)}
-          placeholder="Select Payment Type"
-          options={[
-            { value: "All", label: "All Types" },
-            ...paymentTypes.map(type => ({ value: type, label: type }))
-          ]}
-        />
+          onChange={(e) => onFilterChange("paymentType", e.target.value)}
+          className="w-full border border-input rounded-md p-2 bg-background dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:focus:ring-primary"
+        >
+          <option value="All">All Types</option>
+          {paymentTypes.map((type) => (
+            <option key={type} value={type}>{type}</option>
+          ))}
+        </select>
       </div>
       
       <div>
         <label className="block text-sm font-medium mb-1">Sponsorship</label>
-        <StyledSelect
+        <select
           value={filters.sponsorship || "All"}
-          onValueChange={(value) => onFilterChange("sponsorship", value)}
-          placeholder="Select Sponsorship"
-          options={[
-            { value: "All", label: "All Sponsorships" },
-            ...sponsorshipTypes.map(type => ({ value: type, label: type }))
-          ]}
-        />
+          onChange={(e) => onFilterChange("sponsorship", e.target.value)}
+          className="w-full border border-input rounded-md p-2 bg-background dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:focus:ring-primary"
+        >
+          <option value="All">All Sponsorships</option>
+          {sponsorshipTypes.map((type) => (
+            <option key={type} value={type}>{type}</option>
+          ))}
+        </select>
       </div>
       
       <div>
         <label className="block text-sm font-medium mb-1">Status</label>
-        <StyledSelect
+        <select
           value={filters.status || "All"}
-          onValueChange={(value) => onFilterChange("status", value)}
-          placeholder="Select Status"
-          options={[
-            { value: "All", label: "All Statuses" },
-            { value: "Active", label: "Active Only" },
-            { value: "Archived", label: "Archived Only" }
-          ]}
-        />
+          onChange={(e) => onFilterChange("status", e.target.value)}
+          className="w-full border border-input rounded-md p-2 bg-background dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:focus:ring-primary"
+        >
+          <option value="All">All Status</option>
+          <option value="Active">Active Only</option>
+          <option value="Archived">Archived Only</option>
+        </select>
       </div>
     </div>
   );
