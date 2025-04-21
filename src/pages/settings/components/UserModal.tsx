@@ -3,7 +3,7 @@ import { User } from "@/lib/types";
 import { UserForm } from "./UserForm";
 import { X } from "lucide-react";
 import { useEffect } from "react";
-import { toast } from "@/components/ui/sonner";
+import { useModernNotification } from "@/hooks/useModernNotification";
 
 interface UserModalProps {
   isOpen: boolean;

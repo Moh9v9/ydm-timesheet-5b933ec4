@@ -1,7 +1,7 @@
 
 import React, { useState } from "react";
 import { useTimeZone } from "@/contexts/TimeZoneContext";
-import { toast } from "sonner";
+import { useModernNotification } from "@/hooks/useModernNotification";
 
 // A selection of common time zones for demonstration.
 const allTimeZones = [
@@ -20,11 +20,12 @@ const allTimeZones = [
 
 const TimeZoneSettingsSection = () => {
   const { timeZone, setTimeZone } = useTimeZone();
+  const { success } = useModernNotification();
   const [selectedTZ, setSelectedTZ] = useState(timeZone);
 
   const handleApply = () => {
     setTimeZone(selectedTZ);
-    toast.success(`Time zone set to ${selectedTZ}`);
+    success(`Time zone set to ${selectedTZ}`);
   };
 
   return (
