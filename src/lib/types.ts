@@ -39,6 +39,7 @@ export interface Employee {
   rateOfPayment: number;
   sponsorship: SponsorshipType;
   status: EmployeeStatus;
+  created_at?: string; // Added to support attendance filtering (ISO string)
 }
 
 // Attendance Types

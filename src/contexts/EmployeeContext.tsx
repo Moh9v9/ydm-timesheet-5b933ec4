@@ -1,12 +1,21 @@
-
 import { createContext, useContext, ReactNode } from "react";
 import { EmployeeContextType } from "./employee/types";
 import { useEmployeeState } from "./employee/useEmployeeState";
 import { useEmployeeOperations } from "./employee/useEmployeeOperations";
+import { useAttendance } from "@/contexts/AttendanceContext"; // for attendance date context
 
 const EmployeeContext = createContext<EmployeeContextType | undefined>(undefined);
 
 export const EmployeeProvider = ({ children }: { children: ReactNode }) => {
+  // Only try get attendance date if inside a page that provides it (Attendance)
+  let currentAttendanceDate: string | undefined = undefined;
+  try {
+    // Will fail if AttendanceContext doesn't exist, swallow error silently
+    // @ts-ignore
+    currentAttendanceDate = useAttendance?.().currentDate;
+  } catch {}
+
+  // --- Pass currentAttendanceDate into hook so employee filtering is correct ---
   const {
     employees,
     setEmployees,
@@ -18,7 +27,7 @@ export const EmployeeProvider = ({ children }: { children: ReactNode }) => {
     error,
     dataFetched,
     refreshEmployees
-  } = useEmployeeState();
+  } = useEmployeeState(currentAttendanceDate);
 
   const operations = useEmployeeOperations(
     employees,
