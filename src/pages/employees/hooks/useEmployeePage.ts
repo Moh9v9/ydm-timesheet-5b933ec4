@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useEmployees } from "@/contexts/EmployeeContext";
-import { Employee } from "@/lib/types";
+import { Employee, EmployeeFilters } from "@/lib/types";
 import { toast } from "sonner";
 
 export const useEmployeePage = () => {
@@ -28,20 +28,24 @@ export const useEmployeePage = () => {
     sponsorshipTypes: ["YDM co", "YDM est", "Outside"]
   };
 
-  const handleFilterChange = (key: keyof typeof filters, value: string) => {
+  const handleFilterChange = (key: keyof EmployeeFilters, value: string) => {
     console.log(`Filter changed: ${key} = ${value}`);
     
-    const newFilters = { ...filters };
+    const newFilters = { ...filters } as EmployeeFilters;
     
     // Handle "All" value specifically - we still want to keep it in the filters
     // so the UI shows the correct dropdown selection
     if (value === "All") {
-      newFilters[key] = "All";
+      if (key === "status") {
+        newFilters[key] = "All";
+      } else {
+        newFilters[key] = "All" as any;
+      }
       setFilters(newFilters);
       console.log(`Set ${key} filter to All`);
     } else {
-      // Set the specific filter value
-      newFilters[key] = value;
+      // Set the specific filter value - we need to cast to ensure type safety
+      newFilters[key] = value as any;
       setFilters(newFilters);
       console.log(`Set ${key} filter to ${value}`);
     }
