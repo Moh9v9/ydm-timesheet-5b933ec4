@@ -32,6 +32,7 @@ const DateRangeInputs = ({ reportType, currentDate, selectedDate, setSelectedDat
         setSelectedDate={setSelectedDate}
         open={open}
         setOpen={setOpen}
+        showCalendarView={true}
       />
     );
   }
