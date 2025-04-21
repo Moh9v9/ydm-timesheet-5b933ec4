@@ -12,7 +12,7 @@ export const AttendanceChart = ({
 }: AttendanceChartProps) => {
   return (
     <div className="bg-card shadow-sm rounded-lg p-6 border">
-      <h2 className="text-lg font-medium mb-4">Today's Attendance Summary</h2>
+      {/* Removed the "Today's Attendance Summary" heading */}
       <div className="flex items-center justify-center h-32">
         <div className="flex items-end space-x-4">
           <div className="flex flex-col items-center">
