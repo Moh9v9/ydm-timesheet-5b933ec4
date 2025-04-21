@@ -1,4 +1,3 @@
-
 import { cn } from "@/lib/utils";
 
 export const datePickerStyles = {
@@ -12,22 +11,25 @@ export const datePickerStyles = {
     "focus:outline-none focus:ring-2 focus:ring-primary/20 dark:focus:ring-primary/20",
     "active:scale-[0.98]"
   ),
-  select: cn(
-    "appearance-none pl-3 pr-8 py-1.5 rounded-md",
-    "text-sm font-medium transition-colors duration-200",
-    "bg-transparent border border-gray-200",
-    "text-gray-900 hover:bg-gray-50",
-    "dark:border-gray-700 dark:text-gray-100 dark:hover:bg-gray-700/50",
-    "focus:outline-none focus:ring-2 focus:ring-primary/20",
-    "dark:focus:ring-primary/40",
-    "cursor-pointer relative min-w-[100px]"
+  popoverContent: cn(
+    "p-0 w-auto bg-white dark:bg-gray-800 border dark:border-gray-700",
+    "rounded-lg shadow-lg backdrop-blur-sm"
   ),
-  popoverContent: "p-0 w-auto bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-lg shadow-lg",
+  dropdownWrapper: cn(
+    "p-4 space-y-4",
+    "dark:bg-gray-800/95 backdrop-blur-sm"
+  ),
+  dropdownHeader: cn(
+    "flex items-center justify-between mb-2",
+    "border-b dark:border-gray-700 pb-2"
+  ),
+  dropdownTitle: "text-base font-medium dark:text-gray-100",
+  dropdownGrid: "grid grid-cols-2 gap-3",
   navigation: {
     button: cn(
       "inline-flex items-center justify-center rounded-md p-1.5",
       "text-gray-500 hover:bg-gray-100",
-      "dark:text-gray-400 dark:hover:bg-gray-800",
+      "dark:text-gray-400 dark:hover:bg-gray-700/50",
       "transition-colors duration-200"
     )
   },
@@ -37,6 +39,18 @@ export const datePickerStyles = {
       "bg-primary text-white hover:bg-primary/90",
       "dark:bg-primary dark:hover:bg-primary/90",
       "transition-colors duration-200",
+      "focus:outline-none focus:ring-2 focus:ring-primary/20"
+    )
+  },
+  select: {
+    wrapper: "min-w-[120px]",
+    trigger: cn(
+      "w-full h-9 px-3",
+      "flex items-center justify-between",
+      "rounded-md border border-gray-200",
+      "text-sm font-medium",
+      "dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100",
+      "hover:bg-gray-50 dark:hover:bg-gray-700/50",
       "focus:outline-none focus:ring-2 focus:ring-primary/20"
     )
   },

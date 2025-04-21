@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
@@ -40,13 +39,6 @@ const DailyPicker = ({
     label: format(new Date(2000, i, 1), "MMMM")
   }));
 
-  const handleSelect = (date: Date | undefined) => {
-    if (date) {
-      setSelectedDate(date);
-      setOpen(false);
-    }
-  };
-
   return (
     <div className={datePickerStyles.container}>
       <label className={datePickerStyles.label}>
@@ -54,19 +46,16 @@ const DailyPicker = ({
       </label>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
-          <button className={cn(
-            datePickerStyles.trigger,
-            "flex items-center justify-between gap-4"
-          )}>
+          <button className={datePickerStyles.trigger}>
             <span>{format(selectedDate, showCalendarView ? "PPP" : "MMMM yyyy")}</span>
-            <ChevronRight className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+            <ChevronRight className="h-4 w-4 opacity-60" />
           </button>
         </PopoverTrigger>
         <PopoverContent className={datePickerStyles.popoverContent} align="start">
           {!showCalendarView ? (
-            <div className="p-4 space-y-4">
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="text-base font-medium dark:text-gray-100">
+            <div className={datePickerStyles.dropdownWrapper}>
+              <div className={datePickerStyles.dropdownHeader}>
+                <h3 className={datePickerStyles.dropdownTitle}>
                   {format(selectedDate, "MMMM yyyy")}
                 </h3>
                 <div className="flex space-x-2">
@@ -93,7 +82,7 @@ const DailyPicker = ({
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className={datePickerStyles.dropdownGrid}>
                 <StyledSelect
                   value={String(selectedDate.getFullYear())}
                   onValueChange={(value) => {
@@ -103,6 +92,7 @@ const DailyPicker = ({
                   }}
                   options={years}
                   placeholder="Select Year"
+                  className="min-w-[120px]"
                 />
                 <StyledSelect
                   value={String(selectedDate.getMonth())}
@@ -113,6 +103,7 @@ const DailyPicker = ({
                   }}
                   options={months}
                   placeholder="Select Month"
+                  className="min-w-[120px]"
                 />
               </div>
 
@@ -129,7 +120,12 @@ const DailyPicker = ({
             <Calendar
               mode="single"
               selected={selectedDate}
-              onSelect={handleSelect}
+              onSelect={(date) => {
+                if (date) {
+                  setSelectedDate(date);
+                  setOpen(false);
+                }
+              }}
               initialFocus
               className={cn(datePickerStyles.calendar.wrapper, "pointer-events-auto")}
               classNames={{
