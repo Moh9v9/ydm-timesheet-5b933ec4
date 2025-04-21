@@ -34,11 +34,6 @@ const AttendanceTableRow = ({
 
   const isArchived = employee.status === "Archived";
 
-  // Add debugging for archived employees
-  if (isArchived) {
-    console.log(`Rendering archived employee row: ${employee.fullName} (${employee.id})`);
-  }
-
   return (
     <TooltipProvider>
       <tr
@@ -65,6 +60,9 @@ const AttendanceTableRow = ({
           <div>
             <div className={`font-medium ${isArchived ? "text-red-500 dark:text-red-400" : ""}`}>
               {employee.fullName}
+              {isArchived && (
+                <span className="text-xs text-gray-500 ml-2">(archived)</span>
+              )}
             </div>
             <div className="text-xs text-muted-foreground">
               {employee.iqamaNo || "No Iqama"}
