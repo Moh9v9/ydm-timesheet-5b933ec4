@@ -10,20 +10,20 @@ export const useAttendanceData = (canEdit: boolean, refreshTrigger: number = 0) 
   const [attendanceData, setAttendanceData] = useState<AttendanceRecord[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [lastFetchedDate, setLastFetchedDate] = useState<string>('');
-  const [retryCount, setRetryCount] = useState(0);
+  const [hasAttemptedFetch, setHasAttemptedFetch] = useState(false);
 
   // Effect to fetch attendance data only when date changes, employees load, or explicit refresh is triggered
   useEffect(() => {
     // Only fetch if we have employees
     if (filteredEmployees.length > 0) {
-      // Check if we should fetch based on date change, refresh trigger, or retry logic
+      // Check if we should fetch based on date change, refresh trigger
       const shouldFetch = 
         currentDate !== lastFetchedDate || 
         refreshTrigger > 0 || 
-        (attendanceData.length === 0 && retryCount < 3);
+        !hasAttemptedFetch;
       
       if (shouldFetch) {
-        console.log(`Fetching attendance data: date=${currentDate}, employees=${filteredEmployees.length}, lastFetch=${lastFetchedDate}, refreshTrigger=${refreshTrigger}, retry=${retryCount}`);
+        console.log(`Fetching attendance data: date=${currentDate}, employees=${filteredEmployees.length}, lastFetch=${lastFetchedDate}, refreshTrigger=${refreshTrigger}, hasAttempted=${hasAttemptedFetch}`);
         
         const fetchAttendanceData = async () => {
           setIsLoading(true);
@@ -54,11 +54,9 @@ export const useAttendanceData = (canEdit: boolean, refreshTrigger: number = 0) 
             console.log(`Loaded ${results.length} attendance records for ${currentDate}`);
             setAttendanceData(results);
             setLastFetchedDate(currentDate); // Update last fetched date
-            setRetryCount(0); // Reset retry count on successful load
+            setHasAttemptedFetch(true); // Mark that we've attempted to fetch
           } catch (error) {
             console.error("Error fetching attendance data:", error);
-            // If we fail, increment retry count to try again
-            setRetryCount(prev => prev + 1);
           } finally {
             setIsLoading(false);
           }
@@ -66,13 +64,10 @@ export const useAttendanceData = (canEdit: boolean, refreshTrigger: number = 0) 
         
         fetchAttendanceData();
       }
-    } else if (!employeesLoading && filteredEmployees.length === 0 && retryCount < 3) {
-      // If no employees are loaded yet and we're not in loading state, retry after a delay
-      const retryTimer = setTimeout(() => {
-        setRetryCount(prev => prev + 1);
-      }, 1000); // Wait 1 second before retrying
-      
-      return () => clearTimeout(retryTimer);
+    } else if (!employeesLoading && filteredEmployees.length === 0 && !hasAttemptedFetch) {
+      // If we have no employees and are done loading, mark as attempted to prevent looping
+      setHasAttemptedFetch(true);
+      setIsLoading(false);
     }
   }, [
     filteredEmployees, 
@@ -80,9 +75,8 @@ export const useAttendanceData = (canEdit: boolean, refreshTrigger: number = 0) 
     getRecordsByEmployeeAndDate, 
     lastFetchedDate, 
     employeesLoading, 
-    attendanceData.length, 
     refreshTrigger,
-    retryCount
+    hasAttemptedFetch
   ]);
 
   const toggleAttendance = (index: number) => {

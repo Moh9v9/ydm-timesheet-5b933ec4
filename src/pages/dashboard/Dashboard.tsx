@@ -7,6 +7,7 @@ import { useStatistics } from "@/hooks/useStatistics";
 import Attendance from "@/pages/attendance/Attendance";
 import { useAttendance } from "@/contexts/AttendanceContext";
 import { useEffect } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -37,7 +38,6 @@ const Dashboard = () => {
     // Set date when component mounts
     getCurrentDate();
     
-    // No more automatic refresh for date
   }, [setCurrentDate]);
 
   return (
@@ -46,7 +46,7 @@ const Dashboard = () => {
         <div>
           <h1 className="text-2xl font-bold">Dashboard</h1>
           <p className="text-muted-foreground">
-            Welcome back, {user?.fullName}
+            Welcome back, {user?.fullName || "User"}
           </p>
         </div>
         <div className="mt-2 md:mt-0 text-sm font-medium text-muted-foreground">
@@ -55,24 +55,34 @@ const Dashboard = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-        <StatsCard
-          icon={User}
-          title="Total Employees"
-          value={stats.totalEmployees}
-          colorClass="bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400"
-        />
-        <StatsCard
-          icon={UserCheck}
-          title="Total Present"
-          value={stats.presentToday}
-          colorClass="bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-400"
-        />
-        <StatsCard
-          icon={UserX}
-          title="Total Absent"
-          value={stats.absentToday}
-          colorClass="bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-400"
-        />
+        {!user ? (
+          <>
+            <Skeleton className="h-24" />
+            <Skeleton className="h-24" />
+            <Skeleton className="h-24" />
+          </>
+        ) : (
+          <>
+            <StatsCard
+              icon={User}
+              title="Total Employees"
+              value={stats.totalEmployees}
+              colorClass="bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400"
+            />
+            <StatsCard
+              icon={UserCheck}
+              title="Total Present"
+              value={stats.presentToday}
+              colorClass="bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-400"
+            />
+            <StatsCard
+              icon={UserX}
+              title="Total Absent"
+              value={stats.absentToday}
+              colorClass="bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-400"
+            />
+          </>
+        )}
       </div>
 
       <div className="mt-6">
