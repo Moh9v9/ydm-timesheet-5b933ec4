@@ -1,3 +1,4 @@
+
 import { useAuth } from "@/contexts/AuthContext";
 import { format } from "date-fns";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -13,9 +14,9 @@ const Index = () => {
   const formattedDate = format(today, "EEEE, MMMM d, yyyy");
   
   // Get attendance statistics
-  const stats = useStatistics();
+  const { totalEmployees, presentToday, absentToday, isLoading } = useStatistics();
   
-  console.log("Dashboard rendering with stats:", stats);
+  console.log("Dashboard rendering with stats:", { totalEmployees, presentToday, absentToday, isLoading });
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -39,9 +40,10 @@ const Index = () => {
         </div>
       ) : (
         <CardInformation
-          totalEmployees={stats.totalEmployees}
-          presentToday={stats.presentToday}
-          absentToday={stats.absentToday}
+          totalEmployees={totalEmployees}
+          presentToday={presentToday}
+          absentToday={absentToday}
+          isLoading={isLoading}
         />
       )}
 
