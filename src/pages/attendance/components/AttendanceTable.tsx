@@ -1,9 +1,11 @@
 
-import { useState } from "react";
 import { AttendanceRecord } from "@/lib/types";
 import { Employee } from "@/lib/types";
 import AttendanceTableRow from "./AttendanceTableRow";
-import { ArrowDown, ArrowUp, AlertCircle } from "lucide-react";
+import AttendanceTableEmptyState from "./AttendanceTableEmptyState";
+import { useAttendanceTableSort, SortField } from "./useAttendanceTableSort";
+import SortIcon from "./SortIcon";
+import React from "react";
 
 interface AttendanceTableProps {
   attendanceData: AttendanceRecord[];
@@ -17,9 +19,6 @@ interface AttendanceTableProps {
   employeesLoaded?: boolean;
 }
 
-type SortField = "employee" | "status" | "startTime" | "endTime" | "overtimeHours" | "notes";
-type SortDirection = "asc" | "desc";
-
 const AttendanceTable = ({
   attendanceData,
   filteredEmployees,
@@ -31,136 +30,21 @@ const AttendanceTable = ({
   isLoading = false,
   employeesLoaded = false,
 }: AttendanceTableProps) => {
-  const [sortField, setSortField] = useState<SortField>("employee");
-  const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
+  const {
+    sortField,
+    sortDirection,
+    handleSort,
+    getSortedData,
+  } = useAttendanceTableSort({ attendanceData, filteredEmployees });
 
-  const handleSort = (field: SortField) => {
-    if (sortField === field) {
-      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
-    } else {
-      setSortField(field);
-      setSortDirection("asc");
-    }
-  };
-
-  const getSortedData = () => {
-    // Create a new array with original indices to track position
-    const indexedData = attendanceData.map((record, index) => ({
-      record,
-      originalIndex: index
-    }));
-    
-    indexedData.sort((a, b) => {
-      const employeeA = filteredEmployees.find(emp => emp.id === a.record.employeeId);
-      const employeeB = filteredEmployees.find(emp => emp.id === b.record.employeeId);
-      
-      if (!employeeA || !employeeB) return 0;
-
-      const direction = sortDirection === "asc" ? 1 : -1;
-      
-      switch (sortField) {
-        case "employee":
-          return direction * employeeA.fullName.localeCompare(employeeB.fullName);
-        case "status":
-          return direction * (Number(a.record.present) - Number(b.record.present));
-        case "startTime":
-          return direction * (a.record.startTime || "").localeCompare(b.record.startTime || "");
-        case "endTime":
-          return direction * (a.record.endTime || "").localeCompare(b.record.endTime || "");
-        case "overtimeHours":
-          return direction * ((a.record.overtimeHours || 0) - (b.record.overtimeHours || 0));
-        case "notes":
-          return direction * (a.record.note || "").localeCompare(b.record.note || "");
-        default:
-          return 0;
-      }
-    });
-
-    return indexedData;
-  };
-
-  const SortIcon = ({ field }: { field: SortField }) => {
-    if (sortField !== field) return null;
-    return sortDirection === "asc" ? (
-      <ArrowDown className="inline-block ml-1 h-4 w-4" />
-    ) : (
-      <ArrowUp className="inline-block ml-1 h-4 w-4" />
-    );
-  };
-
-  // Check if we have both attendance data AND employee data
   const hasData = attendanceData.length > 0 && filteredEmployees.length > 0;
+  const sortedData = getSortedData();
 
+  // Debug log just in case
   console.log("🔍 AttendanceTable render - Loading:", isLoading, 
     "Employees Loaded:", employeesLoaded, 
     "Filtered Employees:", filteredEmployees.length,
     "Attendance Data:", attendanceData.length);
-
-  // Enhanced empty state message
-  const getEmptyStateMessage = () => {
-    if (isLoading) {
-      return (
-        <tr>
-          <td colSpan={6} className="text-center py-6">
-            <div className="flex justify-center items-center">
-              <div className="animate-spin h-5 w-5 mr-3 border-t-2 border-b-2 border-primary rounded-full"></div>
-              Loading attendance records...
-            </div>
-          </td>
-        </tr>
-      );
-    }
-    
-    if (!employeesLoaded) {
-      return (
-        <tr>
-          <td colSpan={6} className="text-center py-6">
-            <div className="flex justify-center items-center">
-              <div className="animate-spin h-5 w-5 mr-3 border-t-2 border-b-2 border-primary rounded-full"></div>
-              Loading employee data...
-            </div>
-          </td>
-        </tr>
-      );
-    }
-    
-    if (filteredEmployees.length === 0) {
-      return (
-        <tr>
-          <td colSpan={6} className="text-center py-8">
-            <div className="flex flex-col items-center space-y-2">
-              <AlertCircle size={24} className="text-amber-500" />
-              <div className="text-muted-foreground font-medium">No employees found</div>
-              <div className="text-sm text-center max-w-md">
-                You need to add employees first before you can manage attendance. 
-                Please navigate to the Employees section and add some employees.
-              </div>
-            </div>
-          </td>
-        </tr>
-      );
-    }
-    
-    if (attendanceData.length === 0) {
-      return (
-        <tr>
-          <td colSpan={6} className="text-center py-4">
-            <div className="text-muted-foreground">
-              No attendance records found for this date
-            </div>
-          </td>
-        </tr>
-      );
-    }
-    
-    return (
-      <tr>
-        <td colSpan={6} className="text-center py-4">
-          No matching employees found with current filters
-        </td>
-      </tr>
-    );
-  };
 
   return (
     <div className="bg-card shadow-sm rounded-lg border overflow-hidden">
@@ -172,43 +56,43 @@ const AttendanceTable = ({
                 className="text-left p-3 font-medium cursor-pointer hover:bg-muted/30"
                 onClick={() => handleSort("employee")}
               >
-                Employee <SortIcon field="employee" />
+                Employee <SortIcon field="employee" currentField={sortField} direction={sortDirection} />
               </th>
               <th 
                 className="text-left p-3 font-medium cursor-pointer hover:bg-muted/30"
                 onClick={() => handleSort("status")}
               >
-                Status <SortIcon field="status" />
+                Status <SortIcon field="status" currentField={sortField} direction={sortDirection} />
               </th>
               <th 
                 className="text-left p-3 font-medium cursor-pointer hover:bg-muted/30"
                 onClick={() => handleSort("startTime")}
               >
-                Start Time <SortIcon field="startTime" />
+                Start Time <SortIcon field="startTime" currentField={sortField} direction={sortDirection} />
               </th>
               <th 
                 className="text-left p-3 font-medium cursor-pointer hover:bg-muted/30"
                 onClick={() => handleSort("endTime")}
               >
-                End Time <SortIcon field="endTime" />
+                End Time <SortIcon field="endTime" currentField={sortField} direction={sortDirection} />
               </th>
               <th 
                 className="text-left p-3 font-medium cursor-pointer hover:bg-muted/30"
                 onClick={() => handleSort("overtimeHours")}
               >
-                Overtime Hours <SortIcon field="overtimeHours" />
+                Overtime Hours <SortIcon field="overtimeHours" currentField={sortField} direction={sortDirection} />
               </th>
               <th 
                 className="text-left p-3 font-medium cursor-pointer hover:bg-muted/30"
                 onClick={() => handleSort("notes")}
               >
-                Notes <SortIcon field="notes" />
+                Notes <SortIcon field="notes" currentField={sortField} direction={sortDirection} />
               </th>
             </tr>
           </thead>
           <tbody>
-            {hasData && getSortedData().some(({ record }) => filteredEmployees.find(emp => emp.id === record.employeeId)) ? (
-              getSortedData().map(({ record, originalIndex }) => {
+            {hasData && sortedData.some(({ record }) => filteredEmployees.find(emp => emp.id === record.employeeId)) ? (
+              sortedData.map(({ record, originalIndex }) => {
                 const employee = filteredEmployees.find(
                   emp => emp.id === record.employeeId
                 );
@@ -229,7 +113,12 @@ const AttendanceTable = ({
                 );
               })
             ) : (
-              getEmptyStateMessage()
+              <AttendanceTableEmptyState
+                isLoading={isLoading}
+                employeesLoaded={employeesLoaded}
+                filteredEmployeesLength={filteredEmployees.length}
+                attendanceDataLength={attendanceData.length}
+              />
             )}
           </tbody>
         </table>
