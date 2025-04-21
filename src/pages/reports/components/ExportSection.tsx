@@ -20,7 +20,7 @@ import {
   generateFileContent, 
   downloadFile 
 } from "@/lib/reportUtils";
-import { format, parse } from "date-fns";
+import { format, parse, endOfMonth } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
 
 const ExportSection = () => {
@@ -71,15 +71,16 @@ const ExportSection = () => {
         // Get the month and year from selected date for monthly reports
         const selectedMonth = selectedDate.getMonth();
         const selectedYear = selectedDate.getFullYear();
+        const lastDayOfMonth = endOfMonth(selectedDate);
         
-        // Add date filtering for the selected month
+        // Add date filtering for the selected month - using the proper last day of month
         query = query.gte('date', `${selectedYear}-${String(selectedMonth + 1).padStart(2, '0')}-01`)
-                     .lte('date', `${selectedYear}-${String(selectedMonth + 1).padStart(2, '0')}-31`);
+                     .lte('date', format(lastDayOfMonth, 'yyyy-MM-dd'));
         
         // Add employee filter if an employee is selected
         if (searchTerm && searchTerm !== "") {
           console.log(`Filtering attendance records by employee: ${searchTerm}`);
-          query = query.eq('employee_name', searchTerm);
+          query = query.ilike('employee_name', `%${searchTerm}%`);
         }
         
         // Apply payment type filter if selected
@@ -112,7 +113,28 @@ const ExportSection = () => {
         // we need to handle that separately
         if (includeInactive && (selectedPaymentType === "all" || !selectedPaymentType)) {
           console.log('Including inactive employees in the report');
-          // No additional filtering needed here as we're not filtering out archived employees
+          
+          // Get all employee IDs regardless of status
+          const { data: allEmployees } = await supabase
+            .from('employees')
+            .select('id')
+            .or('status.eq.Active,status.eq.Archived');
+          
+          if (allEmployees && allEmployees.length > 0) {
+            const employeeIds = allEmployees.map(emp => emp.id);
+            query = query.in('employee_uuid', employeeIds);
+          }
+        } else if (!includeInactive && (selectedPaymentType === "all" || !selectedPaymentType)) {
+          // If not including inactive and no specific payment type, only get active employees
+          const { data: activeEmployees } = await supabase
+            .from('employees')
+            .select('id')
+            .eq('status', 'Active');
+            
+          if (activeEmployees && activeEmployees.length > 0) {
+            const employeeIds = activeEmployees.map(emp => emp.id);
+            query = query.in('employee_uuid', employeeIds);
+          }
         }
           
         const { data, error: fetchError } = await query;
@@ -138,7 +160,7 @@ const ExportSection = () => {
       } else if (searchTerm && searchTerm !== "") {
         // For daily reports, filter the existing records by employee name and present status
         allRecords = allRecords.filter(record => 
-          record.employeeName === searchTerm && record.present
+          record.employeeName.toLowerCase().includes(searchTerm.toLowerCase()) && record.present
         );
       } else {
         // For daily reports without employee filter, only get present records
