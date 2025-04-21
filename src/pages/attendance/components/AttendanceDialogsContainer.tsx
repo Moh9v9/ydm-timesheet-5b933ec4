@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import AttendanceDialogs from "./AttendanceDialogs";
 import { AttendanceRecord } from "@/lib/types";
@@ -35,6 +36,26 @@ const AttendanceDialogsContainer = ({
     handleBulkUpdate
   } = useAttendanceOperations(canEdit);
 
+  const handleConfirmSave = async () => {
+    if (!canEdit || isSubmitting) return;
+    
+    setIsSubmitting(true);
+    try {
+      console.log("Starting confirm save with", attendanceData.length, "records");
+      const result = await confirmSave(attendanceData);
+      console.log("Save completed, refreshing data");
+      refreshData();
+      if (onSuccessfulSave) {
+        onSuccessfulSave();
+      }
+      setShowSaveConfirm(false);
+    } catch (err) {
+      console.error("Error during save:", err);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <AttendanceDialogs
       showBulkUpdate={showBulkUpdate}
@@ -53,16 +74,7 @@ const AttendanceDialogsContainer = ({
             setIsSubmitting(false);
           });
       }}
-      onConfirmSave={async () => {
-        setIsSubmitting(true);
-        try {
-          await confirmSave(attendanceData);
-          refreshData();
-          if (onSuccessfulSave) onSuccessfulSave();
-        } finally {
-          setIsSubmitting(false);
-        }
-      }}
+      onConfirmSave={handleConfirmSave}
       attendanceData={attendanceData}
       isSubmitting={isSubmitting}
     />
