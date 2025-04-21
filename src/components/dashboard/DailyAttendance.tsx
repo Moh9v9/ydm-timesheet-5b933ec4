@@ -1,20 +1,20 @@
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Attendance from "@/pages/attendance/Attendance";
 
 const DailyAttendance = () => {
-  // Track if this is the initial render to prevent multiple refreshes
+  // Use a ref to track if we've initialized to prevent unnecessary rerenders
+  const hasInitializedRef = useRef(false);
   const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {
-    // Set initialized to true after first render
-    if (!initialized) {
+    // Only initialize once - this prevents multiple mounts of Attendance
+    if (!hasInitializedRef.current) {
+      hasInitializedRef.current = true;
       setInitialized(true);
     }
-  }, [initialized]);
+  }, []);
 
-  // Only render Attendance component when initialized
-  // This prevents multiple component mounts causing refreshes
   return (
     <div className="mt-2">
       {initialized && <Attendance />}

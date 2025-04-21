@@ -11,13 +11,14 @@ import AttendanceStatusMark from "./components/AttendanceStatusMark";
 import AttendanceLoadingSkeleton from "./components/AttendanceLoadingSkeleton";
 import AttendanceDialogsContainer from "./components/AttendanceDialogsContainer";
 import { useAttendanceLoading } from "./hooks/useAttendanceLoading";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 const Attendance = () => {
   const { user } = useAuth();
   const { filteredEmployees, loading: employeesLoading, dataFetched, refreshEmployees } = useEmployees();
   const { currentDate, setCurrentDate } = useAttendance();
   const { NotificationContainer, success } = useNotification();
+  const hasRefreshedRef = useRef(false);
 
   const canEdit = user?.permissions.attendees.edit;
   const canViewAttendance = user?.permissions.attendees.view;
@@ -32,11 +33,14 @@ const Attendance = () => {
     setDataRefreshTrigger
   } = useAttendanceLoading(currentDate, filteredEmployees.length, employeesLoading, dataFetched, user);
 
-  // Force employee data refresh when component mounts
+  // Only refresh employee data once when component mounts
   useEffect(() => {
-    console.log("🔄 Attendance component mounted - refreshing employee data");
-    refreshEmployees();
-  }, [refreshEmployees]);
+    if (!hasRefreshedRef.current && user) {
+      console.log("🔄 Attendance component mounted - refreshing employee data once");
+      hasRefreshedRef.current = true;
+      refreshEmployees();
+    }
+  }, [refreshEmployees, user]);
 
   const {
     attendanceData,
@@ -74,7 +78,7 @@ const Attendance = () => {
         isSubmitting={false}
         onUpdateAll={() => {}}
         onSave={() => {}}
-        onRefresh={handleFullRefresh} // Use the enhanced refresh function
+        onRefresh={handleFullRefresh}
       />
 
       <div className="flex items-center mb-2">

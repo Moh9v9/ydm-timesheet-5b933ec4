@@ -8,10 +8,14 @@ export function useAttendanceLoading(currentDate: string, filteredEmployeesLengt
   const [dataRefreshTrigger, setDataRefreshTrigger] = useState(0);
   const [initialCheckDone, setInitialCheckDone] = useState(false);
   const hasInitializedRef = useRef(false);
+  const lastFetchedDateRef = useRef('');
 
   useEffect(() => {
-    if (!initialCheckDone && user && !hasInitializedRef.current) {
+    // Only fetch when the date changes or on first load
+    if (user && (!initialCheckDone || lastFetchedDateRef.current !== currentDate) && !hasInitializedRef.current) {
       hasInitializedRef.current = true;
+      lastFetchedDateRef.current = currentDate;
+      
       const fetchActualRecordCount = async () => {
         setRecordsLoading(true);
         try {
@@ -38,10 +42,15 @@ export function useAttendanceLoading(currentDate: string, filteredEmployeesLengt
     }
   }, [currentDate, filteredEmployeesLength, user, initialCheckDone, employeesLoading, dataFetched]);
 
+  // This effect only runs when the date changes
   useEffect(() => {
-    if (initialCheckDone && user) {
+    if (user && lastFetchedDateRef.current !== currentDate) {
+      lastFetchedDateRef.current = currentDate;
+      hasInitializedRef.current = false; // Allow a new fetch for the new date
+      
       const updateRecordCount = async () => {
         try {
+          setRecordsLoading(true);
           const { count, error } = await supabase
             .from("attendance_records")
             .select("*", { count: "exact", head: true })
@@ -52,16 +61,20 @@ export function useAttendanceLoading(currentDate: string, filteredEmployeesLengt
           }
         } catch {
           // ignore
+        } finally {
+          setRecordsLoading(false);
         }
       };
 
       updateRecordCount();
     }
-  }, [currentDate, initialCheckDone, user]);
+  }, [currentDate, user]);
 
   const handleRefresh = () => {
     setRecordsLoading(true);
     setDataRefreshTrigger((prev) => prev + 1);
+    hasInitializedRef.current = false; // Allow a refresh
+    
     const updateRecordCount = async () => {
       try {
         const { count, error } = await supabase
