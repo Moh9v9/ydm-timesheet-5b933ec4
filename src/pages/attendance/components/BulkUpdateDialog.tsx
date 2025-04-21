@@ -11,7 +11,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Check, X, Clock, StickyNote } from "lucide-react";
+import { Check, X, Clock } from "lucide-react";
 
 interface BulkUpdateDialogProps {
   open: boolean;
@@ -133,7 +133,7 @@ const BulkUpdateDialog = ({ open, onClose, onConfirm }: BulkUpdateDialogProps) =
                   <Input
                     type="number"
                     min={0}
-                    step={0.25}
+                    step={0.5}
                     value={overtimeHours}
                     onChange={(e) => setOvertimeHours(Number(e.target.value))}
                     className="w-32"
