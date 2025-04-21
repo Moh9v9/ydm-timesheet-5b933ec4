@@ -17,6 +17,8 @@ interface ReportSelectionFormProps {
   setExportFormat: (value: ExportFormat) => void;
   currentDate: string;
   showFilters: boolean;
+  selectedDate: Date;
+  setSelectedDate: (date: Date) => void;
 }
 
 const ReportSelectionForm = ({
@@ -25,7 +27,9 @@ const ReportSelectionForm = ({
   exportFormat,
   setExportFormat,
   currentDate,
-  showFilters
+  showFilters,
+  selectedDate,
+  setSelectedDate
 }: ReportSelectionFormProps) => {
   const [selectedProject, setSelectedProject] = useState<string>("all");
   const [selectedLocation, setSelectedLocation] = useState<string>("all");
@@ -75,7 +79,9 @@ const ReportSelectionForm = ({
       
       <DateRangeInputs 
         reportType={reportType} 
-        currentDate={currentDate} 
+        currentDate={currentDate}
+        selectedDate={selectedDate}
+        setSelectedDate={setSelectedDate}
       />
       
       {showFilters && (

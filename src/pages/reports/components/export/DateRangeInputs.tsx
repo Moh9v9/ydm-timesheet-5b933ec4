@@ -13,15 +13,16 @@ import { cn } from "@/lib/utils";
 interface DateRangeInputsProps {
   reportType: ReportType;
   currentDate: string;
+  selectedDate: Date;
+  setSelectedDate: (date: Date) => void;
 }
 
-const DateRangeInputs = ({ reportType, currentDate }: DateRangeInputsProps) => {
-  const [date, setDate] = React.useState<Date>(new Date(currentDate));
+const DateRangeInputs = ({ reportType, currentDate, selectedDate, setSelectedDate }: DateRangeInputsProps) => {
   const [open, setOpen] = React.useState(false);
 
-  const handleSelect = (selectedDate: Date | undefined) => {
-    if (selectedDate) {
-      setDate(selectedDate);
+  const handleSelect = (date: Date | undefined) => {
+    if (date) {
+      setSelectedDate(date);
       setOpen(false); // Close the popover after selection
     }
   };
@@ -68,7 +69,7 @@ const DateRangeInputs = ({ reportType, currentDate }: DateRangeInputsProps) => {
       <label className="block text-sm font-medium mb-1.5 dark:text-gray-200">
         {label}
       </label>
-      <Popover>
+      <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <button
             className={cn(
@@ -80,7 +81,7 @@ const DateRangeInputs = ({ reportType, currentDate }: DateRangeInputsProps) => {
               "active:scale-[0.98]"
             )}
           >
-            {format(date, dateFormat)}
+            {format(selectedDate, dateFormat)}
           </button>
         </PopoverTrigger>
         <PopoverContent 
@@ -95,7 +96,7 @@ const DateRangeInputs = ({ reportType, currentDate }: DateRangeInputsProps) => {
         >
           <Calendar
             mode="single"
-            selected={date}
+            selected={selectedDate}
             onSelect={handleSelect}
             initialFocus
             captionLayout="dropdown-buttons"

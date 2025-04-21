@@ -20,64 +20,96 @@ import {
   generateFileContent, 
   downloadFile 
 } from "@/lib/reportUtils";
-import { format } from "date-fns";
+import { format, parse } from "date-fns";
+import { supabase } from "@/integrations/supabase/client";
 
 const ExportSection = () => {
   const [reportType, setReportType] = useState<ReportType>("daily");
   const [exportFormat, setExportFormat] = useState<ExportFormat>("pdf");
   const [isGenerating, setIsGenerating] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   
   const { filteredEmployees } = useEmployees();
   const { attendanceRecords, currentDate } = useAttendance();
   const { success, error } = useNotification();
   
-  const generateReport = () => {
+  const generateReport = async () => {
     setIsGenerating(true);
     
-    setTimeout(() => {
-      try {
-        const reportTypeName = {
-          daily: "Daily Attendance",
-          weekly: "Weekly Attendance",
-          monthly: "Monthly Attendance",
-          employees: "Employee List"
-        }[reportType];
+    try {
+      const reportTypeName = {
+        daily: "Daily Attendance",
+        weekly: "Weekly Attendance",
+        monthly: "Monthly Attendance",
+        employees: "Employee List"
+      }[reportType];
+      
+      const formatName = {
+        csv: "CSV",
+        xlsx: "Excel",
+        pdf: "PDF"
+      }[exportFormat];
+      
+      // Fetch all records for the selected period
+      const formattedDate = format(selectedDate, 'yyyy-MM-dd');
+      console.log(`Generating ${reportType} report for date: ${formattedDate}`);
+      
+      let allRecords = [...attendanceRecords];
+      
+      // For monthly and weekly reports, fetch all relevant records
+      if (reportType === 'monthly' || reportType === 'weekly') {
+        const { data, error } = await supabase
+          .from('attendance_records')
+          .select('*');
+          
+        if (error) {
+          throw error;
+        }
         
-        const formatName = {
-          csv: "CSV",
-          xlsx: "Excel",
-          pdf: "PDF"
-        }[exportFormat];
-        
-        // Format data for export
-        const formattedData = formatAttendanceForExport(attendanceRecords, reportType, currentDate);
-        
-        // Generate file content
-        const { content, mimeType, isBinary } = generateFileContent(formattedData, exportFormat);
-        
-        // Create filename based on report type and date
-        const dateStr = format(new Date(currentDate), "yyyyMMdd");
-        const filename = `${reportType}-attendance-${dateStr}.${exportFormat}`;
-        
-        // Download the file
-        downloadFile(content, filename, mimeType, isBinary);
-        
-        success(`${reportTypeName} exported as ${formatName} successfully`);
-        console.log("Export request:", {
-          reportType,
-          exportFormat,
-          date: currentDate,
-          employeesCount: filteredEmployees.length,
-          recordsCount: attendanceRecords.length
-        });
-      } catch (err) {
-        error("Failed to generate report");
-        console.error(err);
-      } finally {
-        setIsGenerating(false);
+        if (data) {
+          console.log(`Fetched ${data.length} total attendance records from database`);
+          allRecords = data.map(record => ({
+            id: record.id,
+            employeeId: record.employee_uuid,
+            employeeName: record.employee_name || '',
+            date: record.date,
+            present: record.present,
+            startTime: record.start_time || '',
+            endTime: record.end_time || '',
+            overtimeHours: record.overtime_hours || 0,
+            note: record.note || ''
+          }));
+        }
       }
-    }, 1500);
+      
+      // Format data for export
+      const formattedData = formatAttendanceForExport(allRecords, reportType, formattedDate);
+      
+      // Generate file content
+      const { content, mimeType, isBinary } = generateFileContent(formattedData, exportFormat);
+      
+      // Create filename based on report type and date
+      const dateStr = format(selectedDate, "yyyyMMdd");
+      const filename = `${reportType}-attendance-${dateStr}.${exportFormat}`;
+      
+      // Download the file
+      downloadFile(content, filename, mimeType, isBinary);
+      
+      success(`${reportTypeName} exported as ${formatName} successfully`);
+      console.log("Export request:", {
+        reportType,
+        exportFormat,
+        date: formattedDate,
+        employeesCount: filteredEmployees.length,
+        recordsCount: formattedData.length
+      });
+    } catch (err) {
+      error("Failed to generate report");
+      console.error(err);
+    } finally {
+      setIsGenerating(false);
+    }
   };
   
   return (
@@ -104,6 +136,8 @@ const ExportSection = () => {
                   setExportFormat={setExportFormat}
                   currentDate={currentDate}
                   showFilters={showFilters}
+                  selectedDate={selectedDate}
+                  setSelectedDate={setSelectedDate}
                 />
               </div>
               
@@ -139,4 +173,3 @@ const ExportSection = () => {
 };
 
 export default ExportSection;
-

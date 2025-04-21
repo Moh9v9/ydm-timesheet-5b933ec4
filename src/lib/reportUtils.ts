@@ -1,7 +1,9 @@
+
 import { AttendanceRecord, Employee, ExportFormat } from "./types";
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { format, parse, startOfMonth, endOfMonth, eachDayOfInterval } from 'date-fns';
 
 /**
  * Convert data to CSV format
@@ -140,14 +142,51 @@ export const generateFileContent = (
 };
 
 /**
- * Format attendance records for export
+ * Format attendance records for export based on report type
  */
 export const formatAttendanceForExport = (
   records: AttendanceRecord[], 
   reportType: string, 
   date: string
 ): Record<string, any>[] => {
-  return records.map(record => ({
+  let filteredRecords = [...records];
+  
+  // Apply filtering based on report type
+  if (reportType === 'daily') {
+    filteredRecords = records.filter(record => record.date === date);
+  } 
+  else if (reportType === 'weekly') {
+    // For weekly reports, we should filter by the week containing the selected date
+    // This would require additional date processing
+    const selectedDate = new Date(date);
+    // Simple implementation - get records within 7 days of selected date
+    const sevenDaysLater = new Date(selectedDate);
+    sevenDaysLater.setDate(selectedDate.getDate() + 6);
+    
+    filteredRecords = records.filter(record => {
+      const recordDate = new Date(record.date);
+      return recordDate >= selectedDate && recordDate <= sevenDaysLater;
+    });
+  }
+  else if (reportType === 'monthly') {
+    // For monthly reports, filter records for the entire month of the selected date
+    try {
+      const selectedDate = parse(date, 'yyyy-MM-dd', new Date());
+      const monthStart = startOfMonth(selectedDate);
+      const monthEnd = endOfMonth(selectedDate);
+      
+      filteredRecords = records.filter(record => {
+        const recordDate = new Date(record.date);
+        return recordDate >= monthStart && recordDate <= monthEnd;
+      });
+      
+      console.log(`Filtered ${filteredRecords.length} records for month of ${format(selectedDate, 'MMMM yyyy')}`);
+    } catch (err) {
+      console.error("Error filtering monthly records:", err);
+    }
+  }
+  
+  return filteredRecords.map(record => ({
     'Date': record.date,
     'Employee Name': record.employeeName,
     'Present': record.present ? 'Yes' : 'No',
@@ -200,3 +239,4 @@ export const downloadFile = (content: string | Uint8Array, filename: string, mim
     URL.revokeObjectURL(url);
   }, 100);
 };
+
