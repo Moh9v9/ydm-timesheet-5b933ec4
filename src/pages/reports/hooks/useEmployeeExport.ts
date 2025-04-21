@@ -16,7 +16,7 @@ export const useEmployeeExport = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState<EmployeeFilters>({});
   
-  const { filteredEmployees, getUniqueValues } = useEmployees();
+  const { employees, filteredEmployees } = useEmployees();
   const { success, error } = useNotification();
 
   const handleFilterChange = (key: keyof EmployeeFilters, value: string | undefined) => {
@@ -44,7 +44,9 @@ export const useEmployeeExport = () => {
           pdf: "PDF"
         }[exportFormat];
         
-        const employeesToExport = filteredEmployees.filter(employee => {
+        // Use ALL employees instead of filteredEmployees as the source data,
+        // and then apply our filters directly to ensure archived employees are included
+        let employeesToExport = employees.filter(employee => {
           if (filters.project && employee.project !== filters.project) return false;
           if (filters.location && employee.location !== filters.location) return false;
           if (filters.paymentType && employee.paymentType !== filters.paymentType) return false;
@@ -68,7 +70,7 @@ export const useEmployeeExport = () => {
           type: "employees",
           exportFormat,
           filters,
-          totalEmployees: filteredEmployees.length,
+          totalEmployees: employees.length,
           exportedEmployees: employeesToExport.length
         });
       } catch (err) {
@@ -87,6 +89,11 @@ export const useEmployeeExport = () => {
     sponsorships: ["all", ...getUniqueValues("sponsorship")]
   };
 
+  const getUniqueValues = (field: keyof EmployeeFilters) => {
+    // Make sure we include values from ALL employees, not just filtered ones
+    return Array.from(new Set(employees.map(employee => employee[field] as string))).filter(Boolean);
+  };
+
   return {
     exportFormat,
     setExportFormat,
@@ -97,6 +104,13 @@ export const useEmployeeExport = () => {
     handleFilterChange,
     generateReport,
     uniqueValues,
-    filteredEmployeesCount: filteredEmployees.length
+    filteredEmployeesCount: employees.filter(employee => {
+      if (filters.project && employee.project !== filters.project) return false;
+      if (filters.location && employee.location !== filters.location) return false;
+      if (filters.paymentType && employee.paymentType !== filters.paymentType) return false;
+      if (filters.sponsorship && employee.sponsorship !== filters.sponsorship) return false;
+      if (filters.status && employee.status !== filters.status) return false;
+      return true;
+    }).length
   };
 };
