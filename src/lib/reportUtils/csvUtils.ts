@@ -11,7 +11,7 @@ const convertToCSV = (data: Record<string, any>[]): string => {
     const values = headers.map(header => {
       const value = row[header];
       const escaped = String(value).replace(/"/g, '""');
-      return \`"\${escaped}"\`;
+      return `"${escaped}"`;
     });
     csvRows.push(values.join(','));
   }

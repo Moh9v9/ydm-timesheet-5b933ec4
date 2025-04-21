@@ -28,7 +28,7 @@ export const formatAttendanceForExport = (
         const recordDate = new Date(record.date);
         return recordDate >= monthStart && recordDate <= monthEnd;
       });
-      console.log(\`Filtered \${filteredRecords.length} records for month of \${format(selectedDate, 'MMMM yyyy')}\`);
+      console.log(`Filtered ${filteredRecords.length} records for month of ${format(selectedDate, 'MMMM yyyy')}`);
     } catch (err) {
       console.error("Error filtering monthly records:", err);
     }

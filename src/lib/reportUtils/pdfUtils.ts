@@ -22,7 +22,7 @@ const convertToPDF = (data: Record<string, any>[]): Uint8Array => {
     year: 'numeric', month: 'long', day: 'numeric'
   });
   doc.setFontSize(12);
-  doc.text(\`Date: \${formattedDate}\`, 14, 27);
+  doc.text(`Date: ${formattedDate}`, 14, 27);
   autoTable(doc, {
     head: [headers],
     body: rows,
