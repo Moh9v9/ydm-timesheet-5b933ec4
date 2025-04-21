@@ -7,9 +7,10 @@ interface StatsCardProps {
   title: string;
   value: number;
   colorClass: string;
+  isLoading?: boolean;
 }
 
-export const StatsCard = ({ icon: Icon, title, value, colorClass }: StatsCardProps) => {
+export const StatsCard = ({ icon: Icon, title, value, colorClass, isLoading = false }: StatsCardProps) => {
   return (
     <div
       className="rounded-lg p-6 border h-24"
@@ -28,7 +29,7 @@ export const StatsCard = ({ icon: Icon, title, value, colorClass }: StatsCardPro
           <div className="text-sm font-medium text-muted-foreground">
             {title}
           </div>
-          <ValueUpdater value={value} />
+          <ValueUpdater value={value} isLoading={isLoading} />
         </div>
       </div>
     </div>

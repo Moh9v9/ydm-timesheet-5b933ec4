@@ -1,13 +1,12 @@
 
 import { useAuth } from "@/contexts/AuthContext";
 import { format } from "date-fns";
-import { Skeleton } from "@/components/ui/skeleton";
 import { CardInformation } from "@/components/dashboard/CardInformation";
 import DailyAttendance from "@/components/dashboard/DailyAttendance";
 import { useStatistics } from "@/hooks/useStatistics";
 import { AttendanceProvider } from "@/contexts/AttendanceContext";
 import { EmployeeProvider } from "@/contexts/EmployeeContext";
-import { Suspense, useState } from "react";
+import { Suspense } from "react";
 
 const Index = () => {
   const { user } = useAuth();
@@ -15,9 +14,6 @@ const Index = () => {
   // Use today's date for display
   const today = new Date();
   const formattedDate = format(today, "EEEE, MMMM d, yyyy");
-
-  // Remove animation logic completely
-  const [mounted] = useState(true);
 
   return (
     <div className="space-y-6 container py-10 max-w-7xl mx-auto min-h-[800px]">
@@ -54,20 +50,14 @@ const DashboardStats = () => {
   const { user } = useAuth();
 
   if (!user) {
-    return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mb-4">
-        <Skeleton className="h-24" />
-        <Skeleton className="h-24" />
-        <Skeleton className="h-24" />
-      </div>
-    );
+    return null;
   }
 
   return (
     <CardInformation
-      totalEmployees={isLoading ? 0 : totalEmployees}
-      presentToday={isLoading ? 0 : presentToday}
-      absentToday={isLoading ? 0 : absentToday}
+      totalEmployees={totalEmployees}
+      presentToday={presentToday}
+      absentToday={absentToday}
       isLoading={isLoading}
     />
   );
