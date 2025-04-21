@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import {
   Dialog,
@@ -128,6 +129,18 @@ const BulkUpdateDialog = ({ open, onClose, onConfirm }: BulkUpdateDialogProps) =
                 </div>
 
                 <div className="flex items-center gap-4">
+                  <label className="text-right font-medium min-w-24">Overtime (hours):</label>
+                  <Input
+                    type="number"
+                    min={0}
+                    step={0.25}
+                    value={overtimeHours}
+                    onChange={(e) => setOvertimeHours(Number(e.target.value))}
+                    className="w-32"
+                  />
+                </div>
+
+                <div className="flex items-center gap-4">
                   <label className="text-right font-medium min-w-24">Note:</label>
                   <Textarea
                     value={note}
@@ -173,3 +186,4 @@ const BulkUpdateDialog = ({ open, onClose, onConfirm }: BulkUpdateDialogProps) =
 };
 
 export default BulkUpdateDialog;
+
