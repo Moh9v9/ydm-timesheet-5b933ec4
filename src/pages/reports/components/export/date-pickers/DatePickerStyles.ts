@@ -12,63 +12,55 @@ export const datePickerStyles = {
     "focus:outline-none focus:ring-2 focus:ring-primary/20 dark:focus:ring-primary/20",
     "active:scale-[0.98]"
   ),
-  popoverContent: cn(
-    "w-auto p-0",
-    "border dark:border-gray-700",
-    "rounded-lg overflow-hidden",
-    "shadow-lg dark:shadow-black/10",
-    "bg-white dark:bg-gray-800/95 backdrop-blur-sm"
-  ),
   select: cn(
     "appearance-none pl-3 pr-8 py-1.5 rounded-md",
     "text-sm font-medium transition-colors duration-200",
-    "bg-transparent border border-gray-700",
-    "text-gray-100 hover:bg-gray-700/50",
-    "dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100",
-    "dark:hover:bg-gray-700/80",
+    "bg-transparent border border-gray-200",
+    "text-gray-900 hover:bg-gray-50",
+    "dark:border-gray-700 dark:text-gray-100 dark:hover:bg-gray-700/50",
     "focus:outline-none focus:ring-2 focus:ring-primary/20",
     "dark:focus:ring-primary/40",
     "cursor-pointer relative min-w-[100px]"
   ),
-  navigation: {
-    button: cn(
-      "p-1.5 rounded-md",
-      "text-muted-foreground hover:text-primary hover:bg-gray-700/50",
-      "transition-colors duration-200"
-    )
-  },
-  actions: {
-    button: cn(
-      "px-3 py-1.5 rounded-md text-sm font-medium",
-      "bg-primary text-primary-foreground",
-      "hover:bg-primary/90 dark:hover:bg-primary/80",
-      "transition-colors duration-200",
-      "focus:outline-none focus:ring-2 focus:ring-primary/20",
-      "active:scale-[0.98]"
-    )
-  },
   calendar: {
-    wrapper: cn("p-4 pointer-events-auto select-none"),
+    wrapper: "p-3",
     nav_button: cn(
       "inline-flex items-center justify-center rounded-md p-1.5",
-      "text-muted-foreground hover:text-primary hover:bg-gray-700/50",
+      "text-gray-500 hover:bg-gray-100",
+      "dark:text-gray-400 dark:hover:bg-gray-800",
       "transition-colors duration-200"
     ),
     head_cell: cn(
-      "text-muted-foreground rounded-md w-9 font-normal text-[0.8rem]",
-      "uppercase tracking-wide text-gray-400"
+      "text-xs font-medium text-gray-500 dark:text-gray-400",
+      "w-9 py-2"
     ),
     day: cn(
       "h-9 w-9 p-0 font-normal",
-      "text-sm text-gray-200",
-      "rounded-md transition-colors duration-200",
-      "hover:bg-gray-700/50",
+      "text-sm text-gray-900 dark:text-gray-300",
+      "rounded-lg transition-colors duration-200",
+      "hover:bg-gray-100 dark:hover:bg-gray-700/50",
       "focus:outline-none focus:ring-2 focus:ring-primary/20"
     ),
     day_selected: cn(
-      "bg-primary text-primary-foreground",
-      "hover:bg-primary hover:text-primary-foreground",
-      "focus:bg-primary focus:text-primary-foreground"
-    )
+      "bg-primary text-white",
+      "hover:bg-primary/90 hover:text-white",
+      "focus:bg-primary focus:text-white",
+      "dark:bg-primary dark:text-white",
+      "dark:hover:bg-primary/90 dark:hover:text-white"
+    ),
+    day_today: cn(
+      "bg-gray-100/50 text-gray-900",
+      "dark:bg-gray-800 dark:text-gray-100"
+    ),
+    day_outside: "text-gray-400 dark:text-gray-600 opacity-50",
+    day_disabled: "text-gray-400 dark:text-gray-600 opacity-50",
+    day_range_middle: "rounded-none",
+    day_hidden: "invisible",
+    row: "flex justify-center my-0.5",
+    table: "space-y-1",
+    months: "space-y-4",
+    caption: "flex justify-center pt-1 relative items-center",
+    caption_label: "text-sm font-medium dark:text-gray-100",
+    nav: "flex items-center space-x-1"
   }
 };
