@@ -38,11 +38,11 @@ export async function employeeMatchesFilters(
   // 1. We're in attendance view (currentAttendanceDate is provided)
   // 2. The employee is archived
   // 3. We're not explicitly viewing archived employees (filters.status !== "Archived")
-  // 4. We're not viewing all statuses (filters.status !== "All") - THIS IS THE KEY CHANGE
+  // 4. We're not viewing all statuses (filters.status !== "All")
   if (employee.status === "Archived" && 
       currentAttendanceDate && 
       filters.status !== "Archived" && 
-      filters.status !== "All") {  // Added this condition to fix the "All" filter issue
+      filters.status !== "All") {
     // This check should only run in attendance view when we're not explicitly filtering for archived or all employees
     const { data } = await supabase
       .from('attendance_records')
