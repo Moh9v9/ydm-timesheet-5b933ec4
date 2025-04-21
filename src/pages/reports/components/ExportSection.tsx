@@ -35,9 +35,9 @@ const ExportSection = () => {
     exportFormat,
     selectedDate,
     searchTerm,
-    selectedProject: filters.project,
-    selectedLocation: filters.location,
-    selectedPaymentType: filters.paymentType,
+    selectedProject,
+    selectedLocation,
+    selectedPaymentType,
     includeInactive,
     attendanceRecords
   });

@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNotification } from "@/components/ui/notification";
 import { useEmployees } from "@/contexts/EmployeeContext";
@@ -11,9 +12,22 @@ interface UseReportGenerationProps {
   exportFormat: ExportFormat;
   selectedDate: Date;
   searchTerm: string;
-  selectedPaymentType: string;
+  selectedProject?: string;
+  selectedLocation?: string;
+  selectedPaymentType?: string;
   includeInactive: boolean;
   attendanceRecords: any[];
+}
+
+interface ReportFilters {
+  reportType: ReportType;
+  exportFormat: ExportFormat;
+  date: Date;
+  searchTerm?: string;
+  project?: string;
+  location?: string;
+  paymentType?: string;
+  includeInactive?: boolean;
 }
 
 export const useReportGeneration = ({
@@ -21,6 +35,8 @@ export const useReportGeneration = ({
   exportFormat,
   selectedDate,
   searchTerm,
+  selectedProject,
+  selectedLocation,
   selectedPaymentType,
   includeInactive,
   attendanceRecords
@@ -29,7 +45,7 @@ export const useReportGeneration = ({
   const { filteredEmployees } = useEmployees();
   const { success, error } = useNotification();
 
-  const generateReport = async () => {
+  const generateReport = async (filters?: ReportFilters) => {
     setIsGenerating(true);
     
     try {
@@ -71,35 +87,72 @@ export const useReportGeneration = ({
           query = query.ilike('employee_name', `%${searchTerm}%`);
         }
         
+        // Apply project filter if selected
+        const projectFilter = filters?.project || selectedProject;
+        if (projectFilter && projectFilter !== "all") {
+          console.log(`Filtering by project: ${projectFilter}`);
+          
+          // Get employee IDs with the selected project
+          const { data: projectEmployees } = await supabase
+            .from('employees')
+            .select('id')
+            .eq('project', projectFilter)
+            .or(includeInactive ? `status.eq.Active,status.eq.Archived` : 'status.eq.Active');
+            
+          if (projectEmployees && projectEmployees.length > 0) {
+            const employeeIds = projectEmployees.map(emp => emp.id);
+            query = query.in('employee_uuid', employeeIds);
+          }
+        }
+        
+        // Apply location filter if selected
+        const locationFilter = filters?.location || selectedLocation;
+        if (locationFilter && locationFilter !== "all") {
+          console.log(`Filtering by location: ${locationFilter}`);
+          
+          // Get employee IDs with the selected location
+          const { data: locationEmployees } = await supabase
+            .from('employees')
+            .select('id')
+            .eq('location', locationFilter)
+            .or(includeInactive ? `status.eq.Active,status.eq.Archived` : 'status.eq.Active');
+            
+          if (locationEmployees && locationEmployees.length > 0) {
+            const employeeIds = locationEmployees.map(emp => emp.id);
+            query = query.in('employee_uuid', employeeIds);
+          }
+        }
+        
         // Apply payment type filter if selected
-        if (selectedPaymentType && selectedPaymentType !== "all") {
-          console.log(`Filtering by payment type: ${selectedPaymentType}`);
+        const paymentTypeFilter = filters?.paymentType || selectedPaymentType;
+        if (paymentTypeFilter && paymentTypeFilter !== "all") {
+          console.log(`Filtering by payment type: ${paymentTypeFilter}`);
           
           // We need to get employee IDs with the selected payment type first
           const { data: filteredEmployees } = await supabase
             .from('employees')
             .select('id, payment_type')
-            .eq('payment_type', selectedPaymentType)
+            .eq('payment_type', paymentTypeFilter)
             .or(includeInactive ? `status.eq.Active,status.eq.Archived` : 'status.eq.Active');
           
           if (filteredEmployees && filteredEmployees.length > 0) {
             const employeeIds = filteredEmployees.map(emp => emp.id);
-            console.log(`Found ${employeeIds.length} employees with payment type '${selectedPaymentType}'`);
+            console.log(`Found ${employeeIds.length} employees with payment type '${paymentTypeFilter}'`);
             
             // Filter attendance records by these employee IDs
             query = query.in('employee_uuid', employeeIds);
           } else {
-            console.log(`No employees found with payment type: ${selectedPaymentType}`);
+            console.log(`No employees found with payment type: ${paymentTypeFilter}`);
             // Return early as no employees match criteria
             setIsGenerating(false);
-            error(`No employees found with payment type: ${selectedPaymentType}`);
+            error(`No employees found with payment type: ${paymentTypeFilter}`);
             return;
           }
         }
         
         // If include inactive is turned on but no payment type filter,
         // we need to handle that separately
-        if (includeInactive && (selectedPaymentType === "all" || !selectedPaymentType)) {
+        if (includeInactive && (!paymentTypeFilter || paymentTypeFilter === "all")) {
           console.log('Including inactive employees in the report');
           
           // Get all employee IDs regardless of status
@@ -112,7 +165,7 @@ export const useReportGeneration = ({
             const employeeIds = allEmployees.map(emp => emp.id);
             query = query.in('employee_uuid', employeeIds);
           }
-        } else if (!includeInactive && (selectedPaymentType === "all" || !selectedPaymentType)) {
+        } else if (!includeInactive && (!paymentTypeFilter || paymentTypeFilter === "all")) {
           // If not including inactive and no specific payment type, only get active employees
           const { data: activeEmployees } = await supabase
             .from('employees')
@@ -153,12 +206,20 @@ export const useReportGeneration = ({
         allRecords = allRecords.filter(record => record.present);
       }
 
-      const formattedData = formatAttendanceForExport(allRecords, reportType, formattedDate);
+      // Create filter object for the formatter
+      const formatterFilters = {
+        project: filters?.project || selectedProject,
+        location: filters?.location || selectedLocation,
+        paymentType: filters?.paymentType || selectedPaymentType,
+        searchTerm: filters?.searchTerm || searchTerm
+      };
+
+      const formattedData = formatAttendanceForExport(allRecords, reportType, formattedDate, formatterFilters);
       const { content, mimeType, isBinary } = generateFileContent(formattedData, exportFormat);
       
       const dateStr = format(selectedDate, "yyyyMMdd");
       const employeeStr = searchTerm ? `-${searchTerm.replace(/\s+/g, '-')}` : '';
-      const paymentTypeStr = selectedPaymentType !== 'all' ? `-${selectedPaymentType}` : '';
+      const paymentTypeStr = (filters?.paymentType || selectedPaymentType) !== 'all' ? `-${filters?.paymentType || selectedPaymentType}` : '';
       const filename = `${reportType}-attendance${employeeStr}${paymentTypeStr}-${dateStr}.${exportFormat}`;
       
       downloadFile(content, filename, mimeType, isBinary);
@@ -169,7 +230,9 @@ export const useReportGeneration = ({
         exportFormat,
         date: formattedDate,
         employee: searchTerm || "All",
-        paymentType: selectedPaymentType,
+        project: filters?.project || selectedProject || "All",
+        location: filters?.location || selectedLocation || "All",
+        paymentType: filters?.paymentType || selectedPaymentType || "All",
         includeInactive,
         employeesCount: filteredEmployees.length,
         recordsCount: formattedData.length
