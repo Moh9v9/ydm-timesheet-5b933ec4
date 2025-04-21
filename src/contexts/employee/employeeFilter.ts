@@ -1,4 +1,3 @@
-
 import { Employee, EmployeeFilters } from "@/lib/types";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -22,8 +21,8 @@ export async function employeeMatchesFilters(
     }
   }
   
-  // Status filter handling
-  if (filters.status) {
+  // Status filter handling - show all employees if no status filter or "All" is selected
+  if (filters.status && filters.status !== "All") {
     console.log(`Checking status filter for ${employee.fullName}: employee status=${employee.status}, filter status=${filters.status}`);
     
     // Apply status filter
@@ -52,6 +51,7 @@ export async function employeeMatchesFilters(
     console.log(`Archived employee ${employee.id} (${employee.fullName}) included - has record for date: ${currentAttendanceDate} with present=${data.present}`);
   }
   
+  // Other filters remain unchanged
   if (filters.project && employee.project !== filters.project) return false;
   if (filters.location && employee.location !== filters.location) return false;
   if (filters.paymentType && employee.paymentType !== filters.paymentType) return false;

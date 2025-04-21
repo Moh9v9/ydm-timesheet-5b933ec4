@@ -65,7 +65,7 @@ export interface EmployeeFilters {
   location?: string;
   paymentType?: PaymentType;
   sponsorship?: SponsorshipType;
-  status?: EmployeeStatus;
+  status?: EmployeeStatus | "All";
 }
 
 export interface AttendanceFilters {
