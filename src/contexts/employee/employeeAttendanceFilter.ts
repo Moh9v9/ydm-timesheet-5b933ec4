@@ -20,7 +20,7 @@ export async function employeeMatchesAttendanceFilters(
     }
   }
 
-  // Status filter handling first - if specific status is requested, apply it
+  // Status filter handling - if specific status is requested, apply it
   if (filters.status && filters.status !== "All") {
     if (employee.status !== filters.status) {
       console.log(`Employee ${employee.id} (${employee.fullName}) filtered out - status doesn't match: ${employee.status} != ${filters.status}`);
