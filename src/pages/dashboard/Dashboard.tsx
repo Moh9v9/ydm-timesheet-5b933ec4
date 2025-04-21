@@ -1,42 +1,30 @@
 
 import { useAuth } from "@/contexts/AuthContext";
 import { format } from "date-fns";
-import { User, UserCheck, UserX } from "lucide-react";
-import { StatsCard } from "@/components/dashboard/StatsCard";
-import { useStatistics } from "@/hooks/useStatistics";
 import Attendance from "@/pages/attendance/Attendance";
 import { useAttendance } from "@/contexts/AttendanceContext";
 import { useEffect, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { DailyAttendance } from "@/components/dashboard/DailyAttendance";
 
 const Dashboard = () => {
   const { user } = useAuth();
   const { setCurrentDate } = useAttendance();
   const [isInitialized, setIsInitialized] = useState(false);
-  
+
   // Get today's date and format it for display - always fresh
   const today = new Date();
-  const todayISO = today.toISOString().split('T')[0];
   const formattedDate = format(today, "EEEE, MMMM d, yyyy");
-  
-  // Get statistics - our hook will use the current date internally
-  const stats = useStatistics();
 
-  // Set the current date in the context immediately when the component mounts
-  // This ensures the date is always fresh on page load/refresh
   useEffect(() => {
     if (!isInitialized && user) {
-      // Always calculate a fresh date when setting it
       const freshToday = new Date();
-      const freshTodayISO = freshToday.toISOString().split('T')[0];
-      console.log("Dashboard - Setting current date on mount/refresh:", freshTodayISO);
-      
+      const freshTodayISO = freshToday.toISOString().split("T")[0];
       if (setCurrentDate) {
         setCurrentDate(freshTodayISO);
         setIsInitialized(true);
       }
     }
-    
   }, [setCurrentDate, user, isInitialized]);
 
   return (
@@ -53,36 +41,14 @@ const Dashboard = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-        {!user ? (
-          <>
-            <Skeleton className="h-24" />
-            <Skeleton className="h-24" />
-            <Skeleton className="h-24" />
-          </>
-        ) : (
-          <>
-            <StatsCard
-              icon={User}
-              title="Total Employees"
-              value={stats.totalEmployees}
-              colorClass="bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400"
-            />
-            <StatsCard
-              icon={UserCheck}
-              title="Total Present"
-              value={stats.presentToday}
-              colorClass="bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-400"
-            />
-            <StatsCard
-              icon={UserX}
-              title="Total Absent"
-              value={stats.absentToday}
-              colorClass="bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-400"
-            />
-          </>
-        )}
-      </div>
+      {!user ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-5">
+          <Skeleton className="h-40" />
+          <Skeleton className="h-40" />
+        </div>
+      ) : (
+        <DailyAttendance />
+      )}
 
       <div className="mt-6">
         {user && <Attendance />}
