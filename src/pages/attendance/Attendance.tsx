@@ -4,8 +4,6 @@ import { useEmployees } from "@/contexts/EmployeeContext";
 import { useNotification } from "@/components/ui/notification";
 import DateNavigation from "./components/DateNavigation";
 import AttendanceTable from "./components/AttendanceTable";
-import BulkUpdateDialog from "./components/BulkUpdateDialog";
-import ConfirmDialog from "@/components/ConfirmDialog";
 import AttendanceHeader from "./components/AttendanceHeader";
 import { useAttendanceData } from "./hooks/useAttendanceData";
 import { useAttendanceOperations } from "./hooks/useAttendanceOperations";
@@ -13,6 +11,9 @@ import AttendanceStatusMark from "./components/AttendanceStatusMark";
 import { useEffect, useState, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
+
+import AttendanceLoadingSkeleton from "./components/AttendanceLoadingSkeleton";
+import AttendanceDialogs from "./components/AttendanceDialogs";
 
 const Attendance = () => {
   const { user } = useAuth();
@@ -42,12 +43,11 @@ const Attendance = () => {
     handleNoteChange
   } = useAttendanceData(canEdit, dataRefreshTrigger);
 
+  const [showBulkUpdate, setShowBulkUpdate] = useState(false);
+  const [showSaveConfirm, setShowSaveConfirm] = useState(false);
+
   const {
     isSubmitting,
-    showBulkUpdate,
-    setShowBulkUpdate,
-    showSaveConfirm,
-    setShowSaveConfirm,
     handleSave,
     confirmSave,
     handleUpdateAll,
@@ -55,7 +55,10 @@ const Attendance = () => {
     refreshData
   } = useAttendanceOperations(canEdit);
 
-  // Only run the record count check once on initial load
+  const handleSuccessfulSave = () => {
+    setDataRefreshTrigger(prev => prev + 1);
+  };
+
   useEffect(() => {
     if (!initialCheckDone && user && !hasInitializedRef.current) {
       hasInitializedRef.current = true;
@@ -114,10 +117,6 @@ const Attendance = () => {
     }
   }, [currentDate, initialCheckDone, user]);
 
-  const handleSuccessfulSave = () => {
-    setDataRefreshTrigger(prev => prev + 1);
-  };
-
   const handleRefresh = () => {
     setRecordsLoading(true);
     setDataRefreshTrigger(prev => prev + 1);
@@ -164,10 +163,7 @@ const Attendance = () => {
       </div>
 
       {!user ? (
-        <div className="space-y-4">
-          <Skeleton className="h-12 w-full" />
-          <Skeleton className="h-64 w-full" />
-        </div>
+        <AttendanceLoadingSkeleton />
       ) : (
         <AttendanceTable
           attendanceData={attendanceData}
@@ -182,22 +178,18 @@ const Attendance = () => {
         />
       )}
 
-      <BulkUpdateDialog 
-        open={showBulkUpdate}
-        onClose={() => setShowBulkUpdate(false)}
-        onConfirm={(data) => handleBulkUpdate(attendanceData, data)}
-      />
-      
-      <ConfirmDialog
-        open={showSaveConfirm}
-        onOpenChange={setShowSaveConfirm}
-        onConfirm={() => {
+      <AttendanceDialogs
+        showBulkUpdate={showBulkUpdate}
+        setShowBulkUpdate={setShowBulkUpdate}
+        showSaveConfirm={showSaveConfirm}
+        setShowSaveConfirm={setShowSaveConfirm}
+        onBulkUpdateConfirm={handleBulkUpdate}
+        onConfirmSave={() => {
           confirmSave(attendanceData);
           handleSuccessfulSave();
         }}
-        title="Save Attendance Records"
-        description="Are you sure you want to save these attendance records? This action cannot be undone."
-        confirmText={isSubmitting ? "Saving..." : "Save Records"}
+        attendanceData={attendanceData}
+        isSubmitting={isSubmitting}
       />
     </div>
   );
