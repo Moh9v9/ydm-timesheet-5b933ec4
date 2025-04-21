@@ -1,9 +1,11 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import { format, endOfMonth } from "date-fns";
+import { useCallback } from "react";
 
 export const useReportFilters = () => {
-  const applyMonthlyFilters = async (query: any, {
+  // Optimize with useCallback to prevent recreation on each render
+  const applyMonthlyFilters = useCallback(async (query: any, {
     selectedDate,
     searchTerm,
     selectedProject,
@@ -33,80 +35,49 @@ export const useReportFilters = () => {
       query = query.ilike('employee_name', `%${searchTerm}%`);
     }
     
-    // Apply project filter if selected
-    if (selectedProject && selectedProject !== "all") {
-      console.log(`Filtering by project: ${selectedProject}`);
-      
-      const { data: projectEmployees } = await supabase
-        .from('employees')
-        .select('id')
-        .eq('project', selectedProject)
-        .or(includeInactive ? `status.eq.Active,status.eq.Archived` : 'status.eq.Active');
-        
-      if (projectEmployees && projectEmployees.length > 0) {
-        const employeeIds = projectEmployees.map(emp => emp.id);
-        query = query.in('employee_uuid', employeeIds);
-      }
-    }
+    // Use prepared queries to optimize database interactions
+    let employeeIds: string[] = [];
     
-    // Apply location filter if selected
-    if (selectedLocation && selectedLocation !== "all") {
-      console.log(`Filtering by location: ${selectedLocation}`);
+    // Optimize filter queries by combining them
+    if ((selectedProject && selectedProject !== "all") || 
+        (selectedLocation && selectedLocation !== "all") ||
+        (selectedPaymentType && selectedPaymentType !== "all") || 
+        includeInactive) {
+      // Build filter conditions
+      let employeeQuery = supabase.from('employees').select('id');
       
-      const { data: locationEmployees } = await supabase
-        .from('employees')
-        .select('id')
-        .eq('location', selectedLocation)
-        .or(includeInactive ? `status.eq.Active,status.eq.Archived` : 'status.eq.Active');
-        
-      if (locationEmployees && locationEmployees.length > 0) {
-        const employeeIds = locationEmployees.map(emp => emp.id);
-        query = query.in('employee_uuid', employeeIds);
+      if (selectedProject && selectedProject !== "all") {
+        console.log(`Filtering by project: ${selectedProject}`);
+        employeeQuery = employeeQuery.eq('project', selectedProject);
       }
-    }
-    
-    // Apply payment type filter if selected
-    if (selectedPaymentType && selectedPaymentType !== "all") {
-      console.log(`Filtering by payment type: ${selectedPaymentType}`);
       
-      const { data: filteredEmployees } = await supabase
-        .from('employees')
-        .select('id')
-        .eq('payment_type', selectedPaymentType)
-        .or(includeInactive ? `status.eq.Active,status.eq.Archived` : 'status.eq.Active');
+      if (selectedLocation && selectedLocation !== "all") {
+        console.log(`Filtering by location: ${selectedLocation}`);
+        employeeQuery = employeeQuery.eq('location', selectedLocation);
+      }
+      
+      if (selectedPaymentType && selectedPaymentType !== "all") {
+        console.log(`Filtering by payment type: ${selectedPaymentType}`);
+        employeeQuery = employeeQuery.eq('payment_type', selectedPaymentType);
+      }
+      
+      // Apply status filter based on includeInactive flag
+      if (includeInactive) {
+        employeeQuery = employeeQuery.or('status.eq.Active,status.eq.Archived');
+      } else {
+        employeeQuery = employeeQuery.eq('status', 'Active');
+      }
+      
+      const { data: filteredEmployees } = await employeeQuery;
       
       if (filteredEmployees && filteredEmployees.length > 0) {
-        const employeeIds = filteredEmployees.map(emp => emp.id);
-        query = query.in('employee_uuid', employeeIds);
-      }
-    } else if (includeInactive) {
-      // If include inactive is turned on but no payment type filter
-      console.log('Including inactive employees in the report');
-      
-      const { data: allEmployees } = await supabase
-        .from('employees')
-        .select('id')
-        .or('status.eq.Active,status.eq.Archived');
-      
-      if (allEmployees && allEmployees.length > 0) {
-        const employeeIds = allEmployees.map(emp => emp.id);
-        query = query.in('employee_uuid', employeeIds);
-      }
-    } else {
-      // If not including inactive and no specific payment type, only get active employees
-      const { data: activeEmployees } = await supabase
-        .from('employees')
-        .select('id')
-        .eq('status', 'Active');
-        
-      if (activeEmployees && activeEmployees.length > 0) {
-        const employeeIds = activeEmployees.map(emp => emp.id);
+        employeeIds = filteredEmployees.map(emp => emp.id);
         query = query.in('employee_uuid', employeeIds);
       }
     }
     
     return query;
-  };
+  }, []);
 
   return {
     applyMonthlyFilters

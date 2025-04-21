@@ -3,9 +3,11 @@ import { format } from "date-fns";
 import { ExportFormat, ReportType } from "@/lib/types";
 import { generateFileContent } from "@/lib/reportUtils";
 import { downloadFile } from "@/lib/reportUtils";
+import { useMemo } from "react";
 
 export const useReportGenerator = () => {
-  const generateFormattedReport = (
+  // Memoize the function to prevent unnecessary re-creation on re-renders
+  const generateFormattedReport = useMemo(() => (
     formattedData: any[],
     reportType: ReportType,
     exportFormat: ExportFormat,
@@ -38,7 +40,7 @@ export const useReportGenerator = () => {
       formatName,
       recordCount: formattedData.length
     };
-  };
+  }, []);
 
   return {
     generateFormattedReport

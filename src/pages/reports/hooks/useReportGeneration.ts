@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useNotification } from "@/components/ui/notification";
 import { useEmployees } from "@/contexts/EmployeeContext";
 import { ExportFormat, ReportType } from "@/lib/types";
@@ -49,7 +49,8 @@ export const useReportGeneration = ({
   const { applyMonthlyFilters } = useReportFilters();
   const { generateFormattedReport } = useReportGenerator();
 
-  const generateReport = async (filters?: ReportFilters) => {
+  // Optimize the generate report function with useCallback
+  const generateReport = useCallback(async (filters?: ReportFilters) => {
     setIsGenerating(true);
     
     try {
@@ -140,7 +141,22 @@ export const useReportGeneration = ({
     } finally {
       setIsGenerating(false);
     }
-  };
+  }, [
+    reportType,
+    exportFormat, 
+    selectedDate, 
+    searchTerm, 
+    selectedProject, 
+    selectedLocation, 
+    selectedPaymentType, 
+    includeInactive,
+    attendanceRecords,
+    applyMonthlyFilters,
+    generateFormattedReport,
+    filteredEmployees,
+    success,
+    error
+  ]);
 
   return {
     isGenerating,
