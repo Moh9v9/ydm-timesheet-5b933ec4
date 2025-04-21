@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { StyledSelect } from "@/components/ui/styled-select";
 import { ExportFormat, ReportType } from "@/lib/types";
@@ -46,8 +45,7 @@ const ReportSelectionForm = ({
   const reportTypeOptions = [
     { value: "daily", label: "Daily Attendance" },
     { value: "weekly", label: "Weekly Attendance" },
-    { value: "monthly", label: "Monthly Attendance" },
-    { value: "employees", label: "Full Employee List" }
+    { value: "monthly", label: "Monthly Attendance" }
   ];
 
   const exportFormatOptions = [
