@@ -14,15 +14,27 @@ export const useAttendanceData = (canEdit: boolean, refreshTrigger: number = 0) 
   const fetchingRef = useRef(false);
   const initAttemptedRef = useRef(false);
 
+  // Log relevant state for debugging
+  console.log("useAttendanceData - employees:", filteredEmployees.length, 
+    "loading:", employeesLoading, 
+    "dataFetched:", dataFetched, 
+    "hasAttempted:", hasAttemptedFetch, 
+    "lastFetched:", lastFetchedDate, 
+    "current:", currentDate);
+
   // Effect to fetch attendance data only when date changes, employees load, or explicit refresh is triggered
   useEffect(() => {
     // Handle the case where we have no employees but they're not loading anymore
-    if (!employeesLoading && dataFetched && filteredEmployees.length === 0 && !initAttemptedRef.current) {
-      console.log("No employees available yet, but loading completed and data fetched. Setting attempt flag.");
+    if (!employeesLoading && dataFetched && !initAttemptedRef.current) {
+      console.log("Employee data loaded. Ready to process attendance data.");
       initAttemptedRef.current = true;
-      setHasAttemptedFetch(true);
-      setIsLoading(false);
-      return;
+      
+      if (filteredEmployees.length === 0) {
+        // No employees available, no need to load attendance
+        setHasAttemptedFetch(true);
+        setIsLoading(false);
+        return;
+      }
     }
 
     // Only fetch if we have employees and we're not currently fetching
@@ -67,7 +79,6 @@ export const useAttendanceData = (canEdit: boolean, refreshTrigger: number = 0) 
             setAttendanceData(results);
             setLastFetchedDate(currentDate); // Update last fetched date
             setHasAttemptedFetch(true); // Mark that we've attempted to fetch
-            initAttemptedRef.current = true;
           } catch (error) {
             console.error("Error fetching attendance data:", error);
           } finally {

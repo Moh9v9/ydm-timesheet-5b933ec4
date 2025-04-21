@@ -38,7 +38,7 @@ export const useEmployeeState = () => {
 
       console.log("Employees data received:", data);
       
-      if (data) {
+      if (data && data.length > 0) {
         const formattedEmployees: Employee[] = data.map(emp => ({
           id: emp.id,
           fullName: emp.full_name,
@@ -56,6 +56,7 @@ export const useEmployeeState = () => {
         setEmployees(formattedEmployees);
       } else {
         // Make sure we set an empty array even if no data returns
+        console.log("No employees found in the database");
         setEmployees([]);
       }
       
@@ -83,6 +84,8 @@ export const useEmployeeState = () => {
     if (filters.sponsorship && employee.sponsorship !== filters.sponsorship) return false;
     return true;
   });
+
+  console.log("useEmployeeState - filtered employees:", filteredEmployees.length, "loading:", loading, "dataFetched:", dataFetched);
 
   return {
     employees,

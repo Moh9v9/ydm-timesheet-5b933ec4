@@ -1,4 +1,3 @@
-
 import { useAuth } from "@/contexts/AuthContext";
 import { useAttendance } from "@/contexts/AttendanceContext";
 import { useEmployees } from "@/contexts/EmployeeContext";
@@ -17,7 +16,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 const Attendance = () => {
   const { user } = useAuth();
-  const { filteredEmployees, loading: employeesLoading } = useEmployees();
+  const { filteredEmployees, loading: employeesLoading, dataFetched } = useEmployees();
   const { currentDate, setCurrentDate } = useAttendance();
   const { NotificationContainer } = useNotification();
   const [actualRecordCount, setActualRecordCount] = useState(0);
@@ -28,6 +27,10 @@ const Attendance = () => {
   
   const canEdit = user?.permissions.attendees.edit;
   const canViewAttendance = user?.permissions.attendees.view;
+
+  console.log("Attendance component - Employees loading:", employeesLoading, 
+    "Data fetched:", dataFetched, 
+    "Employee count:", filteredEmployees.length);
 
   const {
     attendanceData,
@@ -87,7 +90,7 @@ const Attendance = () => {
 
       fetchActualRecordCount();
     }
-  }, [currentDate, filteredEmployees.length, user, initialCheckDone, employeesLoading]);
+  }, [currentDate, filteredEmployees.length, user, initialCheckDone, employeesLoading, dataFetched]);
 
   // Update record count when date changes (without triggering a data refresh)
   useEffect(() => {

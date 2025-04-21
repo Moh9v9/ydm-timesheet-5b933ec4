@@ -91,6 +91,8 @@ const AttendanceTable = ({
   // Check if we have both attendance data AND employee data
   const hasData = attendanceData.length > 0 && filteredEmployees.length > 0;
 
+  console.log("AttendanceTable render - Loading:", isLoading, "Employees Loaded:", employeesLoaded, "Filtered Employees:", filteredEmployees.length);
+
   return (
     <div className="bg-card shadow-sm rounded-lg border overflow-hidden">
       <div className="overflow-x-auto">
@@ -147,9 +149,10 @@ const AttendanceTable = ({
               </tr>
             ) : !employeesLoaded ? (
               <tr>
-                <td colSpan={6} className="text-center py-4">
-                  <div className="text-muted-foreground">
-                    Employee data loaded successfully. No employees found in system.
+                <td colSpan={6} className="text-center py-6">
+                  <div className="flex justify-center items-center">
+                    <div className="animate-spin h-5 w-5 mr-3 border-t-2 border-b-2 border-primary rounded-full"></div>
+                    Loading employee data...
                   </div>
                 </td>
               </tr>
@@ -157,7 +160,7 @@ const AttendanceTable = ({
               <tr>
                 <td colSpan={6} className="text-center py-4">
                   <div className="text-muted-foreground">
-                    No employees available
+                    No employees found. Please add employees in the Employees section.
                   </div>
                 </td>
               </tr>
@@ -182,10 +185,16 @@ const AttendanceTable = ({
                   />
                 );
               })
+            ) : attendanceData.length > 0 ? (
+              <tr>
+                <td colSpan={6} className="text-center py-4">
+                  No matching employees found with current filters
+                </td>
+              </tr>
             ) : (
               <tr>
                 <td colSpan={6} className="text-center py-4">
-                  No employees found for attendance tracking
+                  No attendance records found for this date
                 </td>
               </tr>
             )}
