@@ -14,9 +14,13 @@ export function employeeMatchesFilters(
     // Extract just the date part from the ISO timestamp for proper comparison
     const employeeCreationDate = employee.created_at.split('T')[0];
     
-    // Now compare the date parts only
-    if (employeeCreationDate > currentAttendanceDate) return false;
+    // Now compare the date parts only - employee should not appear if created AFTER attendance date
+    if (employeeCreationDate > currentAttendanceDate) {
+      console.log(`Filtering out employee ${employee.id} created on ${employeeCreationDate} for attendance date ${currentAttendanceDate}`);
+      return false;
+    }
   }
+  
   if (filters.status && employee.status !== filters.status) return false;
   if (filters.project && employee.project !== filters.project) return false;
   if (filters.location && employee.location !== filters.location) return false;

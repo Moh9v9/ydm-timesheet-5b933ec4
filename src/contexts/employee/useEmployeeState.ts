@@ -59,11 +59,21 @@ export const useEmployeeState = (currentAttendanceDate?: string) => {
   };
 
   // --- FILTERING STEP ---
-  const filteredEmployees = employees.filter(employee =>
-    employeeMatchesFilters(employee, filters, currentAttendanceDate)
-  );
+  const filteredEmployees = employees.filter(employee => {
+    // Add specific debugging for the employee we're having trouble with
+    if (employee.id === "c015e513-e1ed-4403-b699-6fb1a37a2dbc") {
+      console.log("Target employee found:", employee);
+      console.log("Creation date:", employee.created_at);
+      console.log("Current attendance date:", currentAttendanceDate);
+      const matches = employeeMatchesFilters(employee, filters, currentAttendanceDate);
+      console.log("Should show in table:", matches);
+      return matches;
+    }
+    return employeeMatchesFilters(employee, filters, currentAttendanceDate);
+  });
 
-  console.log("🔍 useEmployeeState - filtered employees:", filteredEmployees.length, "loading:", loading, "dataFetched:", dataFetched);
+  console.log("🔍 useEmployeeState - filtered employees:", filteredEmployees.length, 
+    "of", employees.length, "total. Attendance date:", currentAttendanceDate);
 
   return {
     employees,
