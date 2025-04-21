@@ -1,8 +1,7 @@
+
 import { NavLink, useNavigate } from "react-router-dom";
 import { 
-  User, 
   Users, 
-  Calendar, 
   Settings, 
   ChevronLeft,
   BarChart3,
@@ -19,8 +18,9 @@ const Sidebar = ({ isOpen, toggleSidebar }: SidebarProps) => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  const handleProfileClick = () => {
-    navigate("/settings");
+  const handleNavigate = (path: string) => {
+    navigate(path);
+    // Hide sidebar on mobile after navigation
     if (window.innerWidth < 768) {
       toggleSidebar();
     }
@@ -76,61 +76,53 @@ const Sidebar = ({ isOpen, toggleSidebar }: SidebarProps) => {
 
           <nav className="flex-1 px-2 py-2 space-y-1 overflow-y-auto">
             {/* Navigation Links */}
-            <NavLink
-              to="/"
-              className={({ isActive }) =>
-                `flex items-center px-3 py-2 rounded-md transition-colors ${
-                  isActive
-                    ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                    : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-                } ${!isOpen && "md:justify-center"}`
-              }
+            <button
+              onClick={() => handleNavigate("/")}
+              className={`flex items-center px-3 py-2 rounded-md transition-colors ${
+                window.location.pathname === "/"
+                  ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                  : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+              } ${!isOpen && "md:justify-center"}`}
             >
               <BarChart3 size={20} className={isOpen ? "mr-3" : ""} />
               {(isOpen || window.innerWidth < 768) && <span>Dashboard</span>}
-            </NavLink>
+            </button>
 
-            <NavLink
-              to="/employees"
-              className={({ isActive }) =>
-                `flex items-center px-3 py-2 rounded-md transition-colors ${
-                  isActive
-                    ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                    : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-                } ${!isOpen && "md:justify-center"}`
-              }
+            <button
+              onClick={() => handleNavigate("/employees")}
+              className={`flex items-center px-3 py-2 rounded-md transition-colors ${
+                window.location.pathname === "/employees"
+                  ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                  : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+              } ${!isOpen && "md:justify-center"}`}
             >
               <Users size={20} className={isOpen ? "mr-3" : ""} />
               {(isOpen || window.innerWidth < 768) && <span>Employees</span>}
-            </NavLink>
+            </button>
 
-            <NavLink
-              to="/reports"
-              className={({ isActive }) =>
-                `flex items-center px-3 py-2 rounded-md transition-colors ${
-                  isActive
-                    ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                    : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-                } ${!isOpen && "md:justify-center"}`
-              }
+            <button
+              onClick={() => handleNavigate("/reports")}
+              className={`flex items-center px-3 py-2 rounded-md transition-colors ${
+                window.location.pathname === "/reports"
+                  ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                  : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+              } ${!isOpen && "md:justify-center"}`}
             >
               <FileSpreadsheet size={20} className={isOpen ? "mr-3" : ""} />
               {(isOpen || window.innerWidth < 768) && <span>Reports</span>}
-            </NavLink>
+            </button>
 
-            <NavLink
-              to="/settings"
-              className={({ isActive }) =>
-                `flex items-center px-3 py-2 rounded-md transition-colors ${
-                  isActive
-                    ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                    : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-                } ${!isOpen && "md:justify-center"}`
-              }
+            <button
+              onClick={() => handleNavigate("/settings")}
+              className={`flex items-center px-3 py-2 rounded-md transition-colors ${
+                window.location.pathname === "/settings"
+                  ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                  : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+              } ${!isOpen && "md:justify-center"}`}
             >
               <Settings size={20} className={isOpen ? "mr-3" : ""} />
               {(isOpen || window.innerWidth < 768) && <span>Settings</span>}
-            </NavLink>
+            </button>
           </nav>
 
           {/* The profile block has been removed from here */}
@@ -141,3 +133,4 @@ const Sidebar = ({ isOpen, toggleSidebar }: SidebarProps) => {
 };
 
 export default Sidebar;
+
