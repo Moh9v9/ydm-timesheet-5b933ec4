@@ -26,6 +26,16 @@ export const formatAttendanceForExport = (
     }
   }
 
+  // Sort records by date then by employee name for better readability
+  filteredRecords.sort((a, b) => {
+    // First compare by date
+    const dateComparison = a.date.localeCompare(b.date);
+    if (dateComparison !== 0) return dateComparison;
+    
+    // If dates are equal, compare by employee name
+    return a.employeeName.localeCompare(b.employeeName);
+  });
+
   return filteredRecords.map(record => ({
     'Date': record.date,
     'Employee Name': record.employeeName,

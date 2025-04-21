@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { StyledSelect } from "@/components/ui/styled-select";
 import { ExportFormat, ReportType } from "@/lib/types";
@@ -20,6 +21,14 @@ interface ReportSelectionFormProps {
   setSelectedDate: (date: Date) => void;
   searchTerm: string;
   setSearchTerm: (value: string) => void;
+  selectedProject: string;
+  setSelectedProject: (value: string) => void;
+  selectedLocation: string;
+  setSelectedLocation: (value: string) => void;
+  selectedPaymentType: string;
+  setSelectedPaymentType: (value: string) => void;
+  includeInactive: boolean;
+  setIncludeInactive: (value: boolean) => void;
 }
 
 const ReportSelectionForm = ({
@@ -32,12 +41,16 @@ const ReportSelectionForm = ({
   selectedDate,
   setSelectedDate,
   searchTerm,
-  setSearchTerm
+  setSearchTerm,
+  selectedProject,
+  setSelectedProject,
+  selectedLocation,
+  setSelectedLocation,
+  selectedPaymentType,
+  setSelectedPaymentType,
+  includeInactive,
+  setIncludeInactive
 }: ReportSelectionFormProps) => {
-  const [selectedProject, setSelectedProject] = useState<string>("all");
-  const [selectedLocation, setSelectedLocation] = useState<string>("all");
-  const [selectedPaymentType, setSelectedPaymentType] = useState<string>("all");
-  const [includeInactive, setIncludeInactive] = useState(false);
   const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
   
   const { getUniqueValues } = useEmployees();

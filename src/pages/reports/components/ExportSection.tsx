@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useEmployees } from "@/contexts/EmployeeContext";
 import { useAttendance } from "@/contexts/AttendanceContext";
@@ -29,6 +30,10 @@ const ExportSection = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [searchTerm, setSearchTerm] = useState<string>("");
+  const [selectedProject, setSelectedProject] = useState<string>("all");
+  const [selectedLocation, setSelectedLocation] = useState<string>("all");
+  const [selectedPaymentType, setSelectedPaymentType] = useState<string>("all");
+  const [includeInactive, setIncludeInactive] = useState(false);
   
   const { filteredEmployees } = useEmployees();
   const { attendanceRecords, currentDate } = useAttendance();
@@ -63,10 +68,51 @@ const ExportSection = () => {
           .select('*')
           .eq('present', true); // Only get present records
         
+        // Get the month and year from selected date for monthly reports
+        const selectedMonth = selectedDate.getMonth();
+        const selectedYear = selectedDate.getFullYear();
+        
+        // Add date filtering for the selected month
+        query = query.gte('date', `${selectedYear}-${String(selectedMonth + 1).padStart(2, '0')}-01`)
+                     .lte('date', `${selectedYear}-${String(selectedMonth + 1).padStart(2, '0')}-31`);
+        
         // Add employee filter if an employee is selected
         if (searchTerm && searchTerm !== "") {
           console.log(`Filtering attendance records by employee: ${searchTerm}`);
           query = query.eq('employee_name', searchTerm);
+        }
+        
+        // Apply payment type filter if selected
+        if (selectedPaymentType && selectedPaymentType !== "all") {
+          console.log(`Filtering by payment type: ${selectedPaymentType}`);
+          
+          // We need to get employee IDs with the selected payment type first
+          const { data: filteredEmployees } = await supabase
+            .from('employees')
+            .select('id, payment_type')
+            .eq('payment_type', selectedPaymentType)
+            .or(includeInactive ? `status.eq.Active,status.eq.Archived` : 'status.eq.Active');
+          
+          if (filteredEmployees && filteredEmployees.length > 0) {
+            const employeeIds = filteredEmployees.map(emp => emp.id);
+            console.log(`Found ${employeeIds.length} employees with payment type '${selectedPaymentType}'`);
+            
+            // Filter attendance records by these employee IDs
+            query = query.in('employee_uuid', employeeIds);
+          } else {
+            console.log(`No employees found with payment type: ${selectedPaymentType}`);
+            // Return early as no employees match criteria
+            setIsGenerating(false);
+            error(`No employees found with payment type: ${selectedPaymentType}`);
+            return;
+          }
+        }
+        
+        // If include inactive is turned on but no payment type filter,
+        // we need to handle that separately
+        if (includeInactive && (selectedPaymentType === "all" || !selectedPaymentType)) {
+          console.log('Including inactive employees in the report');
+          // No additional filtering needed here as we're not filtering out archived employees
         }
           
         const { data, error: fetchError } = await query;
@@ -108,7 +154,8 @@ const ExportSection = () => {
       // Create filename based on report type and date and employee if filtered
       const dateStr = format(selectedDate, "yyyyMMdd");
       const employeeStr = searchTerm ? `-${searchTerm.replace(/\s+/g, '-')}` : '';
-      const filename = `${reportType}-attendance${employeeStr}-${dateStr}.${exportFormat}`;
+      const paymentTypeStr = selectedPaymentType !== 'all' ? `-${selectedPaymentType}` : '';
+      const filename = `${reportType}-attendance${employeeStr}${paymentTypeStr}-${dateStr}.${exportFormat}`;
       
       // Download the file
       downloadFile(content, filename, mimeType, isBinary);
@@ -119,6 +166,8 @@ const ExportSection = () => {
         exportFormat,
         date: formattedDate,
         employee: searchTerm || "All",
+        paymentType: selectedPaymentType,
+        includeInactive,
         employeesCount: filteredEmployees.length,
         recordsCount: formattedData.length
       });
@@ -158,6 +207,14 @@ const ExportSection = () => {
                   setSelectedDate={setSelectedDate}
                   searchTerm={searchTerm}
                   setSearchTerm={setSearchTerm}
+                  selectedProject={selectedProject}
+                  setSelectedProject={setSelectedProject}
+                  selectedLocation={selectedLocation}
+                  setSelectedLocation={setSelectedLocation}
+                  selectedPaymentType={selectedPaymentType}
+                  setSelectedPaymentType={setSelectedPaymentType}
+                  includeInactive={includeInactive}
+                  setIncludeInactive={setIncludeInactive}
                 />
               </div>
               
