@@ -22,7 +22,7 @@ export async function employeeMatchesFilters(
     }
   }
   
-  // Status filter handling - Only apply when a specific status is selected
+  // Status filter handling - Only apply when a specific status is selected (not "All")
   if (filters.status && filters.status !== "All") {
     console.log(`Checking status filter for ${employee.fullName}: employee status=${employee.status}, filter status=${filters.status}`);
     
@@ -59,6 +59,7 @@ export async function employeeMatchesFilters(
     console.log(`Archived employee ${employee.id} (${employee.fullName}) included - has record for date: ${currentAttendanceDate} with present=${data.present}`);
   }
   
+  // Apply other filters
   if (filters.project && employee.project !== filters.project) return false;
   if (filters.location && employee.location !== filters.location) return false;
   if (filters.paymentType && employee.paymentType !== filters.paymentType) return false;
