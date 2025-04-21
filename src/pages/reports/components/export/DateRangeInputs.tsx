@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { format } from "date-fns";
 import { ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
@@ -134,7 +133,7 @@ const DateRangeInputs = ({ reportType, currentDate, selectedDate, setSelectedDat
                 </div>
               </div>
               
-              <div className="grid grid-cols-2 gap-2 mb-2">
+              <div className="grid grid-cols-2 gap-2">
                 <select 
                   value={selectedDate.getFullYear()}
                   onChange={(e) => {
@@ -187,44 +186,6 @@ const DateRangeInputs = ({ reportType, currentDate, selectedDate, setSelectedDat
                   ))}
                 </select>
               </div>
-              
-              <Calendar
-                mode="single"
-                selected={selectedDate}
-                onSelect={handleSelect}
-                month={selectedDate}
-                className="pointer-events-auto"
-                classNames={{
-                  month: "space-y-4",
-                  caption: "hidden", // Hide the default caption
-                  table: "w-full border-collapse",
-                  head_row: "flex",
-                  head_cell: cn(
-                    "text-muted-foreground rounded-md w-9 font-normal text-xs",
-                    "uppercase tracking-wide"
-                  ),
-                  row: "flex w-full mt-2",
-                  cell: cn(
-                    "relative p-0 text-center text-sm focus-within:relative focus-within:z-20",
-                    "first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md"
-                  ),
-                  day: cn(
-                    "h-9 w-9 p-0 font-normal",
-                    "rounded-md transition-colors duration-200",
-                    "hover:bg-primary/10 dark:hover:bg-primary/20",
-                    "focus:outline-none focus:ring-2 focus:ring-primary/20"
-                  ),
-                  day_selected: cn(
-                    "bg-primary text-primary-foreground dark:bg-primary dark:text-primary-foreground",
-                    "hover:bg-primary hover:text-primary-foreground",
-                    "focus:bg-primary focus:text-primary-foreground"
-                  ),
-                  day_today: "bg-accent/50 text-accent-foreground dark:bg-accent/30 dark:text-white",
-                  day_outside: "text-muted-foreground/50 dark:text-muted-foreground/30",
-                  day_disabled: "text-muted-foreground/50 dark:text-muted-foreground/30",
-                  day_hidden: "invisible",
-                }}
-              />
               
               <div className="mt-2 flex justify-end">
                 <button
