@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useEmployees } from "@/contexts/EmployeeContext";
 import { Employee } from "@/lib/types";
@@ -16,7 +15,6 @@ export const useEmployeePage = () => {
     refreshEmployees
   } = useEmployees();
 
-  const [showFilters, setShowFilters] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentEmployee, setCurrentEmployee] = useState<Employee | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -91,8 +89,6 @@ export const useEmployeePage = () => {
   };
 
   return {
-    showFilters,
-    setShowFilters,
     isModalOpen,
     currentEmployee,
     deleteDialogOpen,

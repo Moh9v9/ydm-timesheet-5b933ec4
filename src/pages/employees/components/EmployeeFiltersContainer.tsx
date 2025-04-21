@@ -3,8 +3,6 @@ import { EmployeeFilters } from "@/lib/types";
 import { EmployeeFiltersSection } from "./EmployeeFilters";
 
 interface EmployeeFiltersContainerProps {
-  showFilters: boolean;
-  setShowFilters: (show: boolean) => void;
   filters: EmployeeFilters;
   onFilterChange: (key: keyof EmployeeFilters, value: string) => void;
   filterOptions: {
@@ -16,8 +14,6 @@ interface EmployeeFiltersContainerProps {
 }
 
 export const EmployeeFiltersContainer = ({
-  showFilters,
-  setShowFilters,
   filters,
   onFilterChange,
   filterOptions
@@ -26,8 +22,6 @@ export const EmployeeFiltersContainer = ({
     <div className="p-4 border-b dark:border-gray-800">
       <div className="flex flex-col gap-4">
         <EmployeeFiltersSection
-          showFilters={showFilters}
-          setShowFilters={setShowFilters}
           filters={filters}
           onFilterChange={onFilterChange}
           projects={filterOptions.projects}

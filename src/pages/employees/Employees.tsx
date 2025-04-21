@@ -1,4 +1,3 @@
-
 import { useEmployeePage } from "./hooks/useEmployeePage";
 import { EmployeePageHeader } from "./components/EmployeePageHeader";
 import { EmployeeFiltersContainer } from "./components/EmployeeFiltersContainer";
@@ -8,8 +7,6 @@ import DeleteConfirmationDialog from "@/components/DeleteConfirmationDialog";
 
 const Employees = () => {
   const {
-    showFilters,
-    setShowFilters,
     isModalOpen,
     currentEmployee,
     deleteDialogOpen,
@@ -38,8 +35,6 @@ const Employees = () => {
       
       <div className="bg-card dark:bg-gray-900/50 shadow-sm rounded-lg border dark:border-gray-800 overflow-hidden">
         <EmployeeFiltersContainer
-          showFilters={showFilters}
-          setShowFilters={setShowFilters}
           filters={filters}
           onFilterChange={handleFilterChange}
           filterOptions={filterOptions}
