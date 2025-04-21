@@ -1,68 +1,26 @@
 
-import { useAuth } from "@/contexts/AuthContext";
-import { format } from "date-fns";
-import { Skeleton } from "@/components/ui/skeleton";
-import { CardInformation } from "@/components/dashboard/CardInformation";
-import DailyAttendance from "@/components/dashboard/DailyAttendance";
-import { useStatistics } from "@/hooks/useStatistics";
+import { Suspense } from "react";
+import Dashboard from "./dashboard/Dashboard";
 import { AttendanceProvider } from "@/contexts/AttendanceContext";
 import { EmployeeProvider } from "@/contexts/EmployeeContext";
+import DailyAttendance from "@/components/dashboard/DailyAttendance";
 
 const Index = () => {
-  const { user } = useAuth();
-  
-  // Use today's date for display
-  const today = new Date();
-  const formattedDate = format(today, "EEEE, MMMM d, yyyy");
-  
-  // Wrap the entire component in both providers to ensure stats can access employee data and currentDate
   return (
-    <AttendanceProvider>
-      <EmployeeProvider>
-        <IndexContent user={user} formattedDate={formattedDate} />
-      </EmployeeProvider>
-    </AttendanceProvider>
-  );
-};
-
-// Separate component to ensure it can use hooks within the provider contexts
-const IndexContent = ({ user, formattedDate }: { user: any, formattedDate: string }) => {
-  // Get attendance statistics
-  const { totalEmployees, presentToday, absentToday, isLoading } = useStatistics();
-  
-  console.log("Dashboard rendering with stats:", { totalEmployees, presentToday, absentToday, isLoading });
-
-  return (
-    <div className="space-y-6 animate-fade-in">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
-        <div>
-          <h1 className="text-2xl font-bold">Dashboard</h1>
-          <p className="text-muted-foreground">
-            Welcome back, {user?.fullName || "User"}
-          </p>
-        </div>
-        <div className="mt-2 md:mt-0 text-sm font-medium text-muted-foreground">
-          {formattedDate}
-        </div>
-      </div>
-
-      {!user ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mb-4">
-          <Skeleton className="h-24" />
-          <Skeleton className="h-24" />
-          <Skeleton className="h-24" />
-        </div>
-      ) : (
-        <CardInformation
-          totalEmployees={totalEmployees}
-          presentToday={presentToday}
-          absentToday={absentToday}
-          isLoading={isLoading}
-        />
-      )}
-
-      <div className="mt-6">
-        {user && <DailyAttendance />}
+    <div className="container py-10 max-w-7xl mx-auto">
+      <h1 className="text-3xl font-semibold mb-8">Dashboard</h1>
+      
+      <Dashboard />
+      
+      <div className="mt-8">
+        <h2 className="text-2xl font-semibold mb-4">Today's Attendance</h2>
+        <AttendanceProvider>
+          <EmployeeProvider>
+            <Suspense fallback={<div>Loading attendance data...</div>}>
+              <DailyAttendance />
+            </Suspense>
+          </EmployeeProvider>
+        </AttendanceProvider>
       </div>
     </div>
   );

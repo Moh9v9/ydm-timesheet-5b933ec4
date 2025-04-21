@@ -21,17 +21,18 @@ export function employeeMatchesFilters(
     }
   }
   
-  // VERY IMPORTANT: For attendance view, we should NEVER filter by status
-  // Allow all employees (active or archived) to appear in attendance tables
+  // CRITICAL: In attendance view (when currentAttendanceDate exists), NEVER filter by status
+  // We must include ALL employees (active or archived) that existed on that date
   if (filters.status && employee.status !== filters.status && !currentAttendanceDate) {
-    // Only apply status filter when NOT in attendance view
+    // Status filter is ONLY applied when NOT viewing attendance
     return false;
   }
   
-  // Log when specifically looking for target archived employees to aid debugging
+  // Debug logging for specific IDs you're looking for
   if (employee.id === "1fdd63f7-a399-4341-8c16-d72b0ab3ca8f" || employee.id === "07ea4c39-8033-439c-89e9-2361833e906d") {
-    console.log(`Checking target archived employee ${employee.id} (${employee.fullName}) - Status: ${employee.status}`);
-    console.log(`Current attendance date: ${currentAttendanceDate}, Will show: ${currentAttendanceDate ? "YES" : "NO"}`);
+    console.log(`TARGET EMPLOYEE FOUND: ${employee.id} (${employee.fullName})`);
+    console.log(`Status: ${employee.status}, Attendance date: ${currentAttendanceDate}`);
+    console.log(`Will show in table: YES`);
   }
   
   if (filters.project && employee.project !== filters.project) return false;
