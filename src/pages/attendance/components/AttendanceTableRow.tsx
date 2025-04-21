@@ -35,6 +35,11 @@ const AttendanceTableRow = ({
 
   const isArchived = employee.status === "Archived";
 
+  // Add debugging for archived employees
+  if (isArchived) {
+    console.log(`Rendering archived employee row: ${employee.fullName} (${employee.id})`);
+  }
+
   return (
     <TooltipProvider>
       <tr
@@ -67,7 +72,7 @@ const AttendanceTableRow = ({
         <td className="p-3">
           <div className="flex items-center">
             <div 
-              className={`relative w-12 h-6 rounded-full cursor-pointer transition-colors ${
+              className={`relative w-12 h-6 rounded-full ${!canEdit ? "opacity-60" : "cursor-pointer"} transition-colors ${
                 record.present 
                   ? "bg-present" 
                   : "bg-absent"

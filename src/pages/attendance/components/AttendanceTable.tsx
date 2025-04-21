@@ -5,7 +5,8 @@ import AttendanceTableRow from "./AttendanceTableRow";
 import AttendanceTableEmptyState from "./AttendanceTableEmptyState";
 import { useAttendanceTableSort, SortField } from "./useAttendanceTableSort";
 import SortIcon from "./SortIcon";
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
+import { useAttendance } from "@/contexts/AttendanceContext";
 
 interface AttendanceTableProps {
   attendanceData: AttendanceRecord[];
@@ -30,56 +31,101 @@ const AttendanceTable = ({
   isLoading = false,
   employeesLoaded = false,
 }: AttendanceTableProps) => {
+  const { currentDate } = useAttendance();
+
+  // Create a map of existing attendance records by employee ID
+  const attendanceByEmployeeId = useMemo(() => {
+    const map = new Map<string, AttendanceRecord>();
+    attendanceData.forEach(record => {
+      map.set(record.employeeId, record);
+    });
+    return map;
+  }, [attendanceData]);
+
+  // Generate combined data with records for every employee (even if no record exists)
+  const combinedData = useMemo(() => {
+    // For debugging
+    const archivedEmployees = filteredEmployees.filter(emp => emp.status === "Archived");
+    if (archivedEmployees.length > 0) {
+      console.log(`Found ${archivedEmployees.length} archived employees to display:`, 
+        archivedEmployees.map(e => ({id: e.id, name: e.fullName})));
+    }
+
+    // Create a record for each employee, either existing or dummy
+    return filteredEmployees.map((employee, idx) => {
+      // Check if we already have a record for this employee
+      const existingRecord = attendanceByEmployeeId.get(employee.id);
+      
+      if (existingRecord) {
+        return {
+          record: existingRecord,
+          originalIndex: attendanceData.findIndex(r => r.id === existingRecord.id),
+          employee
+        };
+      } else {
+        // Create a placeholder record for employees that don't have one
+        // This ensures all employees (including archived) appear in the table
+        console.log(`Creating placeholder record for ${employee.fullName} (${employee.id}), status: ${employee.status}`);
+        return {
+          record: {
+            id: `temp-${employee.id}`,
+            employeeId: employee.id,
+            employeeName: employee.fullName,
+            date: currentDate,
+            present: false,
+            startTime: "",
+            endTime: "",
+            overtimeHours: 0,
+            note: ""
+          },
+          originalIndex: -1, // Indicates this is a placeholder
+          employee
+        };
+      }
+    });
+  }, [filteredEmployees, attendanceData, attendanceByEmployeeId, currentDate]);
+
   const {
     sortField,
     sortDirection,
     handleSort,
     getSortedData,
-  } = useAttendanceTableSort({ attendanceData, filteredEmployees });
+  } = useAttendanceTableSort({ 
+    // Pass the combined data to the sorting hook
+    attendanceData: combinedData.map(item => item.record), 
+    filteredEmployees
+  });
 
-  const hasData = attendanceData.length > 0 && filteredEmployees.length > 0;
-  const sortedData = getSortedData();
-
-  // Enhanced debugging - log employee status to help track archived employees
-  useEffect(() => {
-    // Debug log to trace employee IDs and check if archived employees are included
-    const employeeIds = filteredEmployees.map(e => e.id);
-    console.log("Filtered employees IDs:", employeeIds);
-    
-    // Check for archived employees in the filtered list
-    const archivedEmployees = filteredEmployees.filter(e => e.status === "Archived");
-    console.log(`Found ${archivedEmployees.length} archived employees in filtered list:`, 
-      archivedEmployees.map(e => ({id: e.id, name: e.fullName})));
-    
-    // Check if specific archived employees are in the filtered list
-    const targetIds = ["1fdd63f7-a399-4341-8c16-d72b0ab3ca8f", "07ea4c39-8033-439c-89e9-2361833e906d"];
-    
-    targetIds.forEach(id => {
-      const employee = filteredEmployees.find(e => e.id === id);
-      if (employee) {
-        console.log(`Found target archived employee: ${employee.fullName} (${id})`);
+  // Sort the combined data
+  const sortedData = useMemo(() => {
+    return [...combinedData].sort((a, b) => {
+      const direction = sortDirection === "asc" ? 1 : -1;
+      
+      switch (sortField) {
+        case "employee":
+          return direction * (a.employee.fullName.localeCompare(b.employee.fullName));
+        case "status":
+          return direction * (a.record.present === b.record.present ? 0 : a.record.present ? 1 : -1);
+        case "startTime":
+          return direction * (a.record.startTime.localeCompare(b.record.startTime));
+        case "endTime":
+          return direction * (a.record.endTime.localeCompare(b.record.endTime));
+        case "overtimeHours":
+          return direction * (a.record.overtimeHours - b.record.overtimeHours);
+        case "notes":
+          return direction * ((a.record.note || "").localeCompare(b.record.note || ""));
+        default:
+          return 0;
       }
     });
-    
-    // Log attendance records for archived employees
-    const archivedRecords = attendanceData.filter(record => 
-      archivedEmployees.some(emp => emp.id === record.employeeId)
-    );
-    
-    console.log(`Found ${archivedRecords.length} attendance records for archived employees:`, archivedRecords);
-    
-    // Check if records exist for the target archived employees
-    targetIds.forEach(id => {
-      const records = attendanceData.filter(record => record.employeeId === id);
-      console.log(`Found ${records.length} attendance records for employee ID ${id}:`, records);
-    });
-  }, [filteredEmployees, attendanceData]);
+  }, [combinedData, sortField, sortDirection]);
 
-  // Debug log just in case
-  console.log("🔍 AttendanceTable render - Loading:", isLoading, 
-    "Employees Loaded:", employeesLoaded, 
-    "Filtered Employees:", filteredEmployees.length,
-    "Attendance Data:", attendanceData.length);
+  useEffect(() => {
+    // Log the final sorted data that will be displayed
+    console.log(`AttendanceTable will display ${sortedData.length} rows (${
+      sortedData.filter(item => item.employee.status === "Archived").length
+    } archived)`);
+  }, [sortedData]);
 
   return (
     <div className="bg-card shadow-sm rounded-lg border overflow-hidden">
@@ -126,30 +172,36 @@ const AttendanceTable = ({
             </tr>
           </thead>
           <tbody>
-            {hasData && sortedData.some(({ record }) => filteredEmployees.find(emp => emp.id === record.employeeId)) ? (
-              sortedData.map(({ record, originalIndex }) => {
-                const employee = filteredEmployees.find(
-                  emp => emp.id === record.employeeId
-                );
-
-                if (!employee) {
-                  console.log(`No employee found for record with employeeId: ${record.employeeId}`);
-                  return null;
-                }
-
-                return (
-                  <AttendanceTableRow
-                    key={record.id}
-                    record={record}
-                    employee={employee}
-                    onToggleAttendance={() => onToggleAttendance(originalIndex)}
-                    onTimeChange={(field, value) => onTimeChange(originalIndex, field, value)}
-                    onOvertimeChange={(value) => onOvertimeChange(originalIndex, value)}
-                    onNoteChange={(value) => onNoteChange(originalIndex, value)}
-                    canEdit={canEdit}
-                  />
-                );
-              })
+            {sortedData.length > 0 ? (
+              sortedData.map(({ record, originalIndex, employee }) => (
+                <AttendanceTableRow
+                  key={record.id}
+                  record={record}
+                  employee={employee}
+                  onToggleAttendance={() => {
+                    // Only toggle if this is an existing record
+                    if (originalIndex >= 0) {
+                      onToggleAttendance(originalIndex);
+                    }
+                  }}
+                  onTimeChange={(field, value) => {
+                    if (originalIndex >= 0) {
+                      onTimeChange(originalIndex, field, value);
+                    }
+                  }}
+                  onOvertimeChange={(value) => {
+                    if (originalIndex >= 0) {
+                      onOvertimeChange(originalIndex, value);
+                    }
+                  }}
+                  onNoteChange={(value) => {
+                    if (originalIndex >= 0) {
+                      onNoteChange(originalIndex, value);
+                    }
+                  }}
+                  canEdit={canEdit && originalIndex >= 0}
+                />
+              ))
             ) : (
               <AttendanceTableEmptyState
                 isLoading={isLoading}

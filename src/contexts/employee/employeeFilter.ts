@@ -28,7 +28,11 @@ export function employeeMatchesFilters(
     return false;
   }
   
-  // Debug logging for known target IDs
+  if (employee.status === "Archived" && currentAttendanceDate) {
+    console.log(`Archived employee ${employee.id} (${employee.fullName}) included for attendance date: ${currentAttendanceDate}`);
+    return true; // Always include archived employees in attendance view
+  }
+  
   if (employee.id === "1fdd63f7-a399-4341-8c16-d72b0ab3ca8f" || 
       employee.id === "07ea4c39-8033-439c-89e9-2361833e906d" ||
       employee.id === "e267bcd9-6d19-432f-8354-0f8e069a3071" ||
