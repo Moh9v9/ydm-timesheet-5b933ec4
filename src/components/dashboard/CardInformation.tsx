@@ -16,13 +16,13 @@ export const CardInformation = ({
   absentToday,
   isLoading = false,
 }: CardInformationProps) => (
-  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mb-4 min-h-[120px] transition-all duration-300">
+  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mb-4 relative">
     {isLoading ? (
-      <>
+      <div className="col-span-1 md:col-span-2 lg:col-span-3 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 w-full">
         <Skeleton className="h-24" />
         <Skeleton className="h-24" />
         <Skeleton className="h-24" />
-      </>
+      </div>
     ) : (
       <>
         <StatsCard
