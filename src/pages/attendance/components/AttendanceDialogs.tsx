@@ -28,7 +28,7 @@ const AttendanceDialogs = ({
     <BulkUpdateDialog
       open={showBulkUpdate}
       onClose={() => setShowBulkUpdate(false)}
-      onConfirm={data => onBulkUpdateConfirm(attendanceData, data)}
+      onConfirm={onBulkUpdateConfirm}
     />
     <ConfirmDialog
       open={showSaveConfirm}
