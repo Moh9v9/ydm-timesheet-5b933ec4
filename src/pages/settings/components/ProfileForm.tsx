@@ -56,9 +56,8 @@ const ProfileForm = () => {
       };
       
       if (formData.newPassword) {
-        if (formData.currentPassword !== user?.password) {
-          throw new Error("Current password is incorrect");
-        }
+        // Pass both the current password and new password for verification
+        updateData.currentPassword = formData.currentPassword;
         updateData.password = formData.newPassword;
       }
       

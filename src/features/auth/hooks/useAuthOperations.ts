@@ -1,3 +1,4 @@
+
 import { User } from "@/lib/types";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -118,8 +119,19 @@ export const useAuthOperations = () => {
           if (metadataError) throw metadataError;
         }
 
-        // If password is provided, update it through Auth API
-        if (userData.password) {
+        // If password change is requested, handle it properly
+        if (userData.password && userData.currentPassword) {
+          // First verify the current password by attempting to sign in
+          const { error: signInError } = await supabase.auth.signInWithPassword({
+            email: userData.email || user?.email || '',
+            password: userData.currentPassword,
+          });
+          
+          if (signInError) {
+            throw new Error("Current password is incorrect");
+          }
+          
+          // If verification succeeded, update the password
           const { error: passwordError } = await supabase.auth.updateUser({
             password: userData.password,
           });
@@ -127,10 +139,7 @@ export const useAuthOperations = () => {
           if (passwordError) throw passwordError;
         }
 
-        // Update profile data in the profiles table
-        const updateData: any = {};
-        
-        if (userData.fullName) updateData.full_name = userData.fullName;
+        // Update email if provided
         if (userData.email) {
           // Update email through Auth API
           const { error: emailError } = await supabase.auth.updateUser({
@@ -138,10 +147,13 @@ export const useAuthOperations = () => {
           });
           
           if (emailError) throw emailError;
-          
-          // Also update in profiles table
-          updateData.email = userData.email;
         }
+
+        // Update profile data in the profiles table
+        const updateData: any = {};
+        
+        if (userData.fullName) updateData.full_name = userData.fullName;
+        if (userData.email) updateData.email = userData.email;
         if (userData.role) updateData.role = userData.role;
         if (userData.permissions) updateData.permissions = userData.permissions;
 

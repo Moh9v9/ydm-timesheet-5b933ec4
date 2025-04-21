@@ -38,6 +38,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setSession(null);
         throw error;
       }
+    },
+    updateProfile: async (userData) => {
+      try {
+        await operations.updateProfile(userData);
+        
+        // Update local state to reflect changes
+        if (user) {
+          setUser({
+            ...user,
+            ...userData,
+            // Don't update password in local state
+            password: user.password
+          });
+        }
+      } catch (error) {
+        console.error("Enhanced update profile error:", error);
+        throw error;
+      }
     }
   };
 
