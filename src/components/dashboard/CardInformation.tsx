@@ -19,7 +19,10 @@ export const CardInformation = ({
   return (
     <div
       className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mb-4"
-      style={{ backgroundColor: "transparent" }}
+      style={{ 
+        backgroundColor: "transparent", 
+        background: "none" 
+      }}
     >
       {isLoading ? (
         <>

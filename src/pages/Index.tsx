@@ -7,7 +7,7 @@ import DailyAttendance from "@/components/dashboard/DailyAttendance";
 import { useStatistics } from "@/hooks/useStatistics";
 import { AttendanceProvider } from "@/contexts/AttendanceContext";
 import { EmployeeProvider } from "@/contexts/EmployeeContext";
-import { Suspense, useState, useEffect } from "react";
+import { Suspense, useState } from "react";
 
 const Index = () => {
   const { user } = useAuth();
@@ -16,8 +16,8 @@ const Index = () => {
   const today = new Date();
   const formattedDate = format(today, "EEEE, MMMM d, yyyy");
 
-  // Show content immediately - no animation
-  const [mounted, setMounted] = useState(true);
+  // Remove animation logic completely
+  const [mounted] = useState(true);
 
   return (
     <div className="space-y-6 container py-10 max-w-7xl mx-auto min-h-[800px]">
