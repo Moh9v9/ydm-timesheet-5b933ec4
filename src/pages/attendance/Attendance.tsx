@@ -24,7 +24,8 @@ const Attendance = () => {
   const [dataRefreshTrigger, setDataRefreshTrigger] = useState(0);
   
   const canEdit = user?.permissions.attendees.edit;
-  
+  const canViewAttendance = user?.permissions.attendees.view;
+
   const {
     attendanceData,
     isLoading,
@@ -47,12 +48,10 @@ const Attendance = () => {
     refreshData
   } = useAttendanceOperations(canEdit);
 
-  // Fetch the actual record count from Supabase once on initial load
   useEffect(() => {
     const fetchActualRecordCount = async () => {
       setRecordsLoading(true);
       try {
-        // Make sure we're always using the current date from context
         console.log("Attendance - Fetching record count for date:", currentDate);
         const { count, error } = await supabase
           .from('attendance_records')
@@ -67,7 +66,6 @@ const Attendance = () => {
         console.log(`Attendance - Found ${count || 0} records for date ${currentDate}`);
         setActualRecordCount(count || 0);
         
-        // If we have records or employees have loaded, trigger a refresh of the attendance data
         if ((count && count > 0) || filteredEmployees.length > 0) {
           setDataRefreshTrigger(prev => prev + 1);
         }
@@ -78,18 +76,14 @@ const Attendance = () => {
       }
     };
 
-    // Fetch count when component mounts or currentDate changes
     fetchActualRecordCount();
     
-    // No more refresh timer
   }, [currentDate, filteredEmployees.length]);
 
-  // Refresh attendance data after successful save
   const handleSuccessfulSave = () => {
     setDataRefreshTrigger(prev => prev + 1);
   };
 
-  // Combined loading state
   const combinedLoading = isLoading || recordsLoading || employeesLoading;
 
   return (
@@ -98,6 +92,7 @@ const Attendance = () => {
 
       <AttendanceHeader
         canEdit={canEdit}
+        canViewAttendance={canViewAttendance}
         isSubmitting={isSubmitting}
         onUpdateAll={handleUpdateAll}
         onSave={handleSave}
@@ -142,3 +137,4 @@ const Attendance = () => {
 };
 
 export default Attendance;
+
