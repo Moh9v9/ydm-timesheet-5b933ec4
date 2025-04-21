@@ -1,5 +1,5 @@
 
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { AttendanceRecord, Employee } from "@/lib/types";
 import { useAttendanceTableSort } from "../useAttendanceTableSort";
 import { useAttendance } from "@/contexts/AttendanceContext";
@@ -30,6 +30,11 @@ const AttendanceTable: React.FC<Props> = ({
   employeesLoaded = false,
 }) => {
   const { currentDate } = useAttendance();
+
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const attendanceByEmployeeId = useMemo(() => {
     const map = new Map<string, AttendanceRecord>();
@@ -112,8 +117,13 @@ const AttendanceTable: React.FC<Props> = ({
     } archived)`);
   }, [sortedData]);
 
+  // Apply fade-in only after mount, and maintain min-height to avoid jumps
   return (
-    <div className="bg-card shadow-sm rounded-lg border overflow-hidden">
+    <div
+      className={`bg-card shadow-sm rounded-lg border overflow-hidden transition-opacity duration-300 min-h-[420px] ${
+        mounted ? "opacity-100 animate-fade-in" : "opacity-0"
+      }`}
+    >
       <div className="overflow-x-auto">
         <table className="w-full">
           <AttendanceTableHeader
@@ -142,3 +152,4 @@ const AttendanceTable: React.FC<Props> = ({
 };
 
 export default AttendanceTable;
+
