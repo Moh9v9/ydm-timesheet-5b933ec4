@@ -1,10 +1,9 @@
-
 import { useAuth } from "@/contexts/AuthContext";
 import { useAttendance } from "@/contexts/AttendanceContext";
 import { useEmployees } from "@/contexts/EmployeeContext";
 import { useNotification } from "@/components/ui/notification";
 import DateNavigation from "./components/DateNavigation";
-import AttendanceTable from "./components/AttendanceTable";
+import AttendanceTable from "./components/table/AttendanceTable";
 import AttendanceHeader from "./components/AttendanceHeader";
 import { useAttendanceData } from "./hooks/useAttendanceData";
 import AttendanceStatusMark from "./components/AttendanceStatusMark";
