@@ -12,46 +12,38 @@ export async function employeeMatchesFilters(
 ): Promise<boolean> {
   // Filter out employees who were not created yet on the selected attendance date
   if (currentAttendanceDate && employee.created_at) {
-    // Extract just the date part from the ISO timestamp for proper comparison
     const employeeCreationDate = employee.created_at.split('T')[0];
     
-    // Compare dates as strings - employee should NOT appear in attendance lists for dates BEFORE their creation
     if (employeeCreationDate > currentAttendanceDate) {
       console.log(`Employee ${employee.id} (${employee.fullName}) filtered out - created on ${employeeCreationDate}, attendance date: ${currentAttendanceDate}`);
       return false;
     }
   }
   
+  // For archived employees in attendance view, ONLY include them if they have a record for the selected date
+  if (employee.status === "Archived" && currentAttendanceDate) {
+    const { data } = await supabase
+      .from('attendance_records')
+      .select('id, present')
+      .eq('employee_uuid', employee.id)
+      .eq('date', currentAttendanceDate)
+      .maybeSingle();
+    
+    if (!data) {
+      console.log(`Archived employee ${employee.id} (${employee.fullName}) filtered out - no record for date: ${currentAttendanceDate}`);
+      return false;
+    }
+    
+    console.log(`Archived employee ${employee.id} (${employee.fullName}) included - has record for date: ${currentAttendanceDate} with present=${data.present}`);
+  }
+  
   // Status filter handling - Only apply when a specific status is selected (not "All")
   if (filters.status && filters.status !== "All") {
     console.log(`Checking status filter for ${employee.fullName}: employee status=${employee.status}, filter status=${filters.status}`);
     
-    // Apply status filter
     if (employee.status !== filters.status) {
       console.log(`Employee ${employee.id} (${employee.fullName}) filtered out - status doesn't match: ${employee.status} != ${filters.status}`);
       return false;
-    }
-    
-    // For archived employees in attendance view, ONLY check if they have a record for the selected date
-    // when we're NOT viewing "All" or "Archived" status specifically - but we already know we're NOT
-    // viewing "All" at this point in the code, so we only need to check for "Archived"
-    if (employee.status === "Archived" && 
-        currentAttendanceDate && 
-        filters.status !== "Archived") {
-      // This check should only run in attendance view when we're not explicitly filtering for archived employees
-      const { data } = await supabase
-        .from('attendance_records')
-        .select('id, present')
-        .eq('employee_uuid', employee.id)
-        .eq('date', currentAttendanceDate)
-        .maybeSingle();
-      
-      if (!data) {
-        console.log(`Archived employee ${employee.id} (${employee.fullName}) filtered out - no record for date: ${currentAttendanceDate}`);
-        return false;
-      }
-      
-      console.log(`Archived employee ${employee.id} (${employee.fullName}) included - has record for date: ${currentAttendanceDate} with present=${data.present}`);
     }
   }
   
