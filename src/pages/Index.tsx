@@ -5,7 +5,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { CardInformation } from "@/components/dashboard/CardInformation";
 import DailyAttendance from "@/components/dashboard/DailyAttendance";
 import { useStatistics } from "@/hooks/useStatistics";
-import { AttendanceChart } from "@/components/dashboard/AttendanceChart";
 import { RecentEmployees } from "@/components/dashboard/RecentEmployees";
 
 const Index = () => {
@@ -49,12 +48,7 @@ const Index = () => {
       )}
 
       {user && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <AttendanceChart 
-            presentToday={stats.presentToday}
-            absentToday={stats.absentToday}
-            activeEmployees={stats.totalEmployees}
-          />
+        <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
           <RecentEmployees />
         </div>
       )}
