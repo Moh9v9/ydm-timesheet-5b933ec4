@@ -24,7 +24,7 @@ const DateRangeInputs = ({ reportType, currentDate, selectedDate, setSelectedDat
   const handleSelect = (date: Date | undefined) => {
     if (date) {
       setSelectedDate(date);
-      setOpen(false); // Close the popover after selection
+      setOpen(false);
     }
   };
 
@@ -65,7 +65,7 @@ const DateRangeInputs = ({ reportType, currentDate, selectedDate, setSelectedDat
     },
   };
 
-  const renderDatePicker = (label: string, dateFormat: string) => (
+  const renderDatePicker = (label: string, dateFormat: string, showMonthsOnly: boolean = false) => (
     <div>
       <label className="block text-sm font-medium mb-1.5 dark:text-gray-200">
         {label}
@@ -100,9 +100,14 @@ const DateRangeInputs = ({ reportType, currentDate, selectedDate, setSelectedDat
             selected={selectedDate}
             onSelect={handleSelect}
             initialFocus
-            captionLayout="dropdown-buttons"
+            captionLayout={showMonthsOnly ? "dropdown-buttons" : "buttons"}
             fromYear={2020}
             toYear={2030}
+            ISOWeek
+            {...(showMonthsOnly ? { 
+              numberOfMonths: 1,
+              showOutsideDays: false 
+            } : {})}
             classNames={{
               months: "space-y-4",
               month: "space-y-4",
@@ -156,7 +161,7 @@ const DateRangeInputs = ({ reportType, currentDate, selectedDate, setSelectedDat
   }
 
   if (reportType === "monthly") {
-    return renderDatePicker("Select Month", "MMMM yyyy");
+    return renderDatePicker("Select Month", "MMMM yyyy", true);
   }
 
   return null;
