@@ -45,48 +45,87 @@ export const useBulkOperations = (
         throw new Error("No valid records to save");
       }
       
-      const recordsToUpsert = validRecords.map(record => {
-        let recordId = null;
+      // Separate records for insert and update to handle ID constraints correctly
+      const recordsToUpdate = [];
+      const recordsToInsert = [];
+      
+      for (const record of validRecords) {
+        // Check if the record has a valid ID (not temp ID)
         if ('id' in record && record.id && !record.id.toString().includes('temp_')) {
-          recordId = record.id;
+          // This is an existing record that should be updated
+          recordsToUpdate.push({
+            id: record.id,
+            employee_uuid: record.employeeId,
+            employee_name: record.employeeName,
+            date: record.date,
+            present: record.present,
+            start_time: record.startTime || null,
+            end_time: record.endTime || null,
+            overtime_hours: record.overtimeHours || 0,
+            note: record.note || null
+          });
+        } else {
+          // This is a new record that should be inserted
+          recordsToInsert.push({
+            employee_uuid: record.employeeId,
+            employee_name: record.employeeName,
+            date: record.date,
+            present: record.present,
+            start_time: record.startTime || null,
+            end_time: record.endTime || null,
+            overtime_hours: record.overtimeHours || 0,
+            note: record.note || null
+          });
+        }
+      }
+
+      console.log("Records separated - Updates:", recordsToUpdate.length, "Inserts:", recordsToInsert.length);
+      
+      // Variable to store all saved records
+      let resultData = [];
+      
+      // If we have records to update, update them
+      if (recordsToUpdate.length > 0) {
+        console.log("Updating existing records:", recordsToUpdate.length);
+        const { data: updatedData, error: updateError } = await supabase
+          .from('attendance_records')
+          .upsert(recordsToUpdate, {
+            onConflict: 'id',
+            ignoreDuplicates: false
+          })
+          .select();
+          
+        if (updateError) {
+          console.error("Error updating records:", updateError);
+          throw updateError;
         }
         
-        return {
-          ...(recordId ? { id: recordId } : {}),
-          employee_uuid: record.employeeId,
-          employee_name: record.employeeName,
-          date: record.date,
-          present: record.present,
-          start_time: record.startTime || null,
-          end_time: record.endTime || null,
-          overtime_hours: record.overtimeHours || 0,
-          note: record.note || null
-        };
-      });
-
-      console.log("Records prepared for upsert:", recordsToUpsert);
-
-      // Change this to use a let instead of const, so we can reassign it later
-      let resultData;
-      const { data, error } = await supabase
-        .from('attendance_records')
-        .upsert(recordsToUpsert, { 
-          onConflict: 'employee_uuid,date',
-          ignoreDuplicates: false
-        })
-        .select();
-
-      if (error) {
-        console.error("Error during upsert:", error);
-        throw error;
+        if (updatedData && updatedData.length > 0) {
+          resultData = [...resultData, ...updatedData];
+        }
       }
       
-      // Initialize resultData with the response data
-      resultData = data;
+      // If we have records to insert, insert them
+      if (recordsToInsert.length > 0) {
+        console.log("Inserting new records:", recordsToInsert.length);
+        const { data: insertedData, error: insertError } = await supabase
+          .from('attendance_records')
+          .insert(recordsToInsert)
+          .select();
+          
+        if (insertError) {
+          console.error("Error inserting records:", insertError);
+          throw insertError;
+        }
+        
+        if (insertedData && insertedData.length > 0) {
+          resultData = [...resultData, ...insertedData];
+        }
+      }
       
+      // If no data returned, try to fetch all records for these dates
       if (!resultData || resultData.length === 0) {
-        // If no data is returned but also no error, try to get the current state
-        console.log("No data returned from upsert, fetching current state");
+        console.log("No data returned from operations, fetching current state");
         
         // Get a list of dates we were trying to update
         const dates = Array.from(new Set(records.map(r => r.date)));
@@ -98,11 +137,11 @@ export const useBulkOperations = (
           .in('date', dates);
           
         if (fetchError) {
-          console.error("Error fetching records after upsert:", fetchError);
+          console.error("Error fetching records after operations:", fetchError);
           throw fetchError;
         }
         
-        if (fetchedData) {
+        if (fetchedData && fetchedData.length > 0) {
           resultData = fetchedData;
         } else {
           console.error("Failed to retrieve updated records");
@@ -110,7 +149,7 @@ export const useBulkOperations = (
         }
       }
 
-      console.log("Upsert/fetch successful with", resultData.length, "records returned");
+      console.log("Operations successful with", resultData.length, "records returned");
 
       const savedRecords: AttendanceRecord[] = resultData.map(record => ({
         id: record.id,

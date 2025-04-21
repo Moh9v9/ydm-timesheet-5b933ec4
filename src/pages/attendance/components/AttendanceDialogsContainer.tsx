@@ -42,9 +42,20 @@ const AttendanceDialogsContainer = ({
     setIsSubmitting(true);
     try {
       console.log("Starting confirm save with", attendanceData.length, "records");
+      
+      // Make sure we're not saving empty data
+      if (attendanceData.length === 0) {
+        console.warn("No attendance data to save");
+        setShowSaveConfirm(false);
+        return;
+      }
+      
       const result = await confirmSave(attendanceData);
       console.log("Save completed, refreshing data");
+      
+      // Make sure we refresh the data and update the UI
       refreshData();
+      
       if (onSuccessfulSave) {
         onSuccessfulSave();
       }

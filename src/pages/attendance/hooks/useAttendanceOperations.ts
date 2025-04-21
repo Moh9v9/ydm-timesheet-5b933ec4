@@ -20,18 +20,18 @@ export const useAttendanceOperations = (canEdit: boolean) => {
     try {
       console.log("Starting save process with", attendanceData.length, "records");
       
-      // Prepare data for saving by making a clean copy
-      const cleanData = attendanceData.map(record => ({
-        ...(record.id && !record.id.toString().includes('temp_') ? { id: record.id } : {}),
-        employeeId: record.employeeId,
-        employeeName: record.employeeName,
-        date: record.date,
-        present: record.present,
-        startTime: record.startTime,
-        endTime: record.endTime,
-        overtimeHours: record.overtimeHours,
-        note: record.note
-      }));
+      // Make sure we properly identify existing records with IDs
+      const cleanData = attendanceData.map(record => {
+        // Create a new object to avoid mutation
+        const cleanRecord = { ...record };
+        
+        // If it's a temporary ID, remove it so a new one will be generated
+        if (cleanRecord.id && cleanRecord.id.toString().includes('temp_')) {
+          delete (cleanRecord as any).id;
+        }
+        
+        return cleanRecord;
+      });
 
       console.log("Sending attendance data to save:", cleanData);
       const result = await bulkSaveAttendance(cleanData);
@@ -50,7 +50,6 @@ export const useAttendanceOperations = (canEdit: boolean) => {
     }
   };
 
-  // Now accept updateType and only update present employees if updateType is "times"
   const handleBulkUpdate = async (
     attendanceData: AttendanceRecord[],
     data: {
