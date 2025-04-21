@@ -47,7 +47,10 @@ export const useEmployeeState = (currentAttendanceDate?: string) => {
     setLoading(true);
     try {
       console.log("Applying filters:", filts);
-      if (filts.status) {
+      
+      if (filts.status === "Archived") {
+        console.log(`Archived status filter active - should show ${emps.filter(e => e.status === "Archived").length} employees`);
+      } else if (filts.status) {
         console.log(`Status filter active: ${filts.status}`);
         console.log(`Employees before status filter: ${emps.length}`);
         console.log(`Employees with status ${filts.status}: ${emps.filter(e => e.status === filts.status).length}`);
