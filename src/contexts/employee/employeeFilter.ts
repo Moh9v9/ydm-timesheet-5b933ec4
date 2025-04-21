@@ -33,17 +33,12 @@ export async function employeeMatchesFilters(
     }
   }
   
-  // IMPORTANT: If the filter is set to "All", we should skip the attendance record check for archived employees
-  // This ensures that when "All" is selected, archived employees are shown regardless of attendance records
-  if (filters.status === "All" as string) {
-    // Skip the attendance record check completely when "All" is selected
-    console.log(`Showing all employees regardless of status - including archived employee ${employee.fullName}`);
-  } 
-  // For archived employees in attendance view, check if they have a record for the selected date
-  // ONLY apply this check if we're in attendance view (currentAttendanceDate is provided)
-  // AND we're NOT showing "All" status (which should show everything)
-  else if (employee.status === "Archived" && currentAttendanceDate && filters.status !== "Archived") {
-    // This check should only run in attendance view when we're not explicitly filtering for archived employees or all employees
+  // IMPORTANT: When "All" is selected or no status filter is applied, we should NOT filter out any employee based on status
+  // For attendance view specifically, we still need to check if archived employees have records
+  if (currentAttendanceDate && employee.status === "Archived" && 
+      filters.status !== "Archived" && filters.status !== "All" as string) {
+    // For archived employees in attendance view, check if they have a record for the selected date
+    // This check should only run when we're not explicitly filtering for "All" or "Archived" status
     const { data } = await supabase
       .from('attendance_records')
       .select('id, present')
