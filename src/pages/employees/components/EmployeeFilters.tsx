@@ -1,5 +1,6 @@
 
 import { EmployeeFilters } from "@/lib/types";
+import { StyledSelect } from "@/components/ui/styled-select";
 
 interface EmployeeFiltersProps {
   filters: EmployeeFilters;
