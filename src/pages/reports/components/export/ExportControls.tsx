@@ -1,7 +1,6 @@
 import React from 'react';
 import { ReportType, ExportFormat } from "@/lib/types";
 import ReportSelectionForm from "./ReportSelectionForm";
-import BasicReportControls from "./controls/BasicReportControls";
 import FilterToggleButton from "./controls/FilterToggleButton";
 import GenerateReportButton from "./controls/GenerateReportButton";
 
@@ -56,16 +55,6 @@ const ExportControls: React.FC<ExportControlsProps> = ({
     <>
       <div className="flex justify-between items-start mb-4">
         <div className="flex-1">
-          <BasicReportControls
-            reportType={reportType}
-            setReportType={setReportType}
-            exportFormat={exportFormat}
-            setExportFormat={setExportFormat}
-            currentDate={currentDate}
-            selectedDate={selectedDate}
-            setSelectedDate={setSelectedDate}
-          />
-          
           <ReportSelectionForm
             reportType={reportType}
             setReportType={setReportType}

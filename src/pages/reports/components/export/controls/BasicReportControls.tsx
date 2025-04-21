@@ -8,9 +8,6 @@ interface BasicReportControlsProps {
   setReportType: (value: ReportType) => void;
   exportFormat: ExportFormat;
   setExportFormat: (value: ExportFormat) => void;
-  currentDate: string;
-  selectedDate: Date;
-  setSelectedDate: (date: Date) => void;
 }
 
 const BasicReportControls: React.FC<BasicReportControlsProps> = ({
@@ -18,9 +15,6 @@ const BasicReportControls: React.FC<BasicReportControlsProps> = ({
   setReportType,
   exportFormat,
   setExportFormat,
-  currentDate,
-  selectedDate,
-  setSelectedDate,
 }) => {
   const reportTypeOptions = [
     { value: "daily", label: "Daily Attendance" },
@@ -33,27 +27,8 @@ const BasicReportControls: React.FC<BasicReportControlsProps> = ({
     { value: "pdf", label: "PDF Document" }
   ];
 
-  return (
-    <div className="space-y-5">
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <StyledSelect
-          label="Report Type"
-          value={reportType}
-          onValueChange={(value: ReportType) => setReportType(value)}
-          placeholder="Select Report Type"
-          options={reportTypeOptions}
-        />
-        
-        <StyledSelect
-          label="Export Format"
-          value={exportFormat}
-          onValueChange={(value: ExportFormat) => setExportFormat(value)}
-          placeholder="Select Export Format"
-          options={exportFormatOptions}
-        />
-      </div>
-    </div>
-  );
+  return null; // We'll remove this component's rendering
 };
 
 export default BasicReportControls;
+
