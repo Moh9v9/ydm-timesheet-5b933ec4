@@ -9,8 +9,9 @@ export async function employeeMatchesFilters(
   employee: Employee,
   filters: EmployeeFilters
 ): Promise<boolean> {
-  // Status filter handling
+  // Status filter handling (fixed to properly handle "All" option)
   if (filters.status && filters.status !== "All") {
+    console.log(`Checking if employee ${employee.id} status ${employee.status} matches filter ${filters.status}`);
     if (employee.status !== filters.status) {
       return false;
     }
