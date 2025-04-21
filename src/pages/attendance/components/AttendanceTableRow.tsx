@@ -22,6 +22,15 @@ const AttendanceTableRow = ({
   onNoteChange,
   canEdit,
 }: AttendanceTableRowProps) => {
+  // Common input tailwind classes for better visibility in dark mode
+  const inputClass =
+    "p-1 border rounded-md w-28 bg-background text-foreground placeholder:text-muted-foreground " +
+    "dark:bg-gray-800 dark:border-gray-500 dark:text-white dark:placeholder-gray-400 dark:focus-visible:ring-primary focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2";
+
+  const numberInputClass =
+    "p-1 border rounded-md w-20 bg-background text-foreground placeholder:text-muted-foreground " +
+    "dark:bg-gray-800 dark:border-gray-500 dark:text-white dark:placeholder-gray-400 dark:focus-visible:ring-primary focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2";
+
   return (
     <tr className="border-b border-border/30 last:border-0">
       <td className="p-3">
@@ -60,7 +69,7 @@ const AttendanceTableRow = ({
             value={record.startTime}
             onChange={(e) => onTimeChange("startTime", e.target.value)}
             disabled={!canEdit || !record.present}
-            className="p-1 border rounded-md w-28"
+            className={inputClass}
           />
         ) : (
           <span className="text-muted-foreground">N/A</span>
@@ -74,7 +83,7 @@ const AttendanceTableRow = ({
             value={record.endTime}
             onChange={(e) => onTimeChange("endTime", e.target.value)}
             disabled={!canEdit || !record.present}
-            className="p-1 border rounded-md w-28"
+            className={inputClass}
           />
         ) : (
           <span className="text-muted-foreground">N/A</span>
@@ -90,7 +99,7 @@ const AttendanceTableRow = ({
             value={record.overtimeHours}
             onChange={(e) => onOvertimeChange(e.target.value)}
             disabled={!canEdit || !record.present}
-            className="p-1 border rounded-md w-20"
+            className={numberInputClass}
           />
         ) : (
           <span className="text-muted-foreground">0</span>
@@ -102,7 +111,7 @@ const AttendanceTableRow = ({
           value={record.note || ""}
           onChange={(e) => onNoteChange(e.target.value)}
           placeholder="Add a note..."
-          className="min-h-[80px] w-full max-w-[400px] resize-both"
+          className="min-h-[80px] w-full max-w-[400px] resize-both dark:bg-gray-800 dark:border-gray-500 dark:text-white dark:placeholder-gray-400"
           disabled={!canEdit}
         />
       </td>
