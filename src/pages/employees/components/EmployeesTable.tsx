@@ -18,9 +18,6 @@ export const EmployeesTable = ({
   onDelete 
 }: EmployeesTableProps) => {
   const { sortField, sortDirection, handleSort, getSortedData } = useTableSort();
-  
-  // Process the sorted employees data
-  const sortedEmployees = loading ? [] : getSortedData(employees);
 
   return (
     <div className="data-table-container">
@@ -31,20 +28,11 @@ export const EmployeesTable = ({
           sortDirection={sortDirection}
         />
         <tbody>
-          {loading ? (
-            <tr>
-              <td colSpan={10} className="text-center py-6">
-                <div className="flex justify-center items-center space-x-2">
-                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary"></div>
-                  <span>Loading employees...</span>
-                </div>
-              </td>
-            </tr>
-          ) : employees.length > 0 ? (
-            sortedEmployees.map(item => (
+          {employees.length > 0 ? (
+            getSortedData(employees).map(({ employee }) => (
               <TableRow
-                key={item.employee.id}
-                employee={item.employee}
+                key={employee.id}
+                employee={employee}
                 onEdit={onEdit}
                 onDelete={onDelete}
               />
@@ -52,7 +40,7 @@ export const EmployeesTable = ({
           ) : (
             <tr>
               <td colSpan={10} className="text-center py-4">
-                No employees found
+                {loading ? "Loading..." : "No employees found"}
               </td>
             </tr>
           )}
