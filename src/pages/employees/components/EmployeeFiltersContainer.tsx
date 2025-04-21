@@ -29,7 +29,7 @@ export const EmployeeFiltersContainer = ({
 }: EmployeeFiltersContainerProps) => {
   return (
     <div className="p-4 border-b dark:border-gray-800">
-      <div className="flex flex-col md:flex-row md:items-center gap-4">
+      <div className="flex flex-col gap-4">
         <SearchBar
           searchTerm={searchTerm}
           onSearchChange={onSearchChange}
@@ -49,3 +49,4 @@ export const EmployeeFiltersContainer = ({
     </div>
   );
 };
+
