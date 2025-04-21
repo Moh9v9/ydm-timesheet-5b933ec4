@@ -78,6 +78,10 @@ export const useAttendanceData = (canEdit: boolean, refreshTrigger: number = 0) 
         
         fetchAttendanceData();
       }
+    } else if (dataFetched && !employeesLoading && filteredEmployees.length === 0 && !hasAttemptedFetch) {
+      // If we have no employees but data is fetched, mark as attempted
+      setHasAttemptedFetch(true);
+      setIsLoading(false);
     }
   }, [
     filteredEmployees, 
@@ -99,8 +103,8 @@ export const useAttendanceData = (canEdit: boolean, refreshTrigger: number = 0) 
 
   // Helper function to determine if we're in a valid loading state
   const determineIsLoading = () => {
-    // If we're still loading employees and haven't attempted a fetch yet
-    if ((employeesLoading && !dataFetched) && !hasAttemptedFetch) {
+    // If employees are still loading and we haven't fetched data yet
+    if (employeesLoading && !dataFetched) {
       return true;
     }
     
@@ -111,6 +115,9 @@ export const useAttendanceData = (canEdit: boolean, refreshTrigger: number = 0) 
     
     return false;
   };
+
+  // Updated to provide more accurate employeesLoaded state
+  const areEmployeesLoaded = dataFetched && !employeesLoading;
 
   const toggleAttendance = (index: number) => {
     if (!canEdit) return;
@@ -161,7 +168,7 @@ export const useAttendanceData = (canEdit: boolean, refreshTrigger: number = 0) 
   return {
     attendanceData,
     isLoading: determineIsLoading(),
-    employeesLoaded: !employeesLoading && dataFetched,
+    employeesLoaded: areEmployeesLoaded,
     toggleAttendance,
     handleTimeChange,
     handleOvertimeChange,

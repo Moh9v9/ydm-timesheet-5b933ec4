@@ -59,7 +59,7 @@ export const useEmployeeState = () => {
         setEmployees([]);
       }
       
-      // Mark data as fetched regardless of result
+      // Always set dataFetched to true when done, even if there are no employees
       setDataFetched(true);
     } catch (err: any) {
       console.error('Error fetching employees:', err);
@@ -67,7 +67,7 @@ export const useEmployeeState = () => {
       toast.error("Failed to load employees. Please try again.");
       // Still set employees to empty array to prevent loading state from being stuck
       setEmployees([]);
-      // Mark data as fetched even on error
+      // Set dataFetched to true even on error
       setDataFetched(true);
     } finally {
       setLoading(false);

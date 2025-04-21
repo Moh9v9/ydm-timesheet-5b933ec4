@@ -149,10 +149,7 @@ const AttendanceTable = ({
               <tr>
                 <td colSpan={6} className="text-center py-4">
                   <div className="text-muted-foreground">
-                    Waiting for employee data...
-                    <div className="mt-2 animate-pulse inline-block">
-                      <div className="h-1.5 w-16 bg-muted-foreground/20 rounded-full"></div>
-                    </div>
+                    Employee data loaded successfully. No employees found in system.
                   </div>
                 </td>
               </tr>
