@@ -1,6 +1,6 @@
 
 import { StyledSelect } from "@/components/ui/styled-select";
-import { EmployeeFilters, PaymentType, SponsorshipType } from "@/lib/types";
+import { EmployeeFilters, PaymentType, SponsorshipType, EmployeeStatus } from "@/lib/types";
 
 interface EmployeeExportFiltersProps {
   filters: EmployeeFilters;
@@ -24,6 +24,12 @@ const EmployeeExportFilters = ({
   show,
 }: EmployeeExportFiltersProps) => {
   if (!show) return null;
+
+  const statusOptions = [
+    { value: "all", label: "All Statuses" },
+    { value: "Active", label: "Active" },
+    { value: "Archived", label: "Archived" }
+  ];
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4 p-4 border rounded-lg bg-muted/20 dark:bg-gray-800/30">
@@ -55,6 +61,13 @@ const EmployeeExportFilters = ({
         placeholder="All Sponsorships"
         options={sponsorships.map(s => ({ value: s, label: s === "all" ? "All Sponsorships" : s }))}
       />
+      <StyledSelect
+        label="Status"
+        value={filters.status || "all"}
+        onValueChange={value => onFilterChange("status", value === "all" ? undefined : value as EmployeeStatus)}
+        placeholder="All Statuses"
+        options={statusOptions}
+      />
       <div className="col-span-1 sm:col-span-2">
         <small className="text-muted-foreground">
           {filteredEmployeesCount} employees match the selected filters
@@ -65,4 +78,3 @@ const EmployeeExportFilters = ({
 };
 
 export default EmployeeExportFilters;
-

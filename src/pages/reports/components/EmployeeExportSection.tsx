@@ -44,6 +44,9 @@ const EmployeeExportSection = () => {
           return true;
         });
         
+        console.log('Generating report with filters:', filters);
+        console.log('Filtered employees count:', employeesToExport.length);
+        
         const formattedData = formatEmployeesForExport(employeesToExport);
         const { content, mimeType, isBinary } = generateFileContent(formattedData, exportFormat);
         const dateStr = format(new Date(), "yyyyMMdd");
@@ -51,15 +54,18 @@ const EmployeeExportSection = () => {
         downloadFile(content, filename, mimeType, isBinary);
         
         success(`Employee data exported as ${formatName} successfully with ${employeesToExport.length} records`);
+        
+        // Log export details for debugging
         console.log("Export request:", {
           type: "employees",
           exportFormat,
           filters,
-          employeesCount: employeesToExport.length
+          totalEmployees: filteredEmployees.length,
+          exportedEmployees: employeesToExport.length
         });
       } catch (err) {
+        console.error('Error generating report:', err);
         error("Failed to generate employee report");
-        console.error(err);
       } finally {
         setIsGenerating(false);
       }
@@ -78,11 +84,13 @@ const EmployeeExportSection = () => {
       const newFilters = { ...filters };
       delete newFilters[key];
       setFilters(newFilters);
+      console.log('Filter removed:', key);
     } else {
       setFilters({
         ...filters,
         [key]: value
       });
+      console.log('Filter added:', key, value);
     }
   };
 
