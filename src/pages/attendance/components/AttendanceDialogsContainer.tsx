@@ -9,7 +9,6 @@ interface AttendanceDialogsContainerProps {
   attendanceData: AttendanceRecord[];
   canEdit: boolean;
   onSuccessfulSave?: () => void;
-  // Add new props for controlling dialogs from parent
   showBulkUpdate: boolean;
   setShowBulkUpdate: (show: boolean) => void;
   showSaveConfirm: boolean;
@@ -22,7 +21,6 @@ const AttendanceDialogsContainer = ({
   attendanceData,
   canEdit,
   onSuccessfulSave,
-  // New controlled props
   showBulkUpdate,
   setShowBulkUpdate,
   showSaveConfirm,
