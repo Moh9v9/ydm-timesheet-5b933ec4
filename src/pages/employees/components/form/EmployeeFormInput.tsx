@@ -43,20 +43,28 @@ export const EmployeeFormInput = ({
         min={min}
         className={`w-full p-3 border text-base rounded-md bg-background
           ${error ? 'border-destructive' : 'border-input'}
-          placeholder:text-muted-foreground 
+          placeholder:text-muted-foreground
           focus:ring-2 focus:ring-primary
           transition-all duration-300
           outline-none
-          dark:bg-[#23263A]
-          dark:border-[#3b4261]
-          dark:text-[#F1F1F1]
-          dark:placeholder-[#C8C8C9]
-          dark:focus:border-[#1EAEDB]
+
+          dark:bg-[#23263A]                   /* deep navy bg */
+          dark:border-[#8E9196]               /* lighter neutral gray border */
+          dark:text-[#F1F1F1]                 /* almost white text */
+          dark:placeholder-[#D6BCFA]          /* light purple placeholder */
+          dark:focus:border-[#1EAEDB]         /* bright blue focus border */
           dark:focus:ring-2 dark:focus:ring-[#1EAEDB]
           ${className || ''}
         `}
         required={required}
+        style={{
+          // fallback for softer box shadow focus in dark mode
+          boxShadow:
+            "var(--tw-ring-inset) 0 0 0 calc(2px) #1EAEDB40",
+        }}
+        autoComplete="off"
       />
     </EmployeeFormField>
   );
 };
+

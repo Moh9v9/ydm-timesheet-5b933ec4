@@ -15,7 +15,7 @@ export const EmployeeFormField = ({ label, name, required, children, error }: Em
       </label>
       {children}
       {error && (
-        <p className="mt-1 text-sm text-destructive">{error}</p>
+        <p className="mt-1 text-sm text-destructive dark:text-[#ea384c] font-semibold">{error}</p>
       )}
     </div>
   );
