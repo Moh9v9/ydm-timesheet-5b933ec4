@@ -80,3 +80,4 @@ const DateRangeInputs = ({ reportType, currentDate, selectedDate, setSelectedDat
 };
 
 export default DateRangeInputs;
+

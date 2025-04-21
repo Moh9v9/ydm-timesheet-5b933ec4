@@ -7,7 +7,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { cn } from "@/lib/utils";
+import { datePickerStyles } from './DatePickerStyles';
 
 interface DailyPickerProps {
   selectedDate: Date;
@@ -26,35 +26,17 @@ const DailyPicker = ({ selectedDate, setSelectedDate, open, setOpen, yearMonthCa
   };
 
   return (
-    <div>
-      <label className="block text-sm font-medium mb-1.5 dark:text-gray-200">
+    <div className={datePickerStyles.container}>
+      <label className={datePickerStyles.label}>
         Select Date
       </label>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
-          <button
-            className={cn(
-              "w-full flex items-center px-4 py-2.5 text-left",
-              "border rounded-lg dark:bg-gray-800/50 dark:border-gray-700 dark:text-gray-100",
-              "text-sm font-medium transition-all duration-200",
-              "hover:border-primary/50 dark:hover:border-primary/50",
-              "focus:outline-none focus:ring-2 focus:ring-primary/20 dark:focus:ring-primary/20",
-              "active:scale-[0.98]"
-            )}
-          >
+          <button className={datePickerStyles.trigger}>
             {format(selectedDate, "PPP")}
           </button>
         </PopoverTrigger>
-        <PopoverContent 
-          className={cn(
-            "w-auto p-0",
-            "border dark:border-gray-700",
-            "rounded-lg overflow-hidden",
-            "shadow-lg dark:shadow-black/10",
-            "bg-white dark:bg-gray-800/95 backdrop-blur-sm"
-          )} 
-          align="start"
-        >
+        <PopoverContent className={datePickerStyles.popoverContent} align="start">
           <Calendar
             mode="single"
             selected={selectedDate}
@@ -70,40 +52,21 @@ const DailyPicker = ({ selectedDate, setSelectedDate, open, setOpen, yearMonthCa
               caption: "relative flex items-center justify-center pt-1 pb-2",
               caption_label: "flex items-center gap-1 text-sm font-medium",
               nav: "flex items-center gap-1",
-              nav_button: cn(
-                "inline-flex items-center justify-center rounded-md p-1.5",
-                "text-muted-foreground hover:text-primary hover:bg-gray-100/50 dark:hover:bg-gray-700/50",
-                "transition-colors duration-200"
-              ),
+              nav_button: datePickerStyles.calendar.nav_button,
               table: "w-full border-collapse",
               head_row: "flex",
-              head_cell: cn(
-                "text-muted-foreground rounded-md w-9 font-normal text-xs",
-                "uppercase tracking-wide"
-              ),
+              head_cell: datePickerStyles.calendar.head_cell,
               row: "flex w-full mt-2",
-              cell: cn(
-                "relative p-0 text-center text-sm focus-within:relative focus-within:z-20",
-                "first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md"
-              ),
-              day: cn(
-                "h-9 w-9 p-0 font-normal",
-                "rounded-md transition-colors duration-200",
-                "hover:bg-primary/10 dark:hover:bg-primary/20",
-                "focus:outline-none focus:ring-2 focus:ring-primary/20"
-              ),
-              day_selected: cn(
-                "bg-primary text-primary-foreground dark:bg-primary dark:text-primary-foreground",
-                "hover:bg-primary hover:text-primary-foreground",
-                "focus:bg-primary focus:text-primary-foreground"
-              ),
+              cell: "relative p-0 text-center text-sm focus-within:relative focus-within:z-20",
+              day: datePickerStyles.calendar.day,
+              day_selected: datePickerStyles.calendar.day_selected,
               day_today: "bg-accent/50 text-accent-foreground dark:bg-accent/30 dark:text-white",
               day_outside: "text-muted-foreground/50 dark:text-muted-foreground/30",
               day_disabled: "text-muted-foreground/50 dark:text-muted-foreground/30",
               day_hidden: "invisible",
             }}
             components={yearMonthCaptionLayout.components}
-            className={cn("p-4 pointer-events-auto select-none")}
+            className={datePickerStyles.calendar.wrapper}
           />
         </PopoverContent>
       </Popover>
@@ -112,3 +75,4 @@ const DailyPicker = ({ selectedDate, setSelectedDate, open, setOpen, yearMonthCa
 };
 
 export default DailyPicker;
+
