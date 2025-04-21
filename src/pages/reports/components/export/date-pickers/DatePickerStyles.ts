@@ -1,4 +1,3 @@
-
 import { cn } from "@/lib/utils";
 
 export const datePickerStyles = {
@@ -58,10 +57,12 @@ export const datePickerStyles = {
   calendar: {
     wrapper: "p-3",
     nav_button: cn(
-      "inline-flex items-center justify-center rounded-md p-1.5",
+      "inline-flex items-center justify-center rounded-md p-2.5", // Increased padding from p-1.5 to p-2.5
       "text-gray-500 hover:bg-gray-100",
       "dark:text-gray-400 dark:hover:bg-gray-800",
-      "transition-colors duration-200"
+      "transition-colors duration-200",
+      "h-10 w-10", // Added explicit height and width
+      "hover:scale-105" // Added a subtle scale effect on hover
     ),
     head_cell: cn(
       "text-xs font-medium text-gray-500 dark:text-gray-400",
