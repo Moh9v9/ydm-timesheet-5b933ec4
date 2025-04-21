@@ -11,7 +11,7 @@ import AttendanceStatusMark from "./components/AttendanceStatusMark";
 import AttendanceLoadingSkeleton from "./components/AttendanceLoadingSkeleton";
 import AttendanceDialogsContainer from "./components/AttendanceDialogsContainer";
 import { useAttendanceLoading } from "./hooks/useAttendanceLoading";
-import { useState } from "react";
+import { useEffect } from "react";
 
 const Attendance = () => {
   const { user } = useAuth();
@@ -31,6 +31,12 @@ const Attendance = () => {
     handleRefresh,
     setDataRefreshTrigger
   } = useAttendanceLoading(currentDate, filteredEmployees.length, employeesLoading, dataFetched, user);
+
+  // Force employee data refresh when component mounts
+  useEffect(() => {
+    console.log("🔄 Attendance component mounted - refreshing employee data");
+    refreshEmployees();
+  }, [refreshEmployees]);
 
   const {
     attendanceData,
@@ -55,7 +61,7 @@ const Attendance = () => {
   };
 
   const handleSuccessfulSave = () => {
-    setDataRefreshTrigger((prev: number) => prev + 1);
+    setDataRefreshTrigger((prev) => prev + 1);
   };
 
   return (

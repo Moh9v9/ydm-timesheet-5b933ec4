@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { AttendanceRecord } from "@/lib/types";
 import { useEmployees } from "@/contexts/EmployeeContext";
@@ -22,8 +21,18 @@ export const useAttendanceData = (canEdit: boolean, refreshTrigger: number = 0) 
     hasAttemptedFetch, 
     lastFetchedDate, 
     currentDate,
+    refreshTrigger,
+    fetchingInProgress: fetchingRef.current,
     employees: filteredEmployees.map(e => ({ id: e.id, name: e.fullName, status: e.status }))
   });
+
+  // Force data fetch when employees load or refresh trigger changes
+  useEffect(() => {
+    if (dataFetched && filteredEmployees.length > 0 && !fetchingRef.current) {
+      console.log("🔄 Employee data available - triggering attendance data fetch");
+      setHasAttemptedFetch(false); // Reset fetch flag to force refresh
+    }
+  }, [dataFetched, filteredEmployees.length, refreshTrigger]);
 
   // Effect to fetch attendance data only when date changes, employees load, or explicit refresh is triggered
   useEffect(() => {
@@ -136,6 +145,7 @@ export const useAttendanceData = (canEdit: boolean, refreshTrigger: number = 0) 
   // Updated to provide more accurate employeesLoaded state
   const areEmployeesLoaded = dataFetched && !employeesLoading;
 
+  // Rest of the hook implementation
   const toggleAttendance = (index: number) => {
     if (!canEdit) return;
     
