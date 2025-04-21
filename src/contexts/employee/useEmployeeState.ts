@@ -71,9 +71,9 @@ export const useEmployeeState = (currentAttendanceDate?: string) => {
     }
   }, [employees, filters, currentAttendanceDate]);
 
-  // Function to refresh employees
-  const refreshEmployees = () => {
-    fetchEmployees();
+  // Function to refresh employees - modified to return a Promise
+  const refreshEmployees = async (): Promise<void> => {
+    return await fetchEmployees();
   };
 
   // Fetch employees on component mount
