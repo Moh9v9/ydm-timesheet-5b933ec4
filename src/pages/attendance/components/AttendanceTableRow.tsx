@@ -40,7 +40,7 @@ const AttendanceTableRow = ({
       <tr
         className={`
           border-b border-border/30 last:border-0 transition-colors
-          ${isArchived ? "bg-[#F1F0FB] dark:bg-[#222] border-l-4 border-[#8E9196]" : ""}
+          ${isArchived ? "bg-[#F1F0FB] dark:bg-[#222] border-l-4 border-l-[#8E9196]" : ""}
         `}
       >
         <td className="p-3 flex items-center gap-2">
@@ -72,7 +72,7 @@ const AttendanceTableRow = ({
                   ? "bg-present" 
                   : "bg-absent"
               }`}
-              onClick={onToggleAttendance}
+              onClick={canEdit ? onToggleAttendance : undefined}
             >
               <div 
                 className={`absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${
@@ -145,4 +145,3 @@ const AttendanceTableRow = ({
 };
 
 export default AttendanceTableRow;
-
