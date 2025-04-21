@@ -2,6 +2,8 @@
 import { AttendanceRecord } from "@/lib/types";
 import { Employee } from "@/lib/types";
 import { Textarea } from "@/components/ui/textarea";
+import { ArchiveX } from "lucide-react";
+import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 
 interface AttendanceTableRowProps {
   record: AttendanceRecord;
@@ -31,92 +33,116 @@ const AttendanceTableRow = ({
     "p-1 border rounded-md w-20 bg-background text-foreground placeholder:text-muted-foreground " +
     "dark:bg-gray-800 dark:border-gray-500 dark:text-white dark:placeholder-gray-400 dark:focus-visible:ring-primary focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2";
 
+  const isArchived = employee.status === "Archived";
+
   return (
-    <tr className="border-b border-border/30 last:border-0">
-      <td className="p-3">
-        <div>
-          <div className="font-medium">{employee.fullName}</div>
-          <div className="text-xs text-muted-foreground">{employee.iqamaNo || "No Iqama"}</div>
-        </div>
-      </td>
-
-      <td className="p-3">
-        <div className="flex items-center">
-          <div 
-            className={`relative w-12 h-6 rounded-full cursor-pointer transition-colors ${
-              record.present 
-                ? "bg-present" 
-                : "bg-absent"
-            }`}
-            onClick={onToggleAttendance}
-          >
-            <div 
-              className={`absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${
-                record.present ? "translate-x-6" : ""
-              }`} 
-            />
+    <TooltipProvider>
+      <tr
+        className={`
+          border-b border-border/30 last:border-0 transition-colors
+          ${isArchived ? "bg-[#F1F0FB] dark:bg-[#222] border-l-4 border-[#8E9196]" : ""}
+        `}
+      >
+        <td className="p-3 flex items-center gap-2">
+          {isArchived && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <ArchiveX
+                  size={18}
+                  className="text-[#8E9196] shrink-0 mr-1"
+                  aria-label="Archived employee"
+                />
+              </TooltipTrigger>
+              <TooltipContent>
+                <span>This is an archived employee.</span>
+              </TooltipContent>
+            </Tooltip>
+          )}
+          <div>
+            <div className={`font-medium ${isArchived ? "text-[#8E9196]" : ""}`}>{employee.fullName}</div>
+            <div className="text-xs text-muted-foreground">{employee.iqamaNo || "No Iqama"}</div>
           </div>
-          <span className="ml-2">
-            {record.present ? "Present" : "Absent"}
-          </span>
-        </div>
-      </td>
+        </td>
 
-      <td className="p-3">
-        {record.present ? (
-          <input
-            type="time"
-            value={record.startTime}
-            onChange={(e) => onTimeChange("startTime", e.target.value)}
-            disabled={!canEdit || !record.present}
-            className={inputClass}
+        <td className="p-3">
+          <div className="flex items-center">
+            <div 
+              className={`relative w-12 h-6 rounded-full cursor-pointer transition-colors ${
+                record.present 
+                  ? "bg-present" 
+                  : "bg-absent"
+              }`}
+              onClick={onToggleAttendance}
+            >
+              <div 
+                className={`absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${
+                  record.present ? "translate-x-6" : ""
+                }`} 
+              />
+            </div>
+            <span className="ml-2">
+              {record.present ? "Present" : "Absent"}
+            </span>
+          </div>
+        </td>
+
+        <td className="p-3">
+          {record.present ? (
+            <input
+              type="time"
+              value={record.startTime}
+              onChange={(e) => onTimeChange("startTime", e.target.value)}
+              disabled={!canEdit || !record.present}
+              className={inputClass}
+            />
+          ) : (
+            <span className="text-muted-foreground">N/A</span>
+          )}
+        </td>
+
+        <td className="p-3">
+          {record.present ? (
+            <input
+              type="time"
+              value={record.endTime}
+              onChange={(e) => onTimeChange("endTime", e.target.value)}
+              disabled={!canEdit || !record.present}
+              className={inputClass}
+            />
+          ) : (
+            <span className="text-muted-foreground">N/A</span>
+          )}
+        </td>
+
+        <td className="p-3">
+          {record.present ? (
+            <input
+              type="number"
+              min="0"
+              step="0.5"
+              value={record.overtimeHours}
+              onChange={(e) => onOvertimeChange(e.target.value)}
+              disabled={!canEdit || !record.present}
+              className={numberInputClass}
+            />
+          ) : (
+            <span className="text-muted-foreground">0</span>
+          )}
+        </td>
+
+        <td className="p-3 min-w-[300px]">
+          <Textarea
+            value={record.note || ""}
+            onChange={(e) => onNoteChange(e.target.value)}
+            placeholder="Add a note..."
+            className="min-h-[80px] w-full max-w-[400px] resize-both dark:bg-gray-800 dark:border-gray-500 dark:text-white dark:placeholder-gray-400"
+            disabled={!canEdit}
           />
-        ) : (
-          <span className="text-muted-foreground">N/A</span>
-        )}
-      </td>
-
-      <td className="p-3">
-        {record.present ? (
-          <input
-            type="time"
-            value={record.endTime}
-            onChange={(e) => onTimeChange("endTime", e.target.value)}
-            disabled={!canEdit || !record.present}
-            className={inputClass}
-          />
-        ) : (
-          <span className="text-muted-foreground">N/A</span>
-        )}
-      </td>
-
-      <td className="p-3">
-        {record.present ? (
-          <input
-            type="number"
-            min="0"
-            step="0.5"
-            value={record.overtimeHours}
-            onChange={(e) => onOvertimeChange(e.target.value)}
-            disabled={!canEdit || !record.present}
-            className={numberInputClass}
-          />
-        ) : (
-          <span className="text-muted-foreground">0</span>
-        )}
-      </td>
-
-      <td className="p-3 min-w-[300px]">
-        <Textarea
-          value={record.note || ""}
-          onChange={(e) => onNoteChange(e.target.value)}
-          placeholder="Add a note..."
-          className="min-h-[80px] w-full max-w-[400px] resize-both dark:bg-gray-800 dark:border-gray-500 dark:text-white dark:placeholder-gray-400"
-          disabled={!canEdit}
-        />
-      </td>
-    </tr>
+        </td>
+      </tr>
+    </TooltipProvider>
   );
 };
 
 export default AttendanceTableRow;
+
