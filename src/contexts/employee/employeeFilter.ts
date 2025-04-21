@@ -10,8 +10,10 @@ export async function employeeMatchesFilters(
   filters: EmployeeFilters
 ): Promise<boolean> {
   // Status filter handling - Only apply when a specific status is selected (not "All")
-  if (filters.status && filters.status !== "All" && employee.status !== filters.status) {
-    return false;
+  if (filters.status && filters.status !== "All") {
+    if (employee.status !== filters.status) {
+      return false;
+    }
   }
   
   // Apply other filters
