@@ -21,7 +21,12 @@ export function employeeMatchesFilters(
     }
   }
   
-  if (filters.status && employee.status !== filters.status) return false;
+  // IMPORTANT: For attendance view, don't filter by status - we need to see both active and archived employees
+  // that have attendance records for the selected date
+  if (filters.status && employee.status !== filters.status && !currentAttendanceDate) {
+    // Only apply status filter when NOT in attendance view
+    return false;
+  }
   if (filters.project && employee.project !== filters.project) return false;
   if (filters.location && employee.location !== filters.location) return false;
   if (filters.paymentType && employee.paymentType !== filters.paymentType) return false;

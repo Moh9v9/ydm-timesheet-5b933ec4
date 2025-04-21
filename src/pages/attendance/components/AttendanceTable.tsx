@@ -5,7 +5,7 @@ import AttendanceTableRow from "./AttendanceTableRow";
 import AttendanceTableEmptyState from "./AttendanceTableEmptyState";
 import { useAttendanceTableSort, SortField } from "./useAttendanceTableSort";
 import SortIcon from "./SortIcon";
-import React from "react";
+import React, { useEffect } from "react";
 
 interface AttendanceTableProps {
   attendanceData: AttendanceRecord[];
@@ -39,6 +39,28 @@ const AttendanceTable = ({
 
   const hasData = attendanceData.length > 0 && filteredEmployees.length > 0;
   const sortedData = getSortedData();
+
+  // Log employee IDs to help debug which employees are available
+  useEffect(() => {
+    // Debug log to trace employee IDs and check if archived employees are included
+    const employeeIds = filteredEmployees.map(e => e.id);
+    console.log("Filtered employees IDs:", employeeIds);
+    console.log("Looking for archived employees with IDs: 1fdd63f7-a399-4341-8c16-d72b0ab3ca8f and 07ea4c39-8033-439c-89e9-2361833e906d");
+    
+    // Check if specific archived employees are in the filtered list
+    const hasFirstArchivedEmployee = employeeIds.includes("1fdd63f7-a399-4341-8c16-d72b0ab3ca8f");
+    const hasSecondArchivedEmployee = employeeIds.includes("07ea4c39-8033-439c-89e9-2361833e906d");
+    
+    console.log("First archived employee in list:", hasFirstArchivedEmployee);
+    console.log("Second archived employee in list:", hasSecondArchivedEmployee);
+    
+    // Log attendance records for these employees
+    const firstEmployeeAttendance = attendanceData.filter(record => record.employeeId === "1fdd63f7-a399-4341-8c16-d72b0ab3ca8f");
+    const secondEmployeeAttendance = attendanceData.filter(record => record.employeeId === "07ea4c39-8033-439c-89e9-2361833e906d");
+    
+    console.log("First archived employee attendance records:", firstEmployeeAttendance);
+    console.log("Second archived employee attendance records:", secondEmployeeAttendance);
+  }, [filteredEmployees, attendanceData]);
 
   // Debug log just in case
   console.log("🔍 AttendanceTable render - Loading:", isLoading, 
@@ -97,7 +119,10 @@ const AttendanceTable = ({
                   emp => emp.id === record.employeeId
                 );
 
-                if (!employee) return null;
+                if (!employee) {
+                  console.log(`No employee found for record with employeeId: ${record.employeeId}`);
+                  return null;
+                }
 
                 return (
                   <AttendanceTableRow

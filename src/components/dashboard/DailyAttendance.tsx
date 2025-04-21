@@ -18,9 +18,7 @@ const DailyAttendance = () => {
   // The parent Index component already provides AttendanceProvider and EmployeeProvider
   return (
     <div className="mt-2">
-      {initialized && (
-        <Attendance />
-      )}
+      {initialized && <Attendance />}
     </div>
   );
 };
