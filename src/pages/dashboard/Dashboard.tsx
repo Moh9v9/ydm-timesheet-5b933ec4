@@ -6,12 +6,13 @@ import { StatsCard } from "@/components/dashboard/StatsCard";
 import { useStatistics } from "@/hooks/useStatistics";
 import Attendance from "@/pages/attendance/Attendance";
 import { useAttendance } from "@/contexts/AttendanceContext";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const Dashboard = () => {
   const { user } = useAuth();
   const { setCurrentDate } = useAttendance();
+  const [isInitialized, setIsInitialized] = useState(false);
   
   // Get today's date and format it for display - always fresh
   const today = new Date();
@@ -24,7 +25,7 @@ const Dashboard = () => {
   // Set the current date in the context immediately when the component mounts
   // This ensures the date is always fresh on page load/refresh
   useEffect(() => {
-    const getCurrentDate = () => {
+    if (!isInitialized && user) {
       // Always calculate a fresh date when setting it
       const freshToday = new Date();
       const freshTodayISO = freshToday.toISOString().split('T')[0];
@@ -32,13 +33,11 @@ const Dashboard = () => {
       
       if (setCurrentDate) {
         setCurrentDate(freshTodayISO);
+        setIsInitialized(true);
       }
-    };
+    }
     
-    // Set date when component mounts
-    getCurrentDate();
-    
-  }, [setCurrentDate]);
+  }, [setCurrentDate, user, isInitialized]);
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -86,7 +85,7 @@ const Dashboard = () => {
       </div>
 
       <div className="mt-6">
-        <Attendance />
+        {user && <Attendance />}
       </div>
     </div>
   );

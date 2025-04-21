@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { AttendanceRecord } from "@/lib/types";
 import { useEmployees } from "@/contexts/EmployeeContext";
 import { useAttendance } from "@/contexts/AttendanceContext";
@@ -11,11 +11,12 @@ export const useAttendanceData = (canEdit: boolean, refreshTrigger: number = 0) 
   const [isLoading, setIsLoading] = useState(true);
   const [lastFetchedDate, setLastFetchedDate] = useState<string>('');
   const [hasAttemptedFetch, setHasAttemptedFetch] = useState(false);
+  const fetchingRef = useRef(false);
 
   // Effect to fetch attendance data only when date changes, employees load, or explicit refresh is triggered
   useEffect(() => {
-    // Only fetch if we have employees
-    if (filteredEmployees.length > 0) {
+    // Only fetch if we have employees and we're not currently fetching
+    if (filteredEmployees.length > 0 && !fetchingRef.current) {
       // Check if we should fetch based on date change, refresh trigger
       const shouldFetch = 
         currentDate !== lastFetchedDate || 
@@ -24,6 +25,7 @@ export const useAttendanceData = (canEdit: boolean, refreshTrigger: number = 0) 
       
       if (shouldFetch) {
         console.log(`Fetching attendance data: date=${currentDate}, employees=${filteredEmployees.length}, lastFetch=${lastFetchedDate}, refreshTrigger=${refreshTrigger}, hasAttempted=${hasAttemptedFetch}`);
+        fetchingRef.current = true;
         
         const fetchAttendanceData = async () => {
           setIsLoading(true);
@@ -59,6 +61,7 @@ export const useAttendanceData = (canEdit: boolean, refreshTrigger: number = 0) 
             console.error("Error fetching attendance data:", error);
           } finally {
             setIsLoading(false);
+            fetchingRef.current = false;
           }
         };
         
@@ -78,6 +81,13 @@ export const useAttendanceData = (canEdit: boolean, refreshTrigger: number = 0) 
     refreshTrigger,
     hasAttemptedFetch
   ]);
+
+  // Reset fetch attempt when date changes
+  useEffect(() => {
+    if (lastFetchedDate !== currentDate) {
+      setHasAttemptedFetch(false);
+    }
+  }, [currentDate, lastFetchedDate]);
 
   const toggleAttendance = (index: number) => {
     if (!canEdit) return;

@@ -11,7 +11,7 @@ import AttendanceHeader from "./components/AttendanceHeader";
 import { useAttendanceData } from "./hooks/useAttendanceData";
 import { useAttendanceOperations } from "./hooks/useAttendanceOperations";
 import AttendanceStatusMark from "./components/AttendanceStatusMark";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -24,6 +24,7 @@ const Attendance = () => {
   const [recordsLoading, setRecordsLoading] = useState(false);
   const [dataRefreshTrigger, setDataRefreshTrigger] = useState(0);
   const [initialCheckDone, setInitialCheckDone] = useState(false);
+  const hasInitializedRef = useRef(false);
   
   const canEdit = user?.permissions.attendees.edit;
   const canViewAttendance = user?.permissions.attendees.view;
@@ -52,7 +53,8 @@ const Attendance = () => {
 
   // Only run the record count check once on initial load
   useEffect(() => {
-    if (!initialCheckDone && user) {
+    if (!initialCheckDone && user && !hasInitializedRef.current) {
+      hasInitializedRef.current = true;
       const fetchActualRecordCount = async () => {
         setRecordsLoading(true);
         try {
@@ -71,7 +73,7 @@ const Attendance = () => {
           setActualRecordCount(count || 0);
           
           // Only trigger a refresh if we actually have records or employees
-          if ((count && count > 0) || filteredEmployees.length > 0) {
+          if ((count && count > 0) || (filteredEmployees.length > 0 && !employeesLoading)) {
             setDataRefreshTrigger(prev => prev + 1);
           }
         } catch (err) {
@@ -84,7 +86,7 @@ const Attendance = () => {
 
       fetchActualRecordCount();
     }
-  }, [currentDate, filteredEmployees.length, user, initialCheckDone]);
+  }, [currentDate, filteredEmployees.length, user, initialCheckDone, employeesLoading]);
 
   // Update record count when date changes (without triggering a data refresh)
   useEffect(() => {
