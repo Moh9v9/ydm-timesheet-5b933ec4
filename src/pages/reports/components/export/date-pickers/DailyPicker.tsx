@@ -8,6 +8,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { StyledSelect } from "@/components/ui/styled-select";
 import { cn } from "@/lib/utils";
 import { datePickerStyles } from './DatePickerStyles';
 import { useTheme } from "@/contexts/ThemeContext";
@@ -28,6 +29,15 @@ const DailyPicker = ({
   showCalendarView = true
 }: DailyPickerProps) => {
   const { theme } = useTheme();
+  const years = Array.from({ length: 11 }, (_, i) => ({
+    value: String(2020 + i),
+    label: String(2020 + i)
+  }));
+
+  const months = Array.from({ length: 12 }, (_, i) => ({
+    value: String(i),
+    label: format(new Date(2000, i, 1), "MMMM")
+  }));
 
   const handleSelect = (date: Date | undefined) => {
     if (date) {
@@ -52,10 +62,10 @@ const DailyPicker = ({
           </button>
         </PopoverTrigger>
 
-        <PopoverContent align="start" className="p-0 bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-lg shadow-lg">
+        <PopoverContent align="start" className="p-0 w-auto bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-lg shadow-lg">
           {!showCalendarView && (
             <div className="p-4 space-y-4">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between mb-2">
                 <h3 className="text-base font-medium dark:text-gray-100">
                   {format(selectedDate, "MMMM yyyy")}
                 </h3>
@@ -83,47 +93,27 @@ const DailyPicker = ({
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <select
-                  value={selectedDate.getFullYear()}
-                  onChange={(e) => {
+              <div className="grid grid-cols-2 gap-3">
+                <StyledSelect
+                  value={String(selectedDate.getFullYear())}
+                  onValueChange={(value) => {
                     const newDate = new Date(selectedDate);
-                    newDate.setFullYear(parseInt(e.target.value));
+                    newDate.setFullYear(parseInt(value));
                     setSelectedDate(newDate);
                   }}
-                  className={datePickerStyles.select}
-                >
-                  {Array.from({ length: 11 }, (_, i) => 2020 + i).map((year) => (
-                    <option key={year} value={year} className="dark:bg-gray-800">
-                      {year}
-                    </option>
-                  ))}
-                </select>
-
-                <select
-                  value={selectedDate.getMonth()}
-                  onChange={(e) => {
+                  options={years}
+                  placeholder="Select Year"
+                />
+                <StyledSelect
+                  value={String(selectedDate.getMonth())}
+                  onValueChange={(value) => {
                     const newDate = new Date(selectedDate);
-                    newDate.setMonth(parseInt(e.target.value));
+                    newDate.setMonth(parseInt(value));
                     setSelectedDate(newDate);
                   }}
-                  className={datePickerStyles.select}
-                >
-                  {Array.from({ length: 12 }, (_, i) => i).map((month) => (
-                    <option key={month} value={month} className="dark:bg-gray-800">
-                      {format(new Date(2000, month, 1), "MMMM")}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="flex justify-end">
-                <button
-                  onClick={() => setOpen(false)}
-                  className="px-4 py-2 text-sm font-medium text-white bg-primary rounded-lg hover:bg-primary/90 transition-colors"
-                >
-                  Apply
-                </button>
+                  options={months}
+                  placeholder="Select Month"
+                />
               </div>
             </div>
           )}
@@ -134,9 +124,7 @@ const DailyPicker = ({
               selected={selectedDate}
               onSelect={handleSelect}
               initialFocus
-              captionLayout="dropdown-buttons"
-              fromYear={2020}
-              toYear={2030}
+              className={cn(datePickerStyles.calendar.wrapper, "pointer-events-auto")}
               classNames={{
                 months: datePickerStyles.calendar.months,
                 month: datePickerStyles.calendar.months,
