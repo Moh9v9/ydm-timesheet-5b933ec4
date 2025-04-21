@@ -16,6 +16,7 @@ export const EmployeeProvider = ({ children }: { children: ReactNode }) => {
     loading,
     setLoading,
     error,
+    dataFetched,
     refreshEmployees
   } = useEmployeeState();
 
@@ -35,6 +36,7 @@ export const EmployeeProvider = ({ children }: { children: ReactNode }) => {
         setFilters,
         loading,
         error,
+        dataFetched,
         refreshEmployees,
         ...operations
       }}

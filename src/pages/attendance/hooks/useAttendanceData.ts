@@ -5,7 +5,7 @@ import { useEmployees } from "@/contexts/EmployeeContext";
 import { useAttendance } from "@/contexts/AttendanceContext";
 
 export const useAttendanceData = (canEdit: boolean, refreshTrigger: number = 0) => {
-  const { filteredEmployees, loading: employeesLoading } = useEmployees();
+  const { filteredEmployees, loading: employeesLoading, dataFetched } = useEmployees();
   const { currentDate, getRecordsByEmployeeAndDate } = useAttendance();
   const [attendanceData, setAttendanceData] = useState<AttendanceRecord[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -17,8 +17,8 @@ export const useAttendanceData = (canEdit: boolean, refreshTrigger: number = 0) 
   // Effect to fetch attendance data only when date changes, employees load, or explicit refresh is triggered
   useEffect(() => {
     // Handle the case where we have no employees but they're not loading anymore
-    if (!employeesLoading && filteredEmployees.length === 0 && !initAttemptedRef.current) {
-      console.log("No employees available yet, but loading completed. Setting attempt flag.");
+    if (!employeesLoading && dataFetched && filteredEmployees.length === 0 && !initAttemptedRef.current) {
+      console.log("No employees available yet, but loading completed and data fetched. Setting attempt flag.");
       initAttemptedRef.current = true;
       setHasAttemptedFetch(true);
       setIsLoading(false);
@@ -26,7 +26,7 @@ export const useAttendanceData = (canEdit: boolean, refreshTrigger: number = 0) 
     }
 
     // Only fetch if we have employees and we're not currently fetching
-    if (filteredEmployees.length > 0 && !fetchingRef.current) {
+    if (filteredEmployees.length > 0 && !fetchingRef.current && dataFetched) {
       // Check if we should fetch based on date change, refresh trigger
       const shouldFetch = 
         currentDate !== lastFetchedDate || 
@@ -84,7 +84,8 @@ export const useAttendanceData = (canEdit: boolean, refreshTrigger: number = 0) 
     currentDate, 
     getRecordsByEmployeeAndDate, 
     lastFetchedDate, 
-    employeesLoading, 
+    employeesLoading,
+    dataFetched,
     refreshTrigger,
     hasAttemptedFetch
   ]);
@@ -99,7 +100,7 @@ export const useAttendanceData = (canEdit: boolean, refreshTrigger: number = 0) 
   // Helper function to determine if we're in a valid loading state
   const determineIsLoading = () => {
     // If we're still loading employees and haven't attempted a fetch yet
-    if (employeesLoading && !hasAttemptedFetch) {
+    if ((employeesLoading && !dataFetched) && !hasAttemptedFetch) {
       return true;
     }
     
@@ -160,7 +161,7 @@ export const useAttendanceData = (canEdit: boolean, refreshTrigger: number = 0) 
   return {
     attendanceData,
     isLoading: determineIsLoading(),
-    employeesLoaded: !employeesLoading && filteredEmployees.length > 0,
+    employeesLoaded: !employeesLoading && dataFetched,
     toggleAttendance,
     handleTimeChange,
     handleOvertimeChange,

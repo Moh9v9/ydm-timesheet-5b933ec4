@@ -12,6 +12,7 @@ export const useEmployeeState = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [initialized, setInitialized] = useState(false);
+  const [dataFetched, setDataFetched] = useState(false);
 
   // Fetch employees from Supabase on component mount
   useEffect(() => {
@@ -57,12 +58,17 @@ export const useEmployeeState = () => {
         // Make sure we set an empty array even if no data returns
         setEmployees([]);
       }
+      
+      // Mark data as fetched regardless of result
+      setDataFetched(true);
     } catch (err: any) {
       console.error('Error fetching employees:', err);
       setError(err.message || 'Failed to fetch employees');
       toast.error("Failed to load employees. Please try again.");
       // Still set employees to empty array to prevent loading state from being stuck
       setEmployees([]);
+      // Mark data as fetched even on error
+      setDataFetched(true);
     } finally {
       setLoading(false);
     }
@@ -87,6 +93,7 @@ export const useEmployeeState = () => {
     loading,
     setLoading,
     error,
+    dataFetched,
     refreshEmployees: fetchEmployees
   };
 };
