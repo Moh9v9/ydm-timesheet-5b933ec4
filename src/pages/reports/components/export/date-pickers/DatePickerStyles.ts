@@ -22,6 +22,22 @@ export const datePickerStyles = {
     "dark:focus:ring-primary/40",
     "cursor-pointer relative min-w-[100px]"
   ),
+  popoverContent: "p-0 bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-lg shadow-lg",
+  navigation: {
+    button: cn(
+      "inline-flex items-center justify-center rounded-md p-1.5",
+      "text-gray-500 hover:bg-gray-100",
+      "dark:text-gray-400 dark:hover:bg-gray-800",
+      "transition-colors duration-200"
+    )
+  },
+  actions: {
+    button: cn(
+      "px-4 py-2 text-sm font-medium text-white",
+      "bg-primary rounded-lg",
+      "hover:bg-primary/90 transition-colors"
+    )
+  },
   calendar: {
     wrapper: "p-3",
     nav_button: cn(
