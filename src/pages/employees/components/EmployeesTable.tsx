@@ -41,10 +41,10 @@ export const EmployeesTable = ({
               </td>
             </tr>
           ) : employees.length > 0 ? (
-            sortedEmployees.map(employee => (
+            sortedEmployees.map(item => (
               <TableRow
-                key={employee.id}
-                employee={employee}
+                key={item.employee.id}
+                employee={item.employee}
                 onEdit={onEdit}
                 onDelete={onDelete}
               />
