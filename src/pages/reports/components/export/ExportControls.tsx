@@ -1,9 +1,9 @@
-
 import React from 'react';
-import { Button } from "@/components/ui/button";
-import { Filter, Download } from "lucide-react";
 import { ReportType, ExportFormat } from "@/lib/types";
 import ReportSelectionForm from "./ReportSelectionForm";
+import BasicReportControls from "./controls/BasicReportControls";
+import FilterToggleButton from "./controls/FilterToggleButton";
+import GenerateReportButton from "./controls/GenerateReportButton";
 
 interface ExportControlsProps {
   reportType: ReportType;
@@ -56,6 +56,16 @@ const ExportControls: React.FC<ExportControlsProps> = ({
     <>
       <div className="flex justify-between items-start mb-4">
         <div className="flex-1">
+          <BasicReportControls
+            reportType={reportType}
+            setReportType={setReportType}
+            exportFormat={exportFormat}
+            setExportFormat={setExportFormat}
+            currentDate={currentDate}
+            selectedDate={selectedDate}
+            setSelectedDate={setSelectedDate}
+          />
+          
           <ReportSelectionForm
             reportType={reportType}
             setReportType={setReportType}
@@ -78,26 +88,16 @@ const ExportControls: React.FC<ExportControlsProps> = ({
           />
         </div>
         
-        <Button 
-          variant="outline" 
-          className="mt-8 ml-4 flex items-center gap-2 self-start"
-          onClick={() => setShowFilters(!showFilters)}
-        >
-          <Filter size={16} />
-          {showFilters ? "Hide Filters" : "Show Filters"}
-        </Button>
+        <FilterToggleButton 
+          showFilters={showFilters} 
+          onToggle={() => setShowFilters(!showFilters)} 
+        />
       </div>
       
-      <div className="pt-4 mt-2 border-t">
-        <Button
-          onClick={onGenerate}
-          disabled={isGenerating}
-          className="gap-2"
-        >
-          <Download size={16} />
-          {isGenerating ? "Generating..." : "Generate Report"}
-        </Button>
-      </div>
+      <GenerateReportButton 
+        isGenerating={isGenerating} 
+        onClick={onGenerate} 
+      />
     </>
   );
 };
