@@ -29,6 +29,7 @@ const DailyPicker = ({
   showCalendarView = true
 }: DailyPickerProps) => {
   const { theme } = useTheme();
+  
   const years = Array.from({ length: 11 }, (_, i) => ({
     value: String(2020 + i),
     label: String(2020 + i)
@@ -61,9 +62,8 @@ const DailyPicker = ({
             <ChevronRight className="h-4 w-4 text-gray-500 dark:text-gray-400" />
           </button>
         </PopoverTrigger>
-
-        <PopoverContent align="start" className="p-0 w-auto bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-lg shadow-lg">
-          {!showCalendarView && (
+        <PopoverContent className={datePickerStyles.popoverContent} align="start">
+          {!showCalendarView ? (
             <div className="p-4 space-y-4">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="text-base font-medium dark:text-gray-100">
@@ -76,7 +76,7 @@ const DailyPicker = ({
                       prevMonth.setMonth(prevMonth.getMonth() - 1);
                       setSelectedDate(prevMonth);
                     }}
-                    className={datePickerStyles.calendar.nav_button}
+                    className={datePickerStyles.navigation.button}
                   >
                     <ChevronLeft className="h-4 w-4" />
                   </button>
@@ -86,7 +86,7 @@ const DailyPicker = ({
                       nextMonth.setMonth(nextMonth.getMonth() + 1);
                       setSelectedDate(nextMonth);
                     }}
-                    className={datePickerStyles.calendar.nav_button}
+                    className={datePickerStyles.navigation.button}
                   >
                     <ChevronRight className="h-4 w-4" />
                   </button>
@@ -115,10 +115,17 @@ const DailyPicker = ({
                   placeholder="Select Month"
                 />
               </div>
-            </div>
-          )}
 
-          {showCalendarView && (
+              <div className="mt-4 flex justify-end">
+                <button
+                  onClick={() => setOpen(false)}
+                  className={datePickerStyles.actions.button}
+                >
+                  Apply
+                </button>
+              </div>
+            </div>
+          ) : (
             <Calendar
               mode="single"
               selected={selectedDate}
