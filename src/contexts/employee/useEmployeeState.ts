@@ -2,101 +2,86 @@
 import { useState, useEffect } from "react";
 import { Employee, EmployeeFilters } from "@/lib/types";
 import { supabase } from "@/integrations/supabase/client";
-import { formatEmployee } from "./formatEmployee";
 import { employeeMatchesFilters } from "./employeeFilter";
 
-export const useEmployeeState = (currentAttendanceDate?: string) => {
+export const useEmployeeState = (
+  currentAttendanceDate?: string,
+  filterFunction = employeeMatchesFilters
+) => {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [filteredEmployees, setFilteredEmployees] = useState<Employee[]>([]);
   const [filters, setFilters] = useState<EmployeeFilters>({});
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-  const [dataFetched, setDataFetched] = useState<boolean>(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+  const [dataFetched, setDataFetched] = useState(false);
 
-  // Function to fetch employees from Supabase
+  // Function to fetch employees
   const fetchEmployees = async () => {
-    setLoading(true);
-    setError(null);
     try {
-      const { data, error } = await supabase
-        .from('employees')
-        .select('*')
-        .order('full_name');
-
+      setLoading(true);
+      const { data, error } = await supabase.from('employees').select('*');
+      
       if (error) throw error;
 
-      const formattedEmployees = data.map(formatEmployee);
+      const formattedEmployees: Employee[] = data.map(employee => ({
+        id: employee.id,
+        fullName: employee.full_name,
+        iqamaNo: employee.iqama_no,
+        project: employee.project,
+        location: employee.location,
+        jobTitle: employee.job_title,
+        paymentType: employee.payment_type,
+        rateOfPayment: employee.rate_of_payment,
+        sponsorship: employee.sponsorship,
+        status: employee.status,
+        created_at: employee.created_at
+      }));
+
       setEmployees(formattedEmployees);
       setDataFetched(true);
-      
-      console.log(`Fetched ${formattedEmployees.length} employees from database`);
-      console.log(`Active: ${formattedEmployees.filter(e => e.status === "Active").length}, Archived: ${formattedEmployees.filter(e => e.status === "Archived").length}`);
-
-      // Apply filters to employees
-      await applyFilters(formattedEmployees, filters);
-    } catch (err) {
-      console.error('Error fetching employees:', err);
-      setError(err instanceof Error ? err.message : 'An unknown error occurred');
+    } catch (error) {
+      console.error('Error fetching employees:', error);
+      setError(error as Error);
     } finally {
       setLoading(false);
     }
   };
 
-  // Function to apply filters to employees
-  const applyFilters = async (emps: Employee[], filts: EmployeeFilters) => {
-    setLoading(true);
+  // Function to filter employees
+  const filterEmployees = async () => {
     try {
-      console.log("Applying filters:", filts);
-      
-      if (filts.status === "Archived") {
-        console.log(`Archived status filter active - should show ${emps.filter(e => e.status === "Archived").length} employees`);
-      } else if (filts.status) {
-        console.log(`Status filter active: ${filts.status}`);
-        console.log(`Employees before status filter: ${emps.length}`);
-        console.log(`Employees with status ${filts.status}: ${emps.filter(e => e.status === filts.status).length}`);
-      }
-      
-      // Map each employee through the filter function (now async)
-      const filterPromises = emps.map(emp => 
-        employeeMatchesFilters(emp, filts, currentAttendanceDate)
-          .then(passes => passes ? emp : null)
+      setLoading(true);
+      const filtered = await Promise.all(
+        employees.map(async (employee) => {
+          const passes = await filterFunction(employee, filters, currentAttendanceDate);
+          return { employee, passes };
+        })
       );
       
-      // Wait for all filter promises to resolve
-      const filterResults = await Promise.all(filterPromises);
-      
-      // Filter out null values (employees that didn't pass)
-      const filtered = filterResults.filter(emp => emp !== null) as Employee[];
-      
-      setFilteredEmployees(filtered);
-      console.log(`🔍 useEmployeeState - filtered employees: ${filtered.length} of ${emps.length} total with attendance date: ${currentAttendanceDate || 'none'}`);
-      
-      if (filts.status) {
-        console.log(`After filtering - employees with status ${filts.status}: ${filtered.filter(e => e.status === filts.status).length}`);
-      }
-    } catch (err) {
-      console.error('Error applying filters:', err);
+      setFilteredEmployees(filtered.filter(({ passes }) => passes).map(({ employee }) => employee));
+    } catch (error) {
+      console.error('Error filtering employees:', error);
+      setError(error as Error);
     } finally {
       setLoading(false);
     }
   };
 
-  // Apply filters whenever employees or filters change
-  useEffect(() => {
-    if (employees.length > 0) {
-      applyFilters(employees, filters);
-    }
-  }, [employees, filters, currentAttendanceDate]);
-
-  // Function to refresh employees - modified to return a Promise
-  const refreshEmployees = async (): Promise<void> => {
-    return await fetchEmployees();
-  };
-
-  // Fetch employees on component mount
+  // Fetch employees on mount
   useEffect(() => {
     fetchEmployees();
   }, []);
+
+  // Filter employees when filters or employees change
+  useEffect(() => {
+    if (employees.length > 0) {
+      filterEmployees();
+    }
+  }, [employees, filters, currentAttendanceDate]);
+
+  const refreshEmployees = () => {
+    fetchEmployees();
+  };
 
   return {
     employees,

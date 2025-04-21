@@ -3,7 +3,8 @@ import { createContext, useContext, ReactNode, useEffect } from "react";
 import { EmployeeContextType } from "./employee/types";
 import { useEmployeeState } from "./employee/useEmployeeState";
 import { useEmployeeOperations } from "./employee/useEmployeeOperations";
-import { useAttendance } from "@/contexts/AttendanceContext"; // for attendance date context
+import { useAttendance } from "@/contexts/AttendanceContext";
+import { employeeMatchesAttendanceFilters } from "./employee/employeeAttendanceFilter";
 
 const EmployeeContext = createContext<EmployeeContextType | undefined>(undefined);
 
@@ -15,7 +16,7 @@ export const EmployeeProvider = ({ children }: { children: ReactNode }) => {
     currentAttendanceDate = attendanceContext?.currentDate;
     console.log("EmployeeContext - Got attendance date for filtering:", currentAttendanceDate);
   } catch (error) {
-    console.log("EmployeeContext - No AttendanceContext available, continuing without date filtering");
+    console.log("EmployeeContext - No AttendanceContext available, using regular employee filters");
   }
 
   const {
@@ -29,7 +30,7 @@ export const EmployeeProvider = ({ children }: { children: ReactNode }) => {
     error,
     dataFetched,
     refreshEmployees
-  } = useEmployeeState(currentAttendanceDate);
+  } = useEmployeeState(currentAttendanceDate, employeeMatchesAttendanceFilters);
 
   const operations = useEmployeeOperations(
     employees,
@@ -37,7 +38,6 @@ export const EmployeeProvider = ({ children }: { children: ReactNode }) => {
     setLoading
   );
 
-  // Export loading state to consumers to help with synchronization
   return (
     <EmployeeContext.Provider
       value={{
