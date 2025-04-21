@@ -10,26 +10,14 @@ import DailyAttendance from "@/components/dashboard/DailyAttendance";
 
 const Dashboard = () => {
   const { user } = useAuth();
-  const { setCurrentDate } = useAttendance();
+  const { currentDate } = useAttendance();
   const [isInitialized, setIsInitialized] = useState(false);
 
-  // Get today's date and format it for display - always fresh
-  const today = new Date();
-  const formattedDate = format(today, "EEEE, MMMM d, yyyy");
-  // Get statistics - our hook will use the current date internally
+  // Format the selected date for display
+  const formattedDate = currentDate ? format(new Date(currentDate), "EEEE, MMMM d, yyyy") : "Loading...";
+  
+  // Get statistics - will now use the current date from context
   const stats = useStatistics();
-
-  useEffect(() => {
-    if (!isInitialized && user) {
-      const freshToday = new Date();
-      const freshTodayISO = freshToday.toISOString().split('T')[0];
-      console.log("Dashboard - Setting current date on mount/refresh:", freshTodayISO);
-      if (setCurrentDate) {
-        setCurrentDate(freshTodayISO);
-        setIsInitialized(true);
-      }
-    }
-  }, [setCurrentDate, user, isInitialized]);
 
   return (
     <div className="space-y-6 animate-fade-in">
