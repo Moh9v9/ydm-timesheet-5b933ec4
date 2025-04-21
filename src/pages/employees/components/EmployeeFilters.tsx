@@ -98,9 +98,9 @@ export const EmployeeFiltersSection = ({
               onChange={(e) => onFilterChange("status", e.target.value)}
               className="w-full border border-input rounded-md p-2 bg-background dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:focus:ring-primary"
             >
+              <option value="All">All Status</option>
               <option value="Active">Active Only</option>
               <option value="Archived">Archived Only</option>
-              <option value="All">All Status</option>
             </select>
           </div>
         </div>

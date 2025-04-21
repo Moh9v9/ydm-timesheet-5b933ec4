@@ -43,6 +43,8 @@ const Employees = () => {
   const sponsorshipTypes = ["YDM co", "YDM est", "Outside"];
   
   const handleFilterChange = (key: keyof EmployeeFilters, value: string) => {
+    console.log(`Filter changed: ${key} = ${value}`);
+    
     if (value === "All") {
       const newFilters = { ...filters };
       delete newFilters[key];
@@ -50,6 +52,9 @@ const Employees = () => {
     } else {
       setFilters({ ...filters, [key]: value });
     }
+    
+    // Log the updated filters
+    console.log("Updated filters:", { ...filters, [key]: value === "All" ? undefined : value });
   };
 
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);

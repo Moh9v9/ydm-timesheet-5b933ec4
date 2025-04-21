@@ -24,9 +24,12 @@ export async function employeeMatchesFilters(
   
   // CRITICAL: In attendance view (when currentAttendanceDate exists), NEVER filter by status
   // We must include ALL employees (active or archived) that existed on that date
-  if (filters.status && employee.status !== filters.status && !currentAttendanceDate) {
-    // Status filter is ONLY applied when NOT viewing attendance
-    return false;
+  if (!currentAttendanceDate && filters.status) {
+    // Only apply status filter when not in attendance view
+    console.log(`Employee ${employee.id} (${employee.fullName}) status: ${employee.status}, filter status: ${filters.status}`);
+    if (employee.status !== filters.status) {
+      return false;
+    }
   }
   
   // For archived employees in attendance view, check if they have a record for the selected date
@@ -46,14 +49,6 @@ export async function employeeMatchesFilters(
     
     console.log(`Archived employee ${employee.id} (${employee.fullName}) included - has record for date: ${currentAttendanceDate} with present=${data.present}`);
     return true; // Include archived employees in attendance view only if they have a record
-  }
-  
-  if (employee.id === "1fdd63f7-a399-4341-8c16-d72b0ab3ca8f" || 
-      employee.id === "07ea4c39-8033-439c-89e9-2361833e906d" ||
-      employee.id === "e267bcd9-6d19-432f-8354-0f8e069a3071" ||
-      employee.id === "5ad758ba-dcf2-4c50-b848-0a192d3daf15") {
-    console.log(`TARGET EMPLOYEE FOUND: ${employee.id} (${employee.fullName})`);
-    console.log(`Status: ${employee.status}, Attendance date: ${currentAttendanceDate}`);
   }
   
   if (filters.project && employee.project !== filters.project) return false;
