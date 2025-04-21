@@ -28,16 +28,20 @@ export function employeeMatchesFilters(
     return false;
   }
   
-  // Debug logging for specific IDs you're looking for
-  if (employee.id === "1fdd63f7-a399-4341-8c16-d72b0ab3ca8f" || employee.id === "07ea4c39-8033-439c-89e9-2361833e906d") {
+  // Debug logging for known target IDs
+  if (employee.id === "1fdd63f7-a399-4341-8c16-d72b0ab3ca8f" || 
+      employee.id === "07ea4c39-8033-439c-89e9-2361833e906d" ||
+      employee.id === "e267bcd9-6d19-432f-8354-0f8e069a3071" ||
+      employee.id === "5ad758ba-dcf2-4c50-b848-0a192d3daf15") {
     console.log(`TARGET EMPLOYEE FOUND: ${employee.id} (${employee.fullName})`);
     console.log(`Status: ${employee.status}, Attendance date: ${currentAttendanceDate}`);
-    console.log(`Will show in table: YES`);
+    console.log(`Will show in table: YES - Explicitly included for attendance`);
   }
   
   if (filters.project && employee.project !== filters.project) return false;
   if (filters.location && employee.location !== filters.location) return false;
   if (filters.paymentType && employee.paymentType !== filters.paymentType) return false;
   if (filters.sponsorship && employee.sponsorship !== filters.sponsorship) return false;
+  
   return true;
 }

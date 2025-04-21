@@ -2,7 +2,7 @@
 import { AttendanceRecord } from "@/lib/types";
 import { Employee } from "@/lib/types";
 import { Textarea } from "@/components/ui/textarea";
-import { ArchiveX } from "lucide-react";
+import { Archive } from "lucide-react";
 import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 
 interface AttendanceTableRowProps {
@@ -40,16 +40,16 @@ const AttendanceTableRow = ({
       <tr
         className={`
           border-b border-border/30 last:border-0 transition-colors
-          ${isArchived ? "bg-[#F1F0FB] dark:bg-[#222] border-l-4 border-l-[#8E9196]" : ""}
+          ${isArchived ? "bg-gray-50 dark:bg-gray-800/30 border-l-4 border-l-gray-400" : ""}
         `}
       >
         <td className="p-3 flex items-center gap-2">
           {isArchived && (
             <Tooltip>
               <TooltipTrigger asChild>
-                <ArchiveX
+                <Archive
                   size={18}
-                  className="text-[#8E9196] shrink-0 mr-1"
+                  className="text-gray-500 shrink-0 mr-1"
                   aria-label="Archived employee"
                 />
               </TooltipTrigger>
@@ -59,7 +59,7 @@ const AttendanceTableRow = ({
             </Tooltip>
           )}
           <div>
-            <div className={`font-medium ${isArchived ? "text-[#8E9196]" : ""}`}>{employee.fullName}</div>
+            <div className={`font-medium ${isArchived ? "text-gray-500" : ""}`}>{employee.fullName}</div>
             <div className="text-xs text-muted-foreground">{employee.iqamaNo || "No Iqama"}</div>
           </div>
         </td>
