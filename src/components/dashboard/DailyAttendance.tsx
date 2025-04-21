@@ -1,8 +1,6 @@
 
 import { useState, useEffect } from "react";
 import Attendance from "@/pages/attendance/Attendance";
-import { EmployeeProvider } from "@/contexts/EmployeeContext";
-import { AttendanceProvider } from "@/contexts/AttendanceContext";
 
 const DailyAttendance = () => {
   const [initialized, setInitialized] = useState(false);
@@ -17,16 +15,11 @@ const DailyAttendance = () => {
     // No dependency array - this effect runs only once on mount
   }, []); 
 
-  // Only render Attendance component when initialized, and wrap it with necessary providers
-  // IMPORTANT: EmployeeProvider must be INSIDE AttendanceProvider so it can access the attendance date
+  // The parent Index component already provides AttendanceProvider and EmployeeProvider
   return (
     <div className="mt-2">
       {initialized && (
-        <AttendanceProvider>
-          <EmployeeProvider>
-            <Attendance />
-          </EmployeeProvider>
-        </AttendanceProvider>
+        <Attendance />
       )}
     </div>
   );

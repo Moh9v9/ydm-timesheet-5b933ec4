@@ -6,6 +6,7 @@ import { CardInformation } from "@/components/dashboard/CardInformation";
 import DailyAttendance from "@/components/dashboard/DailyAttendance";
 import { useStatistics } from "@/hooks/useStatistics";
 import { AttendanceProvider } from "@/contexts/AttendanceContext";
+import { EmployeeProvider } from "@/contexts/EmployeeContext";
 
 const Index = () => {
   const { user } = useAuth();
@@ -14,15 +15,17 @@ const Index = () => {
   const today = new Date();
   const formattedDate = format(today, "EEEE, MMMM d, yyyy");
   
-  // Wrap the entire component in AttendanceProvider to ensure stats can access currentDate
+  // Wrap the entire component in both providers to ensure stats can access employee data and currentDate
   return (
     <AttendanceProvider>
-      <IndexContent user={user} formattedDate={formattedDate} />
+      <EmployeeProvider>
+        <IndexContent user={user} formattedDate={formattedDate} />
+      </EmployeeProvider>
     </AttendanceProvider>
   );
 };
 
-// Separate component to ensure it can use hooks within the AttendanceProvider context
+// Separate component to ensure it can use hooks within the provider contexts
 const IndexContent = ({ user, formattedDate }: { user: any, formattedDate: string }) => {
   // Get attendance statistics
   const { totalEmployees, presentToday, absentToday, isLoading } = useStatistics();
