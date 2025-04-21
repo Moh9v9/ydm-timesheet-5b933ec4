@@ -22,8 +22,8 @@ export async function employeeMatchesFilters(
     }
   }
   
-  // Status filter handling - Only apply when a specific status is selected
-  if (filters.status && filters.status !== "All" as string) {
+  // Status filter handling - Only apply when a specific status is selected (not "All")
+  if (filters.status && filters.status !== "All") {
     console.log(`Checking status filter for ${employee.fullName}: employee status=${employee.status}, filter status=${filters.status}`);
     
     // Apply status filter
@@ -31,27 +31,31 @@ export async function employeeMatchesFilters(
       console.log(`Employee ${employee.id} (${employee.fullName}) filtered out - status doesn't match: ${employee.status} != ${filters.status}`);
       return false;
     }
-  }
-  
-  // For archived employees in attendance view, check if they have a record for the selected date
-  // ONLY apply this check if we're in attendance view (currentAttendanceDate is provided)
-  if (employee.status === "Archived" && currentAttendanceDate && filters.status !== "Archived") {
-    // This check should only run in attendance view when we're not explicitly filtering for archived employees
-    const { data } = await supabase
-      .from('attendance_records')
-      .select('id, present')
-      .eq('employee_uuid', employee.id)
-      .eq('date', currentAttendanceDate)
-      .maybeSingle();
     
-    if (!data) {
-      console.log(`Archived employee ${employee.id} (${employee.fullName}) filtered out - no record for date: ${currentAttendanceDate}`);
-      return false;
+    // For archived employees in attendance view, ONLY check if they have a record for the selected date
+    // when we're NOT viewing "All" or "Archived" status specifically - but we already know we're NOT
+    // viewing "All" at this point in the code, so we only need to check for "Archived"
+    if (employee.status === "Archived" && 
+        currentAttendanceDate && 
+        filters.status !== "Archived") {
+      // This check should only run in attendance view when we're not explicitly filtering for archived employees
+      const { data } = await supabase
+        .from('attendance_records')
+        .select('id, present')
+        .eq('employee_uuid', employee.id)
+        .eq('date', currentAttendanceDate)
+        .maybeSingle();
+      
+      if (!data) {
+        console.log(`Archived employee ${employee.id} (${employee.fullName}) filtered out - no record for date: ${currentAttendanceDate}`);
+        return false;
+      }
+      
+      console.log(`Archived employee ${employee.id} (${employee.fullName}) included - has record for date: ${currentAttendanceDate} with present=${data.present}`);
     }
-    
-    console.log(`Archived employee ${employee.id} (${employee.fullName}) included - has record for date: ${currentAttendanceDate} with present=${data.present}`);
   }
   
+  // Apply other filters
   if (filters.project && employee.project !== filters.project) return false;
   if (filters.location && employee.location !== filters.location) return false;
   if (filters.paymentType && employee.paymentType !== filters.paymentType) return false;
