@@ -1,6 +1,8 @@
 
 import { useState, useEffect } from "react";
 import Attendance from "@/pages/attendance/Attendance";
+import { EmployeeProvider } from "@/contexts/EmployeeContext";
+import { AttendanceProvider } from "@/contexts/AttendanceContext";
 
 const DailyAttendance = () => {
   const [initialized, setInitialized] = useState(false);
@@ -15,10 +17,16 @@ const DailyAttendance = () => {
     // No dependency array - this effect runs only once on mount
   }, []); 
 
-  // Only render Attendance component when initialized
+  // Only render Attendance component when initialized, and wrap it with necessary providers
   return (
     <div className="mt-2">
-      {initialized && <Attendance />}
+      {initialized && (
+        <EmployeeProvider>
+          <AttendanceProvider>
+            <Attendance />
+          </AttendanceProvider>
+        </EmployeeProvider>
+      )}
     </div>
   );
 };
