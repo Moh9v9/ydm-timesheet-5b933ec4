@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useEmployees } from "@/contexts/EmployeeContext";
 import { useNotification } from "@/components/ui/notification";
@@ -31,17 +32,29 @@ const EmployeeExportSection = () => {
           xlsx: "Excel",
           pdf: "PDF"
         }[exportFormat];
-        const formattedData = formatEmployeesForExport(filteredEmployees);
+        
+        // Filter employees directly based on current filters
+        const employeesToExport = filteredEmployees.filter(employee => {
+          // Check each filter criteria
+          if (filters.project && employee.project !== filters.project) return false;
+          if (filters.location && employee.location !== filters.location) return false;
+          if (filters.paymentType && employee.paymentType !== filters.paymentType) return false;
+          if (filters.sponsorship && employee.sponsorship !== filters.sponsorship) return false;
+          return true;
+        });
+        
+        const formattedData = formatEmployeesForExport(employeesToExport);
         const { content, mimeType, isBinary } = generateFileContent(formattedData, exportFormat);
         const dateStr = format(new Date(), "yyyyMMdd");
         const filename = `employee-data-${dateStr}.${exportFormat}`;
         downloadFile(content, filename, mimeType, isBinary);
-        success(`Employee data exported as ${formatName} successfully with ${filteredEmployees.length} records`);
+        
+        success(`Employee data exported as ${formatName} successfully with ${employeesToExport.length} records`);
         console.log("Export request:", {
           type: "employees",
           exportFormat,
           filters,
-          employeesCount: filteredEmployees.length
+          employeesCount: employeesToExport.length
         });
       } catch (err) {
         error("Failed to generate employee report");
