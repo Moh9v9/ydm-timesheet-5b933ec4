@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { useEmployees } from "@/contexts/EmployeeContext";
-import { AttendanceRecord } from "@/lib/types";
+import { useAttendance } from "@/contexts/AttendanceContext";
 import { supabase } from "@/integrations/supabase/client";
 
 interface DashboardStats {
@@ -10,11 +10,9 @@ interface DashboardStats {
   absentToday: number;
 }
 
-// Always get a fresh date
-const getTodayISODate = () => new Date().toISOString().split('T')[0];
-
 export const useStatistics = () => {
   const { filteredEmployees } = useEmployees();
+  const { currentDate } = useAttendance(); // Get the selected date from AttendanceContext
   const [stats, setStats] = useState<DashboardStats>({
     totalEmployees: 0,
     presentToday: 0,
@@ -27,22 +25,21 @@ export const useStatistics = () => {
   useEffect(() => {
     const fetchDirectFromDatabase = async () => {
       try {
-        // Always get a fresh date for today
-        const today = getTodayISODate();
-        console.log("useStatistics - Fetching data for fresh current date:", today, "Refresh count:", refreshCount);
+        // Use the selected date from AttendanceContext instead of today's date
+        console.log("useStatistics - Fetching data for current date:", currentDate, "Refresh count:", refreshCount);
         
-        // Get records directly from Supabase for today's date
+        // Get records directly from Supabase for the selected date
         const { data, error } = await supabase
           .from('attendance_records')
           .select('*')
-          .eq('date', today);
+          .eq('date', currentDate);
         
         if (error) {
           console.error("Error fetching attendance stats:", error);
           throw error;
         }
 
-        console.log(`useStatistics - Retrieved ${data?.length || 0} records for ${today}`);
+        console.log(`useStatistics - Retrieved ${data?.length || 0} records for ${currentDate}`);
 
         // Calculate present and absent counts
         const presentCount = (data || []).filter(record => record.present).length;
@@ -68,7 +65,15 @@ export const useStatistics = () => {
     fetchDirectFromDatabase();
     
     // No more automatic refresh
-  }, [filteredEmployees, refreshCount]); // Include refreshCount to enable manual refreshes
+  }, [filteredEmployees, currentDate, refreshCount]); // Include currentDate to refresh when date changes
 
-  return stats;
+  // Add a method to manually trigger a refresh
+  const refreshStats = () => {
+    setRefreshCount(prev => prev + 1);
+  };
+
+  return {
+    ...stats,
+    refreshStats
+  };
 };

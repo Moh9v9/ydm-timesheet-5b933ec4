@@ -1,91 +1,52 @@
 
-import { useAuth } from "@/contexts/AuthContext";
-import { format } from "date-fns";
-import { User, UserCheck, UserX } from "lucide-react";
-import { StatsCard } from "@/components/dashboard/StatsCard";
+import { Briefcase, UserCheck, UserMinus } from "lucide-react";
 import { useStatistics } from "@/hooks/useStatistics";
-import Attendance from "@/pages/attendance/Attendance";
-import { useAttendance } from "@/contexts/AttendanceContext";
-import { useEffect, useState } from "react";
-import { Skeleton } from "@/components/ui/skeleton";
+import { useEmployees } from "@/contexts/EmployeeContext";
+import { StatsCard } from "@/components/dashboard/StatsCard";
+import { AttendanceChart } from "@/components/dashboard/AttendanceChart";
+import { RecentEmployees } from "@/components/dashboard/RecentEmployees";
 
 const Dashboard = () => {
-  const { user } = useAuth();
-  const { setCurrentDate } = useAttendance();
-  const [isInitialized, setIsInitialized] = useState(false);
+  const { totalEmployees, presentToday, absentToday } = useStatistics();
+  const { filteredEmployees } = useEmployees();
   
-  // Get today's date and format it for display - always fresh
-  const today = new Date();
-  const todayISO = today.toISOString().split('T')[0];
-  const formattedDate = format(today, "EEEE, MMMM d, yyyy");
-  
-  // Get statistics - our hook will use the current date internally
-  const stats = useStatistics();
-
-  // Set the current date in the context immediately when the component mounts
-  // This ensures the date is always fresh on page load/refresh
-  useEffect(() => {
-    if (!isInitialized && user) {
-      // Always calculate a fresh date when setting it
-      const freshToday = new Date();
-      const freshTodayISO = freshToday.toISOString().split('T')[0];
-      console.log("Dashboard - Setting current date on mount/refresh:", freshTodayISO);
-      
-      if (setCurrentDate) {
-        setCurrentDate(freshTodayISO);
-        setIsInitialized(true);
-      }
-    }
-    
-  }, [setCurrentDate, user, isInitialized]);
+  // Count active employees for accurate stats
+  const activeEmployees = filteredEmployees.filter(emp => emp.status === "Active").length;
 
   return (
     <div className="space-y-6 animate-fade-in">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
-        <div>
-          <h1 className="text-2xl font-bold">Dashboard</h1>
-          <p className="text-muted-foreground">
-            Welcome back, {user?.fullName || "User"}
-          </p>
-        </div>
-        <div className="mt-2 md:mt-0 text-sm font-medium text-muted-foreground">
-          {formattedDate}
-        </div>
+      <h1 className="text-2xl font-semibold">Dashboard</h1>
+
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <StatsCard
+          icon={Briefcase}
+          title="Total Employees"
+          value={totalEmployees}
+          colorClass="bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400"
+        />
+        <StatsCard
+          icon={UserCheck}
+          title="Present Today"
+          value={presentToday}
+          colorClass="bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
+        />
+        <StatsCard
+          icon={UserMinus}
+          title="Absent Today"
+          value={absentToday}
+          colorClass="bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
+        />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-        {!user ? (
-          <>
-            <Skeleton className="h-24" />
-            <Skeleton className="h-24" />
-            <Skeleton className="h-24" />
-          </>
-        ) : (
-          <>
-            <StatsCard
-              icon={User}
-              title="Total Employees"
-              value={stats.totalEmployees}
-              colorClass="bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400"
-            />
-            <StatsCard
-              icon={UserCheck}
-              title="Total Present"
-              value={stats.presentToday}
-              colorClass="bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-400"
-            />
-            <StatsCard
-              icon={UserX}
-              title="Total Absent"
-              value={stats.absentToday}
-              colorClass="bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-400"
-            />
-          </>
-        )}
-      </div>
-
-      <div className="mt-6">
-        {user && <Attendance />}
+      {/* Charts and Tables */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <AttendanceChart
+          presentToday={presentToday}
+          absentToday={absentToday}
+          activeEmployees={activeEmployees}
+        />
+        <RecentEmployees />
       </div>
     </div>
   );

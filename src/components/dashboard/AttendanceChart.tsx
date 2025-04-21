@@ -1,4 +1,7 @@
 
+import { useAttendance } from "@/contexts/AttendanceContext";
+import { format } from "date-fns";
+
 interface AttendanceChartProps {
   presentToday: number;
   absentToday: number;
@@ -10,9 +13,17 @@ export const AttendanceChart = ({
   absentToday,
   activeEmployees,
 }: AttendanceChartProps) => {
+  const { currentDate } = useAttendance();
+  const isToday = currentDate === new Date().toISOString().split('T')[0];
+  const formattedDate = isToday 
+    ? "Today" 
+    : format(new Date(currentDate), "MMMM d, yyyy");
+
   return (
     <div className="bg-card shadow-sm rounded-lg p-6 border">
-      <h2 className="text-lg font-medium mb-4">Today's Attendance Summary</h2>
+      <h2 className="text-lg font-medium mb-4">
+        {formattedDate}'s Attendance Summary
+      </h2>
       <div className="flex items-center justify-center h-32">
         <div className="flex items-end space-x-4">
           <div className="flex flex-col items-center">
