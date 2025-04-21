@@ -32,17 +32,23 @@ export const useEmployeePage = () => {
   const handleFilterChange = (key: keyof typeof filters, value: string) => {
     console.log(`Filter changed: ${key} = ${value}`);
     
+    // Special handling for "All" value - remove the filter
     if (value === "All") {
       const newFilters = { ...filters };
       delete newFilters[key];
       setFilters(newFilters);
       console.log(`Removed ${key} filter, now using all ${key}s`);
     } else {
+      // Set the specific filter value
       setFilters({ ...filters, [key]: value });
       console.log(`Set ${key} filter to ${value}`);
     }
     
-    console.log("Updated filters:", { ...filters, [key]: value === "All" ? undefined : value });
+    // Log updated filters for debugging
+    const updatedFilters = value === "All" 
+      ? { ...filters, [key]: undefined }
+      : { ...filters, [key]: value };
+    console.log("Updated filters:", updatedFilters);
   };
 
   const handleDeleteClick = (id: string) => {

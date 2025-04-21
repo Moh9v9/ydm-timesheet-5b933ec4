@@ -55,19 +55,11 @@ export const useEmployeeState = (
       
       console.log("Current filters before applying:", JSON.stringify(filters));
       console.log("Is attendance view:", !!currentAttendanceDate);
+      console.log("Total employees before filtering:", employees.length);
       
       const filtered = await Promise.all(
         employees.map(async (employee) => {
           const passes = await filterFunction(employee, filters, currentAttendanceDate);
-          
-          // Add debug log for each employee filtering
-          if (!passes) {
-            console.log(`Employee ${employee.id} (${employee.fullName}) filtered out with filters:`, 
-                        JSON.stringify(filters), 
-                        "current attendance date:", currentAttendanceDate,
-                        "status:", employee.status);
-          }
-          
           return { employee, passes };
         })
       );
