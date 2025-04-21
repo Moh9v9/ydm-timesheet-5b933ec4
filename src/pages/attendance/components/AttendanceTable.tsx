@@ -1,4 +1,3 @@
-
 import { AttendanceRecord } from "@/lib/types";
 import { Employee } from "@/lib/types";
 import AttendanceTableRow from "./AttendanceTableRow";
@@ -42,7 +41,7 @@ const AttendanceTable = ({
     return map;
   }, [attendanceData]);
 
-  // Generate combined data with records for every employee (even if no record exists)
+  // Generate combined data with records for every employee
   const combinedData = useMemo(() => {
     // For debugging
     const archivedEmployees = filteredEmployees.filter(emp => emp.status === "Archived");
@@ -51,7 +50,9 @@ const AttendanceTable = ({
         archivedEmployees.map(e => ({id: e.id, name: e.fullName})));
     }
 
-    // Create a record for each employee, either existing or dummy
+    // Only include employees that are:
+    // 1. Active, OR
+    // 2. Archived WITH an existing attendance record
     return filteredEmployees.map((employee, idx) => {
       // Check if we already have a record for this employee
       const existingRecord = attendanceByEmployeeId.get(employee.id);
@@ -64,7 +65,6 @@ const AttendanceTable = ({
         };
       } else {
         // Create a placeholder record for employees that don't have one
-        // This ensures all employees (including archived) appear in the table
         console.log(`Creating placeholder record for ${employee.fullName} (${employee.id}), status: ${employee.status}`);
         return {
           record: {

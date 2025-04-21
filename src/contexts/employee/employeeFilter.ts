@@ -1,14 +1,15 @@
 
 import { Employee, EmployeeFilters } from "@/lib/types";
+import { supabase } from "@/integrations/supabase/client";
 
 /**
  * Returns true if employee passes all filters, including creation date vs. attendance date.
  */
-export function employeeMatchesFilters(
+export async function employeeMatchesFilters(
   employee: Employee,
   filters: EmployeeFilters,
   currentAttendanceDate?: string
-): boolean {
+): Promise<boolean> {
   // Filter out employees who were not created yet on the selected attendance date
   if (currentAttendanceDate && employee.created_at) {
     // Extract just the date part from the ISO timestamp for proper comparison
@@ -28,9 +29,23 @@ export function employeeMatchesFilters(
     return false;
   }
   
+  // For archived employees in attendance view, check if they have a record for the selected date
   if (employee.status === "Archived" && currentAttendanceDate) {
-    console.log(`Archived employee ${employee.id} (${employee.fullName}) included for attendance date: ${currentAttendanceDate}`);
-    return true; // Always include archived employees in attendance view
+    // Check if this archived employee has an attendance record for the selected date
+    const { data } = await supabase
+      .from('attendance_records')
+      .select('id')
+      .eq('employee_uuid', employee.id)
+      .eq('date', currentAttendanceDate)
+      .maybeSingle();
+    
+    if (!data) {
+      console.log(`Archived employee ${employee.id} (${employee.fullName}) filtered out - no record for date: ${currentAttendanceDate}`);
+      return false;
+    }
+    
+    console.log(`Archived employee ${employee.id} (${employee.fullName}) included - has record for date: ${currentAttendanceDate}`);
+    return true; // Include archived employees in attendance view only if they have a record
   }
   
   if (employee.id === "1fdd63f7-a399-4341-8c16-d72b0ab3ca8f" || 
@@ -39,7 +54,6 @@ export function employeeMatchesFilters(
       employee.id === "5ad758ba-dcf2-4c50-b848-0a192d3daf15") {
     console.log(`TARGET EMPLOYEE FOUND: ${employee.id} (${employee.fullName})`);
     console.log(`Status: ${employee.status}, Attendance date: ${currentAttendanceDate}`);
-    console.log(`Will show in table: YES - Explicitly included for attendance`);
   }
   
   if (filters.project && employee.project !== filters.project) return false;
