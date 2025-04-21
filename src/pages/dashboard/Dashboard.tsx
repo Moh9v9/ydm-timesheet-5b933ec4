@@ -11,9 +11,9 @@ const Dashboard = () => {
   const { user } = useAuth();
   const { currentDate } = useAttendance();
 
-  // Format the selected date for display
-  const formattedDate = currentDate ? format(new Date(currentDate), "EEEE, MMMM d, yyyy") : "Loading...";
-  
+  // Format the selected date to just the date without day or month name
+  const formattedDate = currentDate ? format(new Date(currentDate), "yyyy-MM-dd") : "Loading...";
+
   // Get statistics - will now use the current date from context
   const stats = useStatistics();
 
