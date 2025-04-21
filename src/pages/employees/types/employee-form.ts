@@ -11,6 +11,7 @@ export interface EmployeeFormData {
   rateOfPayment: number;
   sponsorship: SponsorshipType;
   status: EmployeeStatus;
+  created_at?: string; // Add as optional since it's generated for new employees
 }
 
 export interface EmployeeFormProps {

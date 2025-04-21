@@ -21,7 +21,8 @@ const EmployeeModal = ({ employee, onClose }: EmployeeModalProps) => {
     paymentType: employee.paymentType,
     rateOfPayment: employee.rateOfPayment,
     sponsorship: employee.sponsorship,
-    status: employee.status
+    status: employee.status,
+    created_at: employee.created_at,  // Add this line
   } : {
     fullName: "",
     iqamaNo: 0,
@@ -31,7 +32,8 @@ const EmployeeModal = ({ employee, onClose }: EmployeeModalProps) => {
     paymentType: "Monthly" as PaymentType,
     rateOfPayment: 0,
     sponsorship: "YDM co" as SponsorshipType,
-    status: "Active" as EmployeeStatus
+    status: "Active" as EmployeeStatus,
+    created_at: new Date().toISOString(),  // Add this line with current date for new employees
   };
 
   const handleSubmit = async (formData: EmployeeFormData) => {
