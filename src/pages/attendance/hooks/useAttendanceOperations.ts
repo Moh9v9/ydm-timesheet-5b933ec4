@@ -30,7 +30,7 @@ export const useAttendanceOperations = (canEdit: boolean) => {
         overtimeHours: record.overtimeHours,
         note: record.note
       }));
-      
+
       console.log("Sending attendance data to save:", cleanData);
       const result = await bulkSaveAttendance(cleanData);
       console.log("Save result:", result);
@@ -43,10 +43,11 @@ export const useAttendanceOperations = (canEdit: boolean) => {
     }
   };
 
-  // Fixed the function signature for handleBulkUpdate
+  // Now accept updateType and only update present employees if updateType is "times"
   const handleBulkUpdate = async (
     attendanceData: AttendanceRecord[],
     data: {
+      updateType: "presence" | "times";
       present: boolean;
       startTime: string;
       endTime: string;
@@ -55,15 +56,32 @@ export const useAttendanceOperations = (canEdit: boolean) => {
     }
   ) => {
     try {
-      const updatedRecords = attendanceData.map(record => ({
-        ...record,
-        present: data.present,
-        startTime: data.startTime,
-        endTime: data.endTime,
-        overtimeHours: data.overtimeHours,
-        note: data.note
-      }));
-      
+      let updatedRecords: AttendanceRecord[];
+      if (data.updateType === "times") {
+        // Only update records where present is true
+        updatedRecords = attendanceData.map(record =>
+          record.present
+            ? {
+                ...record,
+                startTime: data.startTime,
+                endTime: data.endTime,
+                overtimeHours: data.overtimeHours,
+                note: data.note
+              }
+            : record
+        );
+      } else {
+        // Update all
+        updatedRecords = attendanceData.map(record => ({
+          ...record,
+          present: data.present,
+          startTime: data.present ? data.startTime : "",
+          endTime: data.present ? data.endTime : "",
+          overtimeHours: data.present ? data.overtimeHours : 0,
+          note: data.note
+        }));
+      }
+
       await bulkSaveAttendance(updatedRecords);
       success("All attendance records updated successfully");
       return updatedRecords;

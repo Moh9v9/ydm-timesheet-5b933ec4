@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import AttendanceDialogs from "./AttendanceDialogs";
 import { AttendanceRecord } from "@/lib/types";
@@ -22,7 +21,6 @@ const AttendanceDialogsContainer = ({
   attendanceData,
   canEdit,
   onSuccessfulSave,
-  // New controlled props
   showBulkUpdate,
   setShowBulkUpdate,
   showSaveConfirm,
@@ -37,7 +35,6 @@ const AttendanceDialogsContainer = ({
     handleBulkUpdate
   } = useAttendanceOperations(canEdit);
 
-  // Pass the needed callbacks and values to AttendanceDialogs
   return (
     <AttendanceDialogs
       showBulkUpdate={showBulkUpdate}
@@ -49,7 +46,7 @@ const AttendanceDialogsContainer = ({
         handleBulkUpdate(attendanceData, data)
           .then(() => {
             setShowBulkUpdate(false);
-            refreshData(); // Refresh data after bulk update
+            refreshData();
             if (onSuccessfulSave) onSuccessfulSave();
           })
           .finally(() => {
@@ -60,7 +57,7 @@ const AttendanceDialogsContainer = ({
         setIsSubmitting(true);
         try {
           await confirmSave(attendanceData);
-          refreshData(); // Refresh data after save
+          refreshData();
           if (onSuccessfulSave) onSuccessfulSave();
         } finally {
           setIsSubmitting(false);

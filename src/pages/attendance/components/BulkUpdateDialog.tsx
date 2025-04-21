@@ -17,6 +17,7 @@ interface BulkUpdateDialogProps {
   open: boolean;
   onClose: () => void;
   onConfirm: (data: {
+    updateType: "presence" | "times";
     present: boolean;
     startTime: string;
     endTime: string;
@@ -35,6 +36,7 @@ const BulkUpdateDialog = ({ open, onClose, onConfirm }: BulkUpdateDialogProps) =
 
   const handleConfirm = () => {
     onConfirm({
+      updateType,
       present: updateType === "presence" ? present : true,
       startTime: updateType === "presence" ? (present ? startTime : "") : startTime,
       endTime: updateType === "presence" ? (present ? endTime : "") : endTime,
