@@ -3,7 +3,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { format } from "date-fns";
 import { useStatistics } from "@/hooks/useStatistics";
 import { useAttendance } from "@/contexts/AttendanceContext";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CardInformation } from "@/components/dashboard/CardInformation";
 import DailyAttendance from "@/components/dashboard/DailyAttendance";
@@ -11,7 +11,7 @@ import DailyAttendance from "@/components/dashboard/DailyAttendance";
 const Dashboard = () => {
   const { user } = useAuth();
   const { currentDate } = useAttendance();
-  const [isInitialized, setIsInitialized] = useState(false);
+  const [isInitialized] = useState(false);
 
   // Format the selected date for display
   const formattedDate = currentDate ? format(new Date(currentDate), "EEEE, MMMM d, yyyy") : "Loading...";
