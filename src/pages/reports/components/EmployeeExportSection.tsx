@@ -33,13 +33,14 @@ const EmployeeExportSection = () => {
           pdf: "PDF"
         }[exportFormat];
         
-        // Filter employees directly based on current filters
+        // Apply all filters to the employees list
         const employeesToExport = filteredEmployees.filter(employee => {
           // Check each filter criteria
           if (filters.project && employee.project !== filters.project) return false;
           if (filters.location && employee.location !== filters.location) return false;
           if (filters.paymentType && employee.paymentType !== filters.paymentType) return false;
           if (filters.sponsorship && employee.sponsorship !== filters.sponsorship) return false;
+          if (filters.status && employee.status !== filters.status) return false;
           return true;
         });
         

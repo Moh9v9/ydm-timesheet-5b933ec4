@@ -5,10 +5,17 @@ import { format, parse, startOfMonth, endOfMonth } from 'date-fns';
 export const formatAttendanceForExport = (
   records: AttendanceRecord[],
   reportType: string,
-  date: string
+  date: string,
+  filters?: {
+    project?: string;
+    location?: string;
+    paymentType?: string;
+    searchTerm?: string;
+  }
 ): Record<string, any>[] => {
   let filteredRecords = [...records];
 
+  // Apply date filtering
   if (reportType === 'daily') {
     filteredRecords = records.filter(record => record.date === date);
   } else if (reportType === 'monthly') {
@@ -24,6 +31,20 @@ export const formatAttendanceForExport = (
     } catch (err) {
       console.error("Error filtering monthly records:", err);
     }
+  }
+
+  // Apply additional filters if provided
+  if (filters) {
+    // Apply name search filter if provided
+    if (filters.searchTerm) {
+      const searchLower = filters.searchTerm.toLowerCase();
+      filteredRecords = filteredRecords.filter(record => 
+        record.employeeName.toLowerCase().includes(searchLower)
+      );
+    }
+
+    // These filters depend on having employee data attached to the record
+    // For integration with other filters, the calling code should pre-filter these
   }
 
   // Sort records by date then by employee name for better readability

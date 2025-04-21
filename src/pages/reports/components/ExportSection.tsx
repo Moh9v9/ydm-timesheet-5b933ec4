@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useAttendance } from "@/contexts/AttendanceContext";
 import { ExportFormat, ReportType } from "@/lib/types";
@@ -17,12 +18,26 @@ const ExportSection = () => {
   
   const { attendanceRecords, currentDate } = useAttendance();
   
+  // Create a complete filters object to pass to useReportGeneration
+  const filters = {
+    reportType,
+    exportFormat,
+    date: selectedDate,
+    searchTerm,
+    project: selectedProject !== "all" ? selectedProject : undefined,
+    location: selectedLocation !== "all" ? selectedLocation : undefined,
+    paymentType: selectedPaymentType !== "all" ? selectedPaymentType : undefined,
+    includeInactive
+  };
+  
   const { isGenerating, generateReport } = useReportGeneration({
     reportType,
     exportFormat,
     selectedDate,
     searchTerm,
-    selectedPaymentType,
+    selectedProject: filters.project,
+    selectedLocation: filters.location,
+    selectedPaymentType: filters.paymentType,
     includeInactive,
     attendanceRecords
   });
@@ -51,7 +66,7 @@ const ExportSection = () => {
           includeInactive={includeInactive}
           setIncludeInactive={setIncludeInactive}
           isGenerating={isGenerating}
-          onGenerate={generateReport}
+          onGenerate={() => generateReport(filters)}
         />
       </div>
     </div>
