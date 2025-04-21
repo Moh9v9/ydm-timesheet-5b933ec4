@@ -1,25 +1,12 @@
 
 import { useState } from "react";
-import {
-  Table,
-  TableHeader,
-  TableBody,
-  TableRow,
-  TableHead,
-  TableCell,
-} from "@/components/ui/table";
-import { 
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
-import { Download, Calendar, FileSpreadsheet, FileText } from "lucide-react";
+import { Table, TableBody } from "@/components/ui/table";
 import { useAttendance } from "@/contexts/AttendanceContext";
 import { useEmployees } from "@/contexts/EmployeeContext";
-import { format } from "date-fns";
+import SummaryTableHeader from "./summary/TableHeader";
+import SummaryTableRow from "./summary/TableRow";
+import TablePagination from "./summary/TablePagination";
+import HeaderSection from "./summary/TableHeader/HeaderSection";
 
 interface AttendanceSummaryTableProps {
   view: "daily" | "weekly" | "monthly";
@@ -32,7 +19,6 @@ const AttendanceSummaryTable = ({ view, currentDate }: AttendanceSummaryTablePro
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
-  // Filter attendance records based on the view and current date
   const getFilteredRecords = () => {
     return attendanceRecords.filter((record) => {
       if (view === "daily") {
@@ -46,7 +32,6 @@ const AttendanceSummaryTable = ({ view, currentDate }: AttendanceSummaryTablePro
   const filteredRecords = getFilteredRecords();
   const totalPages = Math.ceil(filteredRecords.length / itemsPerPage);
   
-  // Get the records for the current page
   const paginatedRecords = filteredRecords.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
@@ -57,120 +42,38 @@ const AttendanceSummaryTable = ({ view, currentDate }: AttendanceSummaryTablePro
     return employee ? employee.fullName : "Unknown Employee";
   };
 
-  const formatDate = (dateString: string) => {
-    try {
-      return format(new Date(dateString), "MMM dd, yyyy");
-    } catch (error) {
-      return dateString;
-    }
-  };
-
-  const getReportTypeIcon = () => {
-    switch (view) {
-      case "daily":
-        return <Calendar size={16} className="text-blue-500" />;
-      case "weekly":
-        return <FileSpreadsheet size={16} className="text-green-500" />;
-      case "monthly":
-        return <FileText size={16} className="text-purple-500" />;
-      default:
-        return <Calendar size={16} className="text-blue-500" />;
-    }
-  };
-
   return (
     <div>
-      <div className="flex items-center justify-between px-4 py-3 border-b dark:border-gray-700">
-        <div className="flex items-center gap-2">
-          {getReportTypeIcon()}
-          <h3 className="text-sm font-medium capitalize">{view} Summary</h3>
-        </div>
-        <button className="text-primary hover:text-primary/80 p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-          <Download size={16} />
-        </button>
-      </div>
+      <HeaderSection view={view} />
       
       <div>
         <Table>
-          <TableHeader>
-            <TableRow className="hover:bg-transparent dark:hover:bg-transparent">
-              <TableHead className="font-medium">Employee</TableHead>
-              <TableHead className="font-medium">Date</TableHead>
-              <TableHead className="font-medium">Status</TableHead>
-              <TableHead className="font-medium">Hours</TableHead>
-              <TableHead className="font-medium">Overtime</TableHead>
-            </TableRow>
-          </TableHeader>
+          <SummaryTableHeader />
           <TableBody>
             {paginatedRecords.length > 0 ? (
               paginatedRecords.map((record) => (
-                <TableRow key={record.id} className="dark:hover:bg-gray-750/50">
-                  <TableCell className="font-medium">{getEmployeeName(record.employeeId)}</TableCell>
-                  <TableCell>{formatDate(record.date)}</TableCell>
-                  <TableCell>
-                    <span
-                      className={`px-2 py-0.5 rounded-full text-xs ${
-                        record.present
-                          ? "bg-green-100 text-green-800 dark:bg-green-950/30 dark:text-green-300"
-                          : "bg-red-100 text-red-800 dark:bg-red-950/30 dark:text-red-300"
-                      }`}
-                    >
-                      {record.present ? "Present" : "Absent"}
-                    </span>
-                  </TableCell>
-                  <TableCell>
-                    {record.present
-                      ? `${record.startTime} - ${record.endTime}`
-                      : "N/A"}
-                  </TableCell>
-                  <TableCell>
-                    {record.present ? `${record.overtimeHours}h` : "N/A"}
-                  </TableCell>
-                </TableRow>
+                <SummaryTableRow
+                  key={record.id}
+                  record={record}
+                  getEmployeeName={getEmployeeName}
+                />
               ))
             ) : (
-              <TableRow>
-                <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+              <tr>
+                <td colSpan={5} className="text-center py-8 text-muted-foreground">
                   No attendance records found for this period
-                </TableCell>
-              </TableRow>
+                </td>
+              </tr>
             )}
           </TableBody>
         </Table>
       </div>
 
-      {totalPages > 1 && (
-        <div className="py-4 border-t dark:border-gray-700">
-          <Pagination>
-            <PaginationContent>
-              <PaginationItem>
-                <PaginationPrevious
-                  onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                  className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
-                />
-              </PaginationItem>
-              
-              {Array.from({ length: totalPages }).map((_, i) => (
-                <PaginationItem key={i}>
-                  <PaginationLink
-                    onClick={() => setCurrentPage(i + 1)}
-                    isActive={currentPage === i + 1}
-                  >
-                    {i + 1}
-                  </PaginationLink>
-                </PaginationItem>
-              ))}
-              
-              <PaginationItem>
-                <PaginationNext
-                  onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-                  className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
-                />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
-        </div>
-      )}
+      <TablePagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        setCurrentPage={setCurrentPage}
+      />
     </div>
   );
 };
