@@ -8,24 +8,31 @@ interface AttendanceDialogsContainerProps {
   attendanceData: AttendanceRecord[];
   canEdit: boolean;
   onSuccessfulSave?: () => void;
+  // Add new props for controlling dialogs from parent
+  showBulkUpdate: boolean;
+  setShowBulkUpdate: (show: boolean) => void;
+  showSaveConfirm: boolean;
+  setShowSaveConfirm: (show: boolean) => void;
+  isSubmitting: boolean;
+  setIsSubmitting: (submitting: boolean) => void;
 }
 
 const AttendanceDialogsContainer = ({
   attendanceData,
   canEdit,
-  onSuccessfulSave
+  onSuccessfulSave,
+  // New controlled props
+  showBulkUpdate,
+  setShowBulkUpdate,
+  showSaveConfirm,
+  setShowSaveConfirm,
+  isSubmitting,
+  setIsSubmitting
 }: AttendanceDialogsContainerProps) => {
   const {
-    isSubmitting,
-    showBulkUpdate,
-    setShowBulkUpdate,
-    showSaveConfirm,
-    setShowSaveConfirm,
     handleSave,
     confirmSave,
-    handleUpdateAll,
-    handleBulkUpdate,
-    refreshData
+    handleBulkUpdate
   } = useAttendanceOperations(canEdit);
 
   // Pass the needed callbacks and values to AttendanceDialogs
@@ -35,10 +42,25 @@ const AttendanceDialogsContainer = ({
       setShowBulkUpdate={setShowBulkUpdate}
       showSaveConfirm={showSaveConfirm}
       setShowSaveConfirm={setShowSaveConfirm}
-      onBulkUpdateConfirm={(data: any) => handleBulkUpdate(attendanceData, data)}
+      onBulkUpdateConfirm={(data: any) => {
+        setIsSubmitting(true);
+        handleBulkUpdate(attendanceData, data)
+          .then(() => {
+            setShowBulkUpdate(false);
+            if (onSuccessfulSave) onSuccessfulSave();
+          })
+          .finally(() => {
+            setIsSubmitting(false);
+          });
+      }}
       onConfirmSave={async () => {
-        await confirmSave(attendanceData);
-        if (onSuccessfulSave) onSuccessfulSave();
+        setIsSubmitting(true);
+        try {
+          await confirmSave(attendanceData);
+          if (onSuccessfulSave) onSuccessfulSave();
+        } finally {
+          setIsSubmitting(false);
+        }
       }}
       attendanceData={attendanceData}
       isSubmitting={isSubmitting}

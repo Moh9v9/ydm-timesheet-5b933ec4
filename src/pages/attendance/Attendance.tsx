@@ -11,7 +11,7 @@ import AttendanceStatusMark from "./components/AttendanceStatusMark";
 import AttendanceLoadingSkeleton from "./components/AttendanceLoadingSkeleton";
 import AttendanceDialogsContainer from "./components/AttendanceDialogsContainer";
 import { useAttendanceLoading } from "./hooks/useAttendanceLoading";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const Attendance = () => {
   const { user } = useAuth();
@@ -19,6 +19,11 @@ const Attendance = () => {
   const { currentDate, setCurrentDate } = useAttendance();
   const { NotificationContainer, success } = useNotification();
   const hasRefreshedRef = useRef(false);
+  
+  // Add state for controlling dialogs
+  const [showBulkUpdate, setShowBulkUpdate] = useState(false);
+  const [showSaveConfirm, setShowSaveConfirm] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const canEdit = user?.permissions.attendees.edit;
   const canViewAttendance = user?.permissions.attendees.view;
@@ -64,6 +69,16 @@ const Attendance = () => {
     success("Data refreshed");
   };
 
+  const handleUpdateAll = () => {
+    if (!canEdit) return;
+    setShowBulkUpdate(true);
+  };
+
+  const handleSave = () => {
+    if (!canEdit) return;
+    setShowSaveConfirm(true);
+  };
+
   const handleSuccessfulSave = () => {
     setDataRefreshTrigger((prev) => prev + 1);
   };
@@ -75,9 +90,9 @@ const Attendance = () => {
       <AttendanceHeader
         canEdit={canEdit}
         canViewAttendance={canViewAttendance}
-        isSubmitting={false}
-        onUpdateAll={() => {}}
-        onSave={() => {}}
+        isSubmitting={isSubmitting}
+        onUpdateAll={handleUpdateAll}
+        onSave={handleSave}
         onRefresh={handleFullRefresh}
       />
 
@@ -106,6 +121,12 @@ const Attendance = () => {
         attendanceData={attendanceData}
         canEdit={canEdit}
         onSuccessfulSave={handleSuccessfulSave}
+        showBulkUpdate={showBulkUpdate}
+        setShowBulkUpdate={setShowBulkUpdate}
+        showSaveConfirm={showSaveConfirm}
+        setShowSaveConfirm={setShowSaveConfirm}
+        isSubmitting={isSubmitting}
+        setIsSubmitting={setIsSubmitting}
       />
     </div>
   );

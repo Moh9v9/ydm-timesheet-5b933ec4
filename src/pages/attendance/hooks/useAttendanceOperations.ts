@@ -5,23 +5,18 @@ import { useAttendance } from "@/contexts/AttendanceContext";
 import { useNotification } from "@/components/ui/notification";
 
 export const useAttendanceOperations = (canEdit: boolean) => {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showBulkUpdate, setShowBulkUpdate] = useState(false);
-  const [showSaveConfirm, setShowSaveConfirm] = useState(false);
   const { bulkSaveAttendance } = useAttendance();
   const { success, error } = useNotification();
 
   const handleSave = () => {
     if (!canEdit) {
       error("You don't have permission to edit attendance records");
-      return;
+      return false;
     }
-    setShowSaveConfirm(true);
+    return true;
   };
 
   const confirmSave = async (attendanceData: AttendanceRecord[]) => {
-    setIsSubmitting(true);
-    
     try {
       // Prepare data for saving by making a clean copy
       const cleanData = attendanceData.map(record => ({
@@ -40,24 +35,15 @@ export const useAttendanceOperations = (canEdit: boolean) => {
       const result = await bulkSaveAttendance(cleanData);
       console.log("Save result:", result);
       success("Attendance data saved successfully");
-      setShowSaveConfirm(false);
+      return result;
     } catch (err) {
       error("Failed to save attendance data");
       console.error("Save error:", err);
-    } finally {
-      setIsSubmitting(false);
+      throw err;
     }
   };
 
-  const handleUpdateAll = () => {
-    if (!canEdit) {
-      error("You don't have permission to update attendance records");
-      return;
-    }
-    setShowBulkUpdate(true);
-  };
-
-  // Fixed the function signature to make it work with the container component
+  // Fixed the function signature for handleBulkUpdate
   const handleBulkUpdate = async (
     attendanceData: AttendanceRecord[],
     data: {
@@ -68,8 +54,6 @@ export const useAttendanceOperations = (canEdit: boolean) => {
       note: string;
     }
   ) => {
-    setIsSubmitting(true);
-    
     try {
       const updatedRecords = attendanceData.map(record => ({
         ...record,
@@ -82,30 +66,17 @@ export const useAttendanceOperations = (canEdit: boolean) => {
       
       await bulkSaveAttendance(updatedRecords);
       success("All attendance records updated successfully");
-      setShowBulkUpdate(false);
+      return updatedRecords;
     } catch (err) {
       error("Failed to update attendance records");
       console.error(err);
-    } finally {
-      setIsSubmitting(false);
+      throw err;
     }
   };
 
-  // Add a function to manually refresh data
-  const refreshData = () => {
-    // This function is a placeholder that will trigger a refresh in the parent component
-  };
-
   return {
-    isSubmitting,
-    showBulkUpdate,
-    setShowBulkUpdate,
-    showSaveConfirm,
-    setShowSaveConfirm,
     handleSave,
     confirmSave,
-    handleUpdateAll,
-    handleBulkUpdate,
-    refreshData
+    handleBulkUpdate
   };
 };
