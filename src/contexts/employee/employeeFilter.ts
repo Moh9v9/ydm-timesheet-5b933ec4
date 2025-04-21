@@ -22,8 +22,8 @@ export async function employeeMatchesFilters(
     }
   }
   
-  // Status filter handling
-  if (filters.status) {
+  // Status filter handling - Only apply when a specific status is selected
+  if (filters.status && filters.status !== "All") {
     console.log(`Checking status filter for ${employee.fullName}: employee status=${employee.status}, filter status=${filters.status}`);
     
     // Apply status filter

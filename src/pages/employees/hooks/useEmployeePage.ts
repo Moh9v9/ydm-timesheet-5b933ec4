@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useEmployees } from "@/contexts/EmployeeContext";
 import { Employee } from "@/lib/types";
@@ -35,8 +36,10 @@ export const useEmployeePage = () => {
       const newFilters = { ...filters };
       delete newFilters[key];
       setFilters(newFilters);
+      console.log(`Removed ${key} filter, now using all ${key}s`);
     } else {
       setFilters({ ...filters, [key]: value });
+      console.log(`Set ${key} filter to ${value}`);
     }
     
     console.log("Updated filters:", { ...filters, [key]: value === "All" ? undefined : value });
