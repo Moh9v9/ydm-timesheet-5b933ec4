@@ -1,4 +1,3 @@
-
 // Authentication & User Management Types
 export type UserRole = "admin" | "user";
 
@@ -40,7 +39,6 @@ export interface Employee {
   rateOfPayment: number;
   sponsorship: SponsorshipType;
   status: EmployeeStatus;
-  created_at: string;        // Added created_at field
 }
 
 // Attendance Types

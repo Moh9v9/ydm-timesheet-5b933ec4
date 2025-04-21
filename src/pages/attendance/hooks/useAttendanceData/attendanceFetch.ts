@@ -23,9 +23,11 @@ export function useAttendanceFetch(
     if (lastFetchedDate !== currentDate) {
       setHasAttemptedFetch(false);
     }
-  }, [currentDate, lastFetchedDate, setHasAttemptedFetch]);
+    // eslint-disable-next-line
+  }, [currentDate, lastFetchedDate]);
 
   useEffect(() => {
+    // ... splitting out fetching logic; rest of logic will be in handlers.ts
     if (!employeesLoading && dataFetched && !initAttemptedRef.current) {
       initAttemptedRef.current = true;
       if (filteredEmployees.length === 0) {
@@ -45,17 +47,9 @@ export function useAttendanceFetch(
         fetchingRef.current = true;
         const fetchAttendanceData = async () => {
           setIsLoading(true);
-          
-          // Filter employees based on creation date
-          const eligibleEmployees = filteredEmployees.filter(emp => {
-            const employeeCreatedAt = new Date(emp.created_at);
-            const attendanceDate = new Date(currentDate);
-            // Only include employees created on or before the attendance date
-            return employeeCreatedAt <= attendanceDate;
-          }).filter(emp => emp.status === "Active");
-
+          const activeEmployees = filteredEmployees.filter(emp => emp.status === "Active");
           try {
-            const attendancePromises = eligibleEmployees.map(async (employee) => {
+            const attendancePromises = activeEmployees.map(async (employee) => {
               const existingRecord = await getRecordsByEmployeeAndDate(employee.id, currentDate);
               if (existingRecord) {
                 return existingRecord;
@@ -76,7 +70,7 @@ export function useAttendanceFetch(
 
             const results = await Promise.all(attendancePromises);
             setAttendanceData(results);
-            setLastFetchedDate(currentDate);
+            setLastFetchedDate(currentDate); // Update last fetched date
             setHasAttemptedFetch(true);
           } catch (error) {
             console.error("Error fetching attendance data:", error);
@@ -91,6 +85,7 @@ export function useAttendanceFetch(
       setHasAttemptedFetch(true);
       setIsLoading(false);
     }
+    // eslint-disable-next-line
   }, [
     filteredEmployees, 
     currentDate, 
@@ -99,10 +94,6 @@ export function useAttendanceFetch(
     employeesLoading,
     dataFetched,
     refreshTrigger,
-    hasAttemptedFetch,
-    setAttendanceData,
-    setLastFetchedDate,
-    setHasAttemptedFetch,
-    setIsLoading
+    hasAttemptedFetch
   ]);
 }

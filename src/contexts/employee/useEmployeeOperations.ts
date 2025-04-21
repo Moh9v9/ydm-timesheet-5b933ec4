@@ -59,7 +59,6 @@ export const useEmployeeOperations = (
         rateOfPayment: data.rate_of_payment,
         sponsorship: data.sponsorship as SponsorshipType,
         status: data.status as EmployeeStatus,
-        created_at: data.created_at || new Date().toISOString(), // Add created_at field
       };
 
       setEmployees([...employees, newEmployee]);
@@ -111,7 +110,6 @@ export const useEmployeeOperations = (
         rateOfPayment: data.rate_of_payment,
         sponsorship: data.sponsorship as SponsorshipType,
         status: data.status as EmployeeStatus,
-        created_at: data.created_at || new Date().toISOString(), // Add created_at field
       };
 
       setEmployees(employees.map(emp => emp.id === id ? updatedEmployee : emp));

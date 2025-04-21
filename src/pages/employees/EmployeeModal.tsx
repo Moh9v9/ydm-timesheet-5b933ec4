@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { X } from "lucide-react";
 import { Employee, EmployeeStatus, PaymentType, SponsorshipType } from "@/lib/types";
@@ -20,8 +21,7 @@ const EmployeeModal = ({ employee, onClose }: EmployeeModalProps) => {
     paymentType: employee.paymentType,
     rateOfPayment: employee.rateOfPayment,
     sponsorship: employee.sponsorship,
-    status: employee.status,
-    created_at: employee.created_at,  // Add this line
+    status: employee.status
   } : {
     fullName: "",
     iqamaNo: 0,
@@ -31,8 +31,7 @@ const EmployeeModal = ({ employee, onClose }: EmployeeModalProps) => {
     paymentType: "Monthly" as PaymentType,
     rateOfPayment: 0,
     sponsorship: "YDM co" as SponsorshipType,
-    status: "Active" as EmployeeStatus,
-    created_at: new Date().toISOString(),  // Add this line with current date for new employees
+    status: "Active" as EmployeeStatus
   };
 
   const handleSubmit = async (formData: EmployeeFormData) => {
@@ -40,19 +39,13 @@ const EmployeeModal = ({ employee, onClose }: EmployeeModalProps) => {
     console.log("Submitting form data:", formData);
 
     try {
-      // Ensure created_at is set before passing to addEmployee/updateEmployee
-      const dataWithCreatedAt = {
-        ...formData,
-        created_at: formData.created_at || new Date().toISOString()
-      };
-
       if (employee) {
         // Update existing employee
-        await updateEmployee(employee.id, dataWithCreatedAt);
+        await updateEmployee(employee.id, formData);
         toast.success("Employee updated successfully");
       } else {
         // Create new employee
-        await addEmployee(dataWithCreatedAt);
+        await addEmployee(formData);
         toast.success("Employee added successfully");
       }
       onClose();

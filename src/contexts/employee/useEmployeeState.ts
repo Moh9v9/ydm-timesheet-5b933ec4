@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Employee, EmployeeFilters, PaymentType, SponsorshipType, EmployeeStatus } from "@/lib/types";
 import { supabase } from "@/integrations/supabase/client";
@@ -49,7 +50,6 @@ export const useEmployeeState = () => {
           rateOfPayment: emp.rate_of_payment,
           sponsorship: emp.sponsorship as SponsorshipType,
           status: emp.status as EmployeeStatus,
-          created_at: emp.created_at || new Date().toISOString(), // Ensure created_at is mapped
         }));
         
         console.log("🔍 Formatted employees:", formattedEmployees);
