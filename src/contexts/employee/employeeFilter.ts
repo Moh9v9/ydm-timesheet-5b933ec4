@@ -31,28 +31,28 @@ export async function employeeMatchesFilters(
       console.log(`Employee ${employee.id} (${employee.fullName}) filtered out - status doesn't match: ${employee.status} != ${filters.status}`);
       return false;
     }
-  }
-  
-  // For archived employees in attendance view, ONLY check if they have a record for the selected date
-  // when we're NOT viewing "All" or "Archived" status specifically
-  if (employee.status === "Archived" && 
-      currentAttendanceDate && 
-      filters.status !== "Archived" && 
-      filters.status !== "All") {
-    // This check should only run in attendance view when we're not explicitly filtering for archived or all employees
-    const { data } = await supabase
-      .from('attendance_records')
-      .select('id, present')
-      .eq('employee_uuid', employee.id)
-      .eq('date', currentAttendanceDate)
-      .maybeSingle();
     
-    if (!data) {
-      console.log(`Archived employee ${employee.id} (${employee.fullName}) filtered out - no record for date: ${currentAttendanceDate}`);
-      return false;
+    // For archived employees in attendance view, ONLY check if they have a record for the selected date
+    // when we're NOT viewing "All" or "Archived" status specifically - but we already know we're NOT
+    // viewing "All" at this point in the code, so we only need to check for "Archived"
+    if (employee.status === "Archived" && 
+        currentAttendanceDate && 
+        filters.status !== "Archived") {
+      // This check should only run in attendance view when we're not explicitly filtering for archived employees
+      const { data } = await supabase
+        .from('attendance_records')
+        .select('id, present')
+        .eq('employee_uuid', employee.id)
+        .eq('date', currentAttendanceDate)
+        .maybeSingle();
+      
+      if (!data) {
+        console.log(`Archived employee ${employee.id} (${employee.fullName}) filtered out - no record for date: ${currentAttendanceDate}`);
+        return false;
+      }
+      
+      console.log(`Archived employee ${employee.id} (${employee.fullName}) included - has record for date: ${currentAttendanceDate} with present=${data.present}`);
     }
-    
-    console.log(`Archived employee ${employee.id} (${employee.fullName}) included - has record for date: ${currentAttendanceDate} with present=${data.present}`);
   }
   
   // Apply other filters
