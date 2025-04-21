@@ -28,7 +28,16 @@ export const EmployeesTable = ({
           sortDirection={sortDirection}
         />
         <tbody>
-          {employees.length > 0 ? (
+          {loading ? (
+            <tr>
+              <td colSpan={10} className="text-center py-6">
+                <div className="flex justify-center items-center space-x-2">
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary"></div>
+                  <span>Loading employees...</span>
+                </div>
+              </td>
+            </tr>
+          ) : employees.length > 0 ? (
             getSortedData(employees).map(({ employee }) => (
               <TableRow
                 key={employee.id}
@@ -40,7 +49,7 @@ export const EmployeesTable = ({
           ) : (
             <tr>
               <td colSpan={10} className="text-center py-4">
-                {loading ? "Loading..." : "No employees found"}
+                No employees found
               </td>
             </tr>
           )}
