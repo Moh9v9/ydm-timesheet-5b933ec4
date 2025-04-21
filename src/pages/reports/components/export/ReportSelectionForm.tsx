@@ -44,7 +44,6 @@ const ReportSelectionForm = ({
   
   const reportTypeOptions = [
     { value: "daily", label: "Daily Attendance" },
-    { value: "weekly", label: "Weekly Attendance" },
     { value: "monthly", label: "Monthly Attendance" }
   ];
 

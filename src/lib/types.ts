@@ -1,4 +1,3 @@
-
 // Authentication & User Management Types
 export type UserRole = "admin" | "user";
 
@@ -58,7 +57,7 @@ export interface AttendanceRecord {
 
 // Export Types
 export type ExportFormat = "csv" | "pdf" | "xlsx";
-export type ReportType = "daily" | "weekly" | "monthly";
+export type ReportType = "daily" | "monthly";
 
 // Filter Types
 export interface EmployeeFilters {
