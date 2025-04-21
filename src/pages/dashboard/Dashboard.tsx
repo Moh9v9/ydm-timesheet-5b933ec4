@@ -2,13 +2,14 @@
 import { Briefcase, UserCheck, UserMinus } from "lucide-react";
 import { useStatistics } from "@/hooks/useStatistics";
 import { useEmployees } from "@/contexts/EmployeeContext";
+import { useAttendance } from "@/contexts/AttendanceContext";
 import { StatsCard } from "@/components/dashboard/StatsCard";
-import { AttendanceChart } from "@/components/dashboard/AttendanceChart";
-import { RecentEmployees } from "@/components/dashboard/RecentEmployees";
+import { DashboardAttendanceTable } from "@/components/dashboard/DashboardAttendanceTable";
 
 const Dashboard = () => {
-  const { totalEmployees, presentToday, absentToday } = useStatistics();
+  const { totalEmployees, presentToday, absentToday, refreshStats } = useStatistics();
   const { filteredEmployees } = useEmployees();
+  const { currentDate } = useAttendance();
   
   // Count active employees for accurate stats
   const activeEmployees = filteredEmployees.filter(emp => emp.status === "Active").length;
@@ -39,14 +40,13 @@ const Dashboard = () => {
         />
       </div>
 
-      {/* Charts and Tables */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <AttendanceChart
-          presentToday={presentToday}
-          absentToday={absentToday}
-          activeEmployees={activeEmployees}
+      {/* Attendance Table */}
+      <div className="bg-card shadow-sm rounded-lg border overflow-hidden">
+        <h2 className="text-lg font-medium p-4 border-b">Daily Attendance</h2>
+        <DashboardAttendanceTable 
+          currentDate={currentDate}
+          employeeData={filteredEmployees.filter(emp => emp.status === "Active")}
         />
-        <RecentEmployees />
       </div>
     </div>
   );
