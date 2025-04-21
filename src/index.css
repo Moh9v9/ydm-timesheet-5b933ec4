@@ -149,4 +149,47 @@
   .dark input:focus {
     @apply ring-2 ring-primary ring-offset-2 ring-offset-background;
   }
+
+  /* --- Attendance Table: Improved Dark Mode Visibility --- */
+  .dark .bg-card,
+  .dark .data-table-container {
+    background-color: #1A1F2C !important; /* Deep dark purple/navy */
+  }
+  .dark .data-table,
+  .dark .data-table th,
+  .dark .data-table td {
+    color: #F1F1F1 !important; /* Almost white text */
+    border-color: #313244 !important; /* Soft neutral border */
+  }
+  .dark .data-table thead {
+    background-color: #23263A !important; /* Slightly brighter row for header */
+  }
+  .dark .data-table th {
+    color: #FFFFFF !important;
+    border-bottom: 2px solid #444A61 !important;
+    background: linear-gradient(90deg,#23263A 75%,#21273c 100%);
+    text-shadow: 0 1px 2px #191B26;
+  }
+  .dark .data-table td {
+    background-color: #181B22 !important;
+    color: #ECECEC !important;
+    border-top: 1px solid #23263A !important;
+  }
+  .dark .data-table tr:hover td {
+    background-color: #262B3A !important;
+    color: #FFFFFF !important;
+  }
+  .dark .attendance-present {
+    background-color: #22c55e !important;
+    color: #181B22 !important;
+    font-weight: 600;
+  }
+  .dark .attendance-absent {
+    background-color: #ef4444 !important;
+    color: #FAFAFA !important;
+    font-weight: 600;
+  }
+  .dark .text-muted-foreground {
+    color: #8E9196 !important;
+  }
 }
