@@ -1,7 +1,7 @@
 import { AttendanceRecord } from "@/lib/types";
 import { Employee } from "@/lib/types";
 import { Textarea } from "@/components/ui/textarea";
-import { Archive } from "lucide-react";
+import { Trash2 } from "lucide-react"; // Changed from Archive to Trash2
 import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 
 interface AttendanceTableRowProps {
@@ -51,7 +51,7 @@ const AttendanceTableRow = ({
           {isArchived && (
             <Tooltip>
               <TooltipTrigger asChild>
-                <Archive
+                <Trash2 
                   size={18}
                   className="text-red-500 shrink-0 mr-1"
                   aria-label="Archived employee"
