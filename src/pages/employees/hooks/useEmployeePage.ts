@@ -100,6 +100,7 @@ export const useEmployeePage = () => {
     error,
     filterOptions,
     filters,
+    filteredEmployees,
     handleFilterChange,
     handleDeleteClick,
     handleDeleteConfirm,

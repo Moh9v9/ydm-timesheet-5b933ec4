@@ -17,6 +17,7 @@ const Employees = () => {
     error,
     filterOptions,
     filters,
+    filteredEmployees,
     handleFilterChange,
     handleDeleteClick,
     handleDeleteConfirm,
