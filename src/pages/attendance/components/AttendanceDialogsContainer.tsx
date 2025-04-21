@@ -3,6 +3,7 @@ import { useState } from "react";
 import AttendanceDialogs from "./AttendanceDialogs";
 import { AttendanceRecord } from "@/lib/types";
 import { useAttendanceOperations } from "../hooks/useAttendanceOperations";
+import { useAttendance } from "@/contexts/AttendanceContext";
 
 interface AttendanceDialogsContainerProps {
   attendanceData: AttendanceRecord[];
@@ -29,6 +30,7 @@ const AttendanceDialogsContainer = ({
   isSubmitting,
   setIsSubmitting
 }: AttendanceDialogsContainerProps) => {
+  const { refreshData } = useAttendance();
   const {
     handleSave,
     confirmSave,
@@ -47,6 +49,7 @@ const AttendanceDialogsContainer = ({
         handleBulkUpdate(attendanceData, data)
           .then(() => {
             setShowBulkUpdate(false);
+            refreshData(); // Refresh data after bulk update
             if (onSuccessfulSave) onSuccessfulSave();
           })
           .finally(() => {
@@ -57,6 +60,7 @@ const AttendanceDialogsContainer = ({
         setIsSubmitting(true);
         try {
           await confirmSave(attendanceData);
+          refreshData(); // Refresh data after save
           if (onSuccessfulSave) onSuccessfulSave();
         } finally {
           setIsSubmitting(false);

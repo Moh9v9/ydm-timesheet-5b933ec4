@@ -35,6 +35,8 @@ export const useBulkOperations = (
     setLoading(true);
     
     try {
+      console.log("Starting bulk save operation with", records.length, "records");
+      
       const recordsToUpsert = records.map(record => {
         let recordId = null;
         if ('id' in record && !record.id.toString().includes('temp_')) {
@@ -61,10 +63,17 @@ export const useBulkOperations = (
         .upsert(recordsToUpsert)
         .select();
 
-      if (error) throw error;
-      if (!data) throw new Error('No data returned from upsert');
+      if (error) {
+        console.error("Error during upsert:", error);
+        throw error;
+      }
+      
+      if (!data) {
+        console.error("No data returned from upsert");
+        throw new Error('No data returned from upsert');
+      }
 
-      console.log("Upsert response:", data);
+      console.log("Upsert successful with", data.length, "records returned");
 
       const savedRecords: AttendanceRecord[] = data.map(record => ({
         id: record.id,
@@ -78,6 +87,7 @@ export const useBulkOperations = (
         note: record.note || ''
       }));
 
+      console.log("Transformed records for state update:", savedRecords.length);
       setAttendanceRecords(savedRecords);
       return savedRecords;
     } catch (err) {

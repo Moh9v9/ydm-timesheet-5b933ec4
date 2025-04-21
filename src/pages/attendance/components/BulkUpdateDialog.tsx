@@ -186,4 +186,3 @@ const BulkUpdateDialog = ({ open, onClose, onConfirm }: BulkUpdateDialogProps) =
 };
 
 export default BulkUpdateDialog;
-

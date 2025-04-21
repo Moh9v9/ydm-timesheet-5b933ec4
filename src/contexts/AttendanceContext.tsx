@@ -16,6 +16,7 @@ const AttendanceContext = createContext<AttendanceContextType>({
   filters: { date: getTodayISODate() }, // Always use fresh date
   setFilters: () => {},
   loading: false,
+  refreshData: () => {}, // Add this function to force a refresh
   // Default implementations that will never be used but satisfy TypeScript
   addAttendanceRecord: async () => ({ id: '', employeeId: '', employeeName: '', date: '', present: false, startTime: '', endTime: '', overtimeHours: 0, note: '' }),
   updateAttendanceRecord: async () => ({ id: '', employeeId: '', employeeName: '', date: '', present: false, startTime: '', endTime: '', overtimeHours: 0, note: '' }),
@@ -36,6 +37,7 @@ export const AttendanceProvider = ({ children }: { children: ReactNode }) => {
     loading,
     setLoading,
     filteredRecords,
+    refreshData, // Add this function to the state
   } = useAttendanceState();
 
   const operations = useAttendanceOperations(
@@ -70,6 +72,7 @@ export const AttendanceProvider = ({ children }: { children: ReactNode }) => {
         filters,
         setFilters,
         loading,
+        refreshData, // Expose the refresh function
         ...operations
       }}
     >

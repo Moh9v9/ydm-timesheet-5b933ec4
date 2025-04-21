@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { AttendanceRecord, AttendanceFilters } from "@/lib/types";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -15,6 +15,13 @@ export const useAttendanceState = () => {
     date: currentDate
   });
   const [loading, setLoading] = useState(false);
+  const [refreshCounter, setRefreshCounter] = useState(0); // Add refresh counter
+
+  // Function to force a refresh of the data
+  const refreshData = useCallback(() => {
+    console.log("useAttendanceState - Forcing data refresh");
+    setRefreshCounter(prev => prev + 1);
+  }, []);
 
   // Update filters when currentDate changes
   useEffect(() => {
@@ -71,7 +78,7 @@ export const useAttendanceState = () => {
     };
 
     fetchAttendanceRecords();
-  }, [filters]);
+  }, [filters, refreshCounter]); // Add refreshCounter as a dependency
 
   // Filter attendance records based on current filters
   const filteredRecords = attendanceRecords;
@@ -86,5 +93,6 @@ export const useAttendanceState = () => {
     loading,
     setLoading,
     filteredRecords,
+    refreshData, // Expose the refresh function
   };
 };
