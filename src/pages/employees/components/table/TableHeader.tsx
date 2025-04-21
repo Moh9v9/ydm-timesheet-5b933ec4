@@ -1,6 +1,6 @@
 
 import { useAuth } from "@/contexts/AuthContext";
-import { SortField, SortDirection } from "../types/table-types";
+import { SortField, SortDirection } from "../../types/table-types";
 import { SortIcon } from "./SortIcon";
 
 interface TableHeaderProps {

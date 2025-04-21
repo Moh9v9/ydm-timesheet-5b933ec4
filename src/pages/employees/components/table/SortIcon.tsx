@@ -1,6 +1,6 @@
 
 import { ArrowUp, ArrowDown } from "lucide-react";
-import { SortField } from "../types/table-types";
+import { SortField } from "../../types/table-types";
 
 interface SortIconProps {
   currentField: SortField;
