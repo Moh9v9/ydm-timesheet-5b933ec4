@@ -33,12 +33,8 @@ export async function employeeMatchesFilters(
     }
   }
   
-  // For archived employees in attendance view, check if they have a record for the selected date
-  // ONLY apply this check if:
-  // 1. We're in attendance view (currentAttendanceDate is provided)
-  // 2. The employee is archived
-  // 3. We're not explicitly viewing archived employees (filters.status !== "Archived")
-  // 4. We're not viewing all statuses (filters.status !== "All")
+  // For archived employees in attendance view, ONLY check if they have a record for the selected date
+  // when we're NOT viewing "All" or "Archived" status specifically
   if (employee.status === "Archived" && 
       currentAttendanceDate && 
       filters.status !== "Archived" && 
