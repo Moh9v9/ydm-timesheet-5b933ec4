@@ -1,4 +1,3 @@
-
 import { NavLink, useNavigate } from "react-router-dom";
 import { 
   Users, 
@@ -41,12 +40,13 @@ const Sidebar = ({ isOpen, toggleSidebar }: SidebarProps) => {
       <aside
         className={`
           fixed inset-y-0 left-0 z-50
-          w-64 bg-sidebar
+          bg-sidebar
           transform transition-transform duration-300 ease-in-out
           border-r border-sidebar-border
           ${isOpen ? 'translate-x-0' : '-translate-x-full'}
           md:translate-x-0 md:static md:z-0
           ${!isOpen && 'md:w-16'}
+          w-auto min-w-[4rem] max-w-full
         `}
       >
         <div className="flex flex-col h-full">
@@ -133,4 +133,3 @@ const Sidebar = ({ isOpen, toggleSidebar }: SidebarProps) => {
 };
 
 export default Sidebar;
-
