@@ -66,6 +66,8 @@ export const useBulkOperations = (
 
       console.log("Records prepared for upsert:", recordsToUpsert);
 
+      // Change this to use a let instead of const, so we can reassign it later
+      let resultData;
       const { data, error } = await supabase
         .from('attendance_records')
         .upsert(recordsToUpsert, { 
@@ -79,7 +81,10 @@ export const useBulkOperations = (
         throw error;
       }
       
-      if (!data || data.length === 0) {
+      // Initialize resultData with the response data
+      resultData = data;
+      
+      if (!resultData || resultData.length === 0) {
         // If no data is returned but also no error, try to get the current state
         console.log("No data returned from upsert, fetching current state");
         
@@ -98,16 +103,16 @@ export const useBulkOperations = (
         }
         
         if (fetchedData) {
-          data = fetchedData;
+          resultData = fetchedData;
         } else {
           console.error("Failed to retrieve updated records");
           throw new Error('Failed to retrieve updated records');
         }
       }
 
-      console.log("Upsert/fetch successful with", data.length, "records returned");
+      console.log("Upsert/fetch successful with", resultData.length, "records returned");
 
-      const savedRecords: AttendanceRecord[] = data.map(record => ({
+      const savedRecords: AttendanceRecord[] = resultData.map(record => ({
         id: record.id,
         employeeId: record.employee_uuid,
         employeeName: record.employee_name || '',
