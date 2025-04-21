@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -6,6 +5,7 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { toast } from "sonner";
 import MainLayout from "@/components/layout/MainLayout";
 import { Moon, Sun } from "lucide-react";
+import { useModernNotification } from "@/hooks/useModernNotification";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -14,6 +14,7 @@ const Login = () => {
   const { login, user, loading } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
+  const { showNotification, NotificationContainer } = useModernNotification();
 
   // Check if user is already authenticated
   useEffect(() => {
@@ -27,7 +28,7 @@ const Login = () => {
     e.preventDefault();
     
     if (!email || !password) {
-      toast.error("Please enter both email and password.");
+      showNotification("error", "Please enter both email and password.");
       return;
     }
     
@@ -37,7 +38,7 @@ const Login = () => {
       await login(email, password);
       
       // Show success message
-      toast.success("Login successful!");
+      showNotification("success", "Login successful!");
       
       // Explicitly navigate to the dashboard
       navigate("/", { replace: true });
@@ -46,7 +47,7 @@ const Login = () => {
         ? err.message 
         : "Login failed. Please check your credentials.";
       
-      toast.error(errorMessage);
+      showNotification("error", errorMessage);
       console.error("Login error:", err);
     } finally {
       setIsSubmitting(false);
@@ -55,6 +56,7 @@ const Login = () => {
 
   return (
     <MainLayout requireAuth={false}>
+      <NotificationContainer />
       <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-md w-full space-y-6">
           <div className="absolute top-4 right-4">
