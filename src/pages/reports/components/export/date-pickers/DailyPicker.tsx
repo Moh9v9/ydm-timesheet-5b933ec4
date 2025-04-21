@@ -2,12 +2,15 @@
 import React from 'react';
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 import { datePickerStyles } from './DatePickerStyles';
+import { useTheme } from "@/contexts/ThemeContext";
 
 interface DailyPickerProps {
   selectedDate: Date;
@@ -17,12 +20,49 @@ interface DailyPickerProps {
   yearMonthCaptionLayout: any;
 }
 
-const DailyPicker = ({ selectedDate, setSelectedDate, open, setOpen, yearMonthCaptionLayout }: DailyPickerProps) => {
+const DailyPicker = ({ selectedDate, setSelectedDate, open, setOpen }: DailyPickerProps) => {
+  const { theme } = useTheme();
+  
   const handleSelect = (date: Date | undefined) => {
     if (date) {
       setSelectedDate(date);
       setOpen(false);
     }
+  };
+
+  // Custom navigation components
+  const captionLayout = {
+    components: {
+      Dropdown: ({ value, onChange, children, ...props }: any) => {
+        return (
+          <div className="relative inline-flex items-center">
+            <select
+              value={value}
+              onChange={onChange}
+              className={datePickerStyles.select}
+              {...props}
+            >
+              {children}
+            </select>
+            <ChevronRight className={cn(
+              "w-4 h-4 absolute right-2",
+              "text-muted-foreground/70 dark:text-gray-400",
+              "pointer-events-none rotate-90"
+            )} />
+          </div>
+        );
+      },
+      IconLeft: ({ ...props }) => (
+        <button {...props} className={datePickerStyles.navigation.button}>
+          <ChevronLeft className="h-4 w-4" />
+        </button>
+      ),
+      IconRight: ({ ...props }) => (
+        <button {...props} className={datePickerStyles.navigation.button}>
+          <ChevronRight className="h-4 w-4" />
+        </button>
+      ),
+    },
   };
 
   return (
@@ -45,7 +85,6 @@ const DailyPicker = ({ selectedDate, setSelectedDate, open, setOpen, yearMonthCa
             captionLayout="dropdown-buttons"
             fromYear={2020}
             toYear={2030}
-            ISOWeek
             classNames={{
               months: "space-y-4",
               month: "space-y-4",
@@ -65,7 +104,7 @@ const DailyPicker = ({ selectedDate, setSelectedDate, open, setOpen, yearMonthCa
               day_disabled: "text-muted-foreground/50 dark:text-muted-foreground/30",
               day_hidden: "invisible",
             }}
-            components={yearMonthCaptionLayout.components}
+            components={captionLayout.components}
             className={datePickerStyles.calendar.wrapper}
           />
         </PopoverContent>
@@ -75,4 +114,3 @@ const DailyPicker = ({ selectedDate, setSelectedDate, open, setOpen, yearMonthCa
 };
 
 export default DailyPicker;
-

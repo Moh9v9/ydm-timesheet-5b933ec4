@@ -59,13 +59,5 @@ export const datePickerStyles = {
       "hover:bg-primary hover:text-primary-foreground",
       "focus:bg-primary focus:text-primary-foreground"
     )
-  },
-  actions: {
-    button: cn(
-      "px-3 py-1 text-xs font-medium rounded-md",
-      "bg-primary text-primary-foreground",
-      "hover:bg-primary/90 transition-colors duration-200"
-    )
   }
 };
-
