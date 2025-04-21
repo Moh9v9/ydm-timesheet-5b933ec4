@@ -32,6 +32,7 @@ const Attendance = () => {
   const {
     attendanceData,
     isLoading,
+    employeesLoaded,
     toggleAttendance,
     handleTimeChange,
     handleOvertimeChange,
@@ -139,7 +140,7 @@ const Attendance = () => {
     updateRecordCount();
   };
 
-  const combinedLoading = isLoading || recordsLoading || employeesLoading;
+  const combinedLoading = isLoading || recordsLoading;
 
   return (
     <div className="space-y-4 sm:space-y-6 animate-fade-in pb-20">
@@ -174,6 +175,7 @@ const Attendance = () => {
           onOvertimeChange={handleOvertimeChange}
           onNoteChange={handleNoteChange}
           isLoading={combinedLoading}
+          employeesLoaded={employeesLoaded}
         />
       )}
 

@@ -14,6 +14,7 @@ interface AttendanceTableProps {
   onOvertimeChange: (index: number, value: string) => void;
   onNoteChange: (index: number, value: string) => void;
   isLoading?: boolean;
+  employeesLoaded?: boolean;
 }
 
 type SortField = "employee" | "status" | "startTime" | "endTime" | "overtimeHours" | "notes";
@@ -28,6 +29,7 @@ const AttendanceTable = ({
   onOvertimeChange,
   onNoteChange,
   isLoading = false,
+  employeesLoaded = false,
 }: AttendanceTableProps) => {
   const [sortField, setSortField] = useState<SortField>("employee");
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
@@ -143,7 +145,7 @@ const AttendanceTable = ({
                   </div>
                 </td>
               </tr>
-            ) : filteredEmployees.length === 0 ? (
+            ) : !employeesLoaded ? (
               <tr>
                 <td colSpan={6} className="text-center py-4">
                   <div className="text-muted-foreground">
@@ -151,6 +153,14 @@ const AttendanceTable = ({
                     <div className="mt-2 animate-pulse inline-block">
                       <div className="h-1.5 w-16 bg-muted-foreground/20 rounded-full"></div>
                     </div>
+                  </div>
+                </td>
+              </tr>
+            ) : filteredEmployees.length === 0 ? (
+              <tr>
+                <td colSpan={6} className="text-center py-4">
+                  <div className="text-muted-foreground">
+                    No employees available
                   </div>
                 </td>
               </tr>
