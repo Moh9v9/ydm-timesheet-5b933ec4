@@ -20,7 +20,7 @@ export const SearchBar = ({
   
   // Create employee options for the select
   const employeeOptions = [
-    { value: "", label: "All Employees" },
+    { value: "all", label: "All Employees" }, // Changed from empty string to "all"
     ...employees.map(emp => ({
       value: emp.fullName,
       label: emp.fullName
@@ -31,7 +31,10 @@ export const SearchBar = ({
     <div className={`relative flex-1 ${className}`}>
       <StyledSelect
         value={searchTerm}
-        onValueChange={onSearchChange}
+        onValueChange={(value) => {
+          // Convert "all" back to empty string for compatibility with existing logic
+          onSearchChange(value === "all" ? "" : value);
+        }}
         placeholder={placeholder}
         options={employeeOptions}
       />
