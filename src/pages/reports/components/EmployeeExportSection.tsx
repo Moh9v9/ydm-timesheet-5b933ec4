@@ -2,17 +2,8 @@
 import { useState } from "react";
 import { useEmployees } from "@/contexts/EmployeeContext";
 import { useNotification } from "@/components/ui/notification";
-import { Download, FileText, Filter } from "lucide-react";
-import { ExportFormat, EmployeeFilters, PaymentType, SponsorshipType } from "@/lib/types";
-import { StyledSelect } from "@/components/ui/styled-select";
-import { Button } from "@/components/ui/button";
-import { 
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription
-} from "@/components/ui/card";
+import { ExportFormat, EmployeeFilters } from "@/lib/types";
+import { Card, CardContent } from "@/components/ui/card";
 import AvailableReports from "./export/AvailableReports";
 import { 
   formatEmployeesForExport, 
@@ -21,7 +12,9 @@ import {
 } from "@/lib/reportUtils";
 import { format } from "date-fns";
 import EmployeeExportFilters from "./export/EmployeeExportFilters";
-import EmployeeExportFormatSelect from "./export/EmployeeExportFormatSelect";
+import EmployeeExportHeader from "./export/sections/EmployeeExportHeader";
+import EmployeeExportControls from "./export/sections/EmployeeExportControls";
+import EmployeeExportActions from "./export/sections/EmployeeExportActions";
 
 const EmployeeExportSection = () => {
   const [exportFormat, setExportFormat] = useState<ExportFormat>("pdf");
@@ -61,6 +54,12 @@ const EmployeeExportSection = () => {
     }, 1200);
   };
 
+  // Get unique values for filters
+  const projects = ["all", ...getUniqueValues("project")];
+  const locations = ["all", ...getUniqueValues("location")];
+  const paymentTypes = ["all", ...getUniqueValues("paymentType")];
+  const sponsorships = ["all", ...getUniqueValues("sponsorship")];
+
   // Filters logic
   const handleFilterChange = (key: keyof EmployeeFilters, value: string | undefined) => {
     if (!value || value === "all") {
@@ -75,41 +74,19 @@ const EmployeeExportSection = () => {
     }
   };
 
-  // Get unique values for filters
-  const projects = ["all", ...getUniqueValues("project")];
-  const locations = ["all", ...getUniqueValues("location")];
-  const paymentTypes = ["all", ...getUniqueValues("paymentType")];
-  const sponsorships = ["all", ...getUniqueValues("sponsorship")];
-
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <div className="lg:col-span-2">
         <Card>
-          <CardHeader className="pb-3">
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle>Employee Data Export</CardTitle>
-                <CardDescription>Export employee information based on filters</CardDescription>
-              </div>
-              <FileText className="text-gray-400 dark:text-gray-500" size={20} />
-            </div>
-          </CardHeader>
-
+          <EmployeeExportHeader />
           <CardContent>
-            <div className="flex justify-between items-center mb-4">
-              <EmployeeExportFormatSelect
-                exportFormat={exportFormat}
-                setExportFormat={setExportFormat}
-              />
-              <Button
-                variant="outline"
-                className="flex items-center gap-2"
-                onClick={() => setShowFilters(!showFilters)}
-              >
-                <Filter size={16} />
-                {showFilters ? "Hide Filters" : "Show Filters"}
-              </Button>
-            </div>
+            <EmployeeExportControls
+              exportFormat={exportFormat}
+              setExportFormat={setExportFormat}
+              showFilters={showFilters}
+              setShowFilters={setShowFilters}
+            />
+            
             <EmployeeExportFilters
               filters={filters}
               onFilterChange={handleFilterChange}
@@ -120,21 +97,12 @@ const EmployeeExportSection = () => {
               sponsorships={sponsorships}
               show={showFilters}
             />
-            <div className="flex mt-6 justify-between items-center">
-              <div>
-                <p className="text-sm text-muted-foreground">
-                  Total employees: <strong>{filteredEmployees.length}</strong>
-                </p>
-              </div>
-              <Button
-                onClick={generateReport}
-                disabled={isGenerating || filteredEmployees.length === 0}
-                className="gap-2"
-              >
-                <Download size={16} />
-                {isGenerating ? "Generating..." : "Export Employee Data"}
-              </Button>
-            </div>
+            
+            <EmployeeExportActions
+              isGenerating={isGenerating}
+              filteredEmployeesCount={filteredEmployees.length}
+              onGenerate={generateReport}
+            />
           </CardContent>
         </Card>
       </div>
@@ -146,4 +114,3 @@ const EmployeeExportSection = () => {
 };
 
 export default EmployeeExportSection;
-
