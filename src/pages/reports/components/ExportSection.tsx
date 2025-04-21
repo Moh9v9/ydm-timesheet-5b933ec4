@@ -40,9 +40,7 @@ const ExportSection = () => {
     try {
       const reportTypeName = {
         daily: "Daily Attendance",
-        weekly: "Weekly Attendance",
         monthly: "Monthly Attendance",
-        employees: "Employee List"
       }[reportType];
       
       const formatName = {
@@ -57,8 +55,8 @@ const ExportSection = () => {
       
       let allRecords = [...attendanceRecords];
       
-      // For monthly and weekly reports, fetch all relevant records
-      if (reportType === 'monthly' || reportType === 'weekly') {
+      // For monthly reports, fetch all relevant records
+      if (reportType === 'monthly') {
         // Build the query
         let query = supabase
           .from('attendance_records')

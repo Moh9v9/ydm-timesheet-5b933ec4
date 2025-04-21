@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { format } from "date-fns";
 import { ChevronDown } from "lucide-react";
@@ -152,10 +153,6 @@ const DateRangeInputs = ({ reportType, currentDate, selectedDate, setSelectedDat
 
   if (reportType === "daily") {
     return renderDatePicker("Select Date", "PPP");
-  }
-
-  if (reportType === "weekly") {
-    return renderDatePicker("Select Week", "'Week of' MMM d, yyyy");
   }
 
   if (reportType === "monthly") {

@@ -11,14 +11,6 @@ export const formatAttendanceForExport = (
 
   if (reportType === 'daily') {
     filteredRecords = records.filter(record => record.date === date);
-  } else if (reportType === 'weekly') {
-    const selectedDate = new Date(date);
-    const sevenDaysLater = new Date(selectedDate);
-    sevenDaysLater.setDate(selectedDate.getDate() + 6);
-    filteredRecords = records.filter(record => {
-      const recordDate = new Date(record.date);
-      return recordDate >= selectedDate && recordDate <= sevenDaysLater;
-    });
   } else if (reportType === 'monthly') {
     try {
       const selectedDate = parse(date, 'yyyy-MM-dd', new Date());
