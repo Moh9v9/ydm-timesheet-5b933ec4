@@ -57,6 +57,7 @@ export const useAttendanceOperations = (canEdit: boolean) => {
     setShowBulkUpdate(true);
   };
 
+  // Fixed the function signature to make it work with the container component
   const handleBulkUpdate = async (
     attendanceData: AttendanceRecord[],
     data: {

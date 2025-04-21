@@ -8,7 +8,7 @@ interface AttendanceDialogsProps {
   setShowBulkUpdate: (open: boolean) => void;
   showSaveConfirm: boolean;
   setShowSaveConfirm: (open: boolean) => void;
-  onBulkUpdateConfirm: (data: any) => void;
+  onBulkUpdateConfirm: (data: any) => void; // Keep this as a single parameter function
   onConfirmSave: () => void;
   attendanceData: AttendanceRecord[];
   isSubmitting: boolean;
