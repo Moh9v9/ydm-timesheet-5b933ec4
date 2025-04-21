@@ -18,6 +18,9 @@ export const EmployeesTable = ({
   onDelete 
 }: EmployeesTableProps) => {
   const { sortField, sortDirection, handleSort, getSortedData } = useTableSort();
+  
+  // Process the sorted employees data
+  const sortedEmployees = loading ? [] : getSortedData(employees);
 
   return (
     <div className="data-table-container">
@@ -38,7 +41,7 @@ export const EmployeesTable = ({
               </td>
             </tr>
           ) : employees.length > 0 ? (
-            getSortedData(employees).map(({ employee }) => (
+            sortedEmployees.map(employee => (
               <TableRow
                 key={employee.id}
                 employee={employee}
