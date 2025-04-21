@@ -1,10 +1,8 @@
-
 import { useState } from "react";
 import { useEmployees } from "@/contexts/EmployeeContext";
 import { useNotification } from "@/components/ui/notification";
 import { ExportFormat, EmployeeFilters } from "@/lib/types";
 import { Card, CardContent } from "@/components/ui/card";
-import AvailableReports from "./export/AvailableReports";
 import { 
   formatEmployeesForExport, 
   generateFileContent, 
@@ -75,8 +73,8 @@ const EmployeeExportSection = () => {
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <div className="lg:col-span-2">
+    <div className="grid grid-cols-1">
+      <div>
         <Card>
           <EmployeeExportHeader />
           <CardContent>
@@ -105,9 +103,6 @@ const EmployeeExportSection = () => {
             />
           </CardContent>
         </Card>
-      </div>
-      <div className="lg:col-span-1">
-        <AvailableReports />
       </div>
     </div>
   );

@@ -1,10 +1,8 @@
-
 import { useState } from "react";
 import { useAttendance } from "@/contexts/AttendanceContext";
 import { ExportFormat, ReportType } from "@/lib/types";
 import { useReportGeneration } from "../hooks/useReportGeneration";
 import ReportConfigSection from "./export/sections/ReportConfigSection";
-import AvailableReports from "./export/AvailableReports";
 
 const ExportSection = () => {
   const [reportType, setReportType] = useState<ReportType>("daily");
@@ -30,8 +28,8 @@ const ExportSection = () => {
   });
   
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <div className="lg:col-span-2">
+    <div className="grid grid-cols-1">
+      <div>
         <ReportConfigSection
           reportType={reportType}
           setReportType={setReportType}
@@ -55,10 +53,6 @@ const ExportSection = () => {
           isGenerating={isGenerating}
           onGenerate={generateReport}
         />
-      </div>
-      
-      <div className="lg:col-span-1">
-        <AvailableReports />
       </div>
     </div>
   );
