@@ -12,6 +12,7 @@ export interface EmployeeContextType {
   getEmployee: (id: string) => Employee | undefined;
   loading: boolean;
   error: string | null;
+  dataFetched: boolean;
   getUniqueValues: (field: keyof Employee) => string[];
   refreshEmployees: () => Promise<void>;
 }
