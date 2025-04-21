@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useEmployees } from "@/contexts/EmployeeContext";
 import { useAttendance } from "@/contexts/AttendanceContext";
@@ -63,7 +62,8 @@ const ExportSection = () => {
         // Build the query
         let query = supabase
           .from('attendance_records')
-          .select('*');
+          .select('*')
+          .eq('present', true); // Only get present records
         
         // Add employee filter if an employee is selected
         if (searchTerm && searchTerm !== "") {
@@ -92,10 +92,15 @@ const ExportSection = () => {
           }));
         }
       } else if (searchTerm && searchTerm !== "") {
-        // For daily reports, filter the existing records by employee name
-        allRecords = allRecords.filter(record => record.employeeName === searchTerm);
+        // For daily reports, filter the existing records by employee name and present status
+        allRecords = allRecords.filter(record => 
+          record.employeeName === searchTerm && record.present
+        );
+      } else {
+        // For daily reports without employee filter, only get present records
+        allRecords = allRecords.filter(record => record.present);
       }
-      
+
       // Format data for export
       const formattedData = formatAttendanceForExport(allRecords, reportType, formattedDate);
       
