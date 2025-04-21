@@ -28,6 +28,9 @@ export const useEmployeeState = (currentAttendanceDate?: string) => {
       const formattedEmployees = data.map(formatEmployee);
       setEmployees(formattedEmployees);
       setDataFetched(true);
+      
+      console.log(`Fetched ${formattedEmployees.length} employees from database`);
+      console.log(`Active: ${formattedEmployees.filter(e => e.status === "Active").length}, Archived: ${formattedEmployees.filter(e => e.status === "Archived").length}`);
 
       // Apply filters to employees
       await applyFilters(formattedEmployees, filters);
@@ -43,6 +46,13 @@ export const useEmployeeState = (currentAttendanceDate?: string) => {
   const applyFilters = async (emps: Employee[], filts: EmployeeFilters) => {
     setLoading(true);
     try {
+      console.log("Applying filters:", filts);
+      if (filts.status) {
+        console.log(`Status filter active: ${filts.status}`);
+        console.log(`Employees before status filter: ${emps.length}`);
+        console.log(`Employees with status ${filts.status}: ${emps.filter(e => e.status === filts.status).length}`);
+      }
+      
       // Map each employee through the filter function (now async)
       const filterPromises = emps.map(emp => 
         employeeMatchesFilters(emp, filts, currentAttendanceDate)
@@ -56,7 +66,11 @@ export const useEmployeeState = (currentAttendanceDate?: string) => {
       const filtered = filterResults.filter(emp => emp !== null) as Employee[];
       
       setFilteredEmployees(filtered);
-      console.log(`🔍 useEmployeeState - filtered employees: ${filtered.length} of ${emps.length} total with attendance date: ${currentAttendanceDate}`);
+      console.log(`🔍 useEmployeeState - filtered employees: ${filtered.length} of ${emps.length} total with attendance date: ${currentAttendanceDate || 'none'}`);
+      
+      if (filts.status) {
+        console.log(`After filtering - employees with status ${filts.status}: ${filtered.filter(e => e.status === filts.status).length}`);
+      }
     } catch (err) {
       console.error('Error applying filters:', err);
     } finally {
