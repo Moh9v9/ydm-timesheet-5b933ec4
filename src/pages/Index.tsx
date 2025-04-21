@@ -5,6 +5,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { CardInformation } from "@/components/dashboard/CardInformation";
 import DailyAttendance from "@/components/dashboard/DailyAttendance";
 import { useStatistics } from "@/hooks/useStatistics";
+import { AttendanceProvider } from "@/contexts/AttendanceContext";
 
 const Index = () => {
   const { user } = useAuth();
@@ -13,6 +14,16 @@ const Index = () => {
   const today = new Date();
   const formattedDate = format(today, "EEEE, MMMM d, yyyy");
   
+  // Wrap the entire component in AttendanceProvider to ensure stats can access currentDate
+  return (
+    <AttendanceProvider>
+      <IndexContent user={user} formattedDate={formattedDate} />
+    </AttendanceProvider>
+  );
+};
+
+// Separate component to ensure it can use hooks within the AttendanceProvider context
+const IndexContent = ({ user, formattedDate }: { user: any, formattedDate: string }) => {
   // Get attendance statistics
   const { totalEmployees, presentToday, absentToday, isLoading } = useStatistics();
   

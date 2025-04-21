@@ -7,7 +7,6 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { EmployeeProvider } from "@/contexts/EmployeeContext";
-import { AttendanceProvider } from "@/contexts/AttendanceContext";
 import { UsersProvider } from "@/contexts/UsersContext";
 
 import MainLayout from "@/components/layout/MainLayout";
@@ -19,6 +18,7 @@ import Reports from "@/pages/reports/Reports";
 import Settings from "@/pages/settings/Settings";
 import NotFound from "./pages/NotFound";
 import { TimeZoneProvider } from "@/contexts/TimeZoneContext";
+import { AttendanceProvider } from "@/contexts/AttendanceContext";
 
 const queryClient = new QueryClient();
 
@@ -27,51 +27,53 @@ const App = () => (
     <ThemeProvider>
       <TimeZoneProvider>
         <AuthProvider>
-          <EmployeeProvider>
-            <AttendanceProvider>
-              <UsersProvider>
-                <TooltipProvider>
-                  <Toaster />
-                  <Sonner />
-                  <BrowserRouter>
-                    <Routes>
-                      {/* Auth Routes */}
-                      <Route path="/login" element={<Login />} />
-                      <Route path="/forgot-password" element={<ForgotPassword />} />
-                      
-                      {/* Protected Routes */}
-                      <Route path="/" element={
-                        <MainLayout>
-                          <Index />
-                        </MainLayout>
-                      } />
-                      
-                      <Route path="/employees" element={
-                        <MainLayout>
-                          <Employees />
-                        </MainLayout>
-                      } />
-                      
-                      <Route path="/reports" element={
-                        <MainLayout>
+          <UsersProvider>
+            <TooltipProvider>
+              <Toaster />
+              <Sonner />
+              <BrowserRouter>
+                <Routes>
+                  {/* Auth Routes */}
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/forgot-password" element={<ForgotPassword />} />
+                  
+                  {/* Protected Routes */}
+                  <Route path="/" element={
+                    <MainLayout>
+                      <Index />
+                    </MainLayout>
+                  } />
+                  
+                  <Route path="/employees" element={
+                    <MainLayout>
+                      <EmployeeProvider>
+                        <Employees />
+                      </EmployeeProvider>
+                    </MainLayout>
+                  } />
+                  
+                  <Route path="/reports" element={
+                    <MainLayout>
+                      <AttendanceProvider>
+                        <EmployeeProvider>
                           <Reports />
-                        </MainLayout>
-                      } />
+                        </EmployeeProvider>
+                      </AttendanceProvider>
+                    </MainLayout>
+                  } />
 
-                      <Route path="/settings" element={
-                        <MainLayout>
-                          <Settings />
-                        </MainLayout>
-                      } />
-                      
-                      {/* Catch-all route */}
-                      <Route path="*" element={<NotFound />} />
-                    </Routes>
-                  </BrowserRouter>
-                </TooltipProvider>
-              </UsersProvider>
-            </AttendanceProvider>
-          </EmployeeProvider>
+                  <Route path="/settings" element={
+                    <MainLayout>
+                      <Settings />
+                    </MainLayout>
+                  } />
+                  
+                  {/* Catch-all route */}
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </BrowserRouter>
+            </TooltipProvider>
+          </UsersProvider>
         </AuthProvider>
       </TimeZoneProvider>
     </ThemeProvider>
