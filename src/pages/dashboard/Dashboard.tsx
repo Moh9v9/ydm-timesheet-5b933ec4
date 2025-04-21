@@ -17,6 +17,8 @@ const Dashboard = () => {
   // Get statistics - will now use the current date from context
   const stats = useStatistics();
 
+  console.log("Dashboard render - Current date:", currentDate, "Stats:", stats);
+
   return (
     <div className="space-y-6 animate-fade-in">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
