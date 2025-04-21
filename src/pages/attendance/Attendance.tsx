@@ -19,6 +19,7 @@ const Attendance = () => {
   const { currentDate, setCurrentDate } = useAttendance();
   const { NotificationContainer, success } = useNotification();
   const hasRefreshedRef = useRef(false);
+  const lastDateRef = useRef(currentDate);
   
   // Add state for controlling dialogs
   const [showBulkUpdate, setShowBulkUpdate] = useState(false);
@@ -46,6 +47,16 @@ const Attendance = () => {
       refreshEmployees();
     }
   }, [refreshEmployees, user]);
+  
+  // Also refresh employees when date changes
+  useEffect(() => {
+    if (lastDateRef.current !== currentDate) {
+      console.log(`🔄 Date changed from ${lastDateRef.current} to ${currentDate} - refreshing employee data`);
+      lastDateRef.current = currentDate;
+      refreshEmployees();
+      handleRefresh();
+    }
+  }, [currentDate, refreshEmployees, handleRefresh]);
 
   const {
     attendanceData,
