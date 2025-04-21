@@ -19,7 +19,11 @@ export async function employeeMatchesFilters(
   // Apply other filters
   if (filters.project && filters.project !== "All" && employee.project !== filters.project) return false;
   if (filters.location && filters.location !== "All" && employee.location !== filters.location) return false;
+  
+  // Fix the TypeScript errors by checking if paymentType filter exists and is not "All" using string comparison
   if (filters.paymentType && filters.paymentType !== "All" && employee.paymentType !== filters.paymentType) return false;
+  
+  // Fix the TypeScript errors by checking if sponsorship filter exists and is not "All" using string comparison
   if (filters.sponsorship && filters.sponsorship !== "All" && employee.sponsorship !== filters.sponsorship) return false;
   
   // If all filters pass, return true

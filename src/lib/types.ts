@@ -64,8 +64,8 @@ export type ReportType = "daily" | "monthly";
 export interface EmployeeFilters {
   project?: string;
   location?: string;
-  paymentType?: PaymentType;
-  sponsorship?: SponsorshipType;
+  paymentType?: PaymentType | string; // Modified to allow "All" string
+  sponsorship?: SponsorshipType | string; // Modified to allow "All" string
   status?: EmployeeStatus | "All";
 }
 
