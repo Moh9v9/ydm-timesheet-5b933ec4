@@ -29,6 +29,7 @@ const ExportSection = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [searchTerm, setSearchTerm] = useState<string>("");
   
   const { filteredEmployees } = useEmployees();
   const { attendanceRecords, currentDate } = useAttendance();
@@ -59,12 +60,21 @@ const ExportSection = () => {
       
       // For monthly and weekly reports, fetch all relevant records
       if (reportType === 'monthly' || reportType === 'weekly') {
-        const { data, error } = await supabase
+        // Build the query
+        let query = supabase
           .from('attendance_records')
           .select('*');
+        
+        // Add employee filter if an employee is selected
+        if (searchTerm && searchTerm !== "") {
+          console.log(`Filtering attendance records by employee: ${searchTerm}`);
+          query = query.eq('employee_name', searchTerm);
+        }
           
-        if (error) {
-          throw error;
+        const { data, error: fetchError } = await query;
+        
+        if (fetchError) {
+          throw fetchError;
         }
         
         if (data) {
@@ -81,6 +91,9 @@ const ExportSection = () => {
             note: record.note || ''
           }));
         }
+      } else if (searchTerm && searchTerm !== "") {
+        // For daily reports, filter the existing records by employee name
+        allRecords = allRecords.filter(record => record.employeeName === searchTerm);
       }
       
       // Format data for export
@@ -89,9 +102,10 @@ const ExportSection = () => {
       // Generate file content
       const { content, mimeType, isBinary } = generateFileContent(formattedData, exportFormat);
       
-      // Create filename based on report type and date
+      // Create filename based on report type and date and employee if filtered
       const dateStr = format(selectedDate, "yyyyMMdd");
-      const filename = `${reportType}-attendance-${dateStr}.${exportFormat}`;
+      const employeeStr = searchTerm ? `-${searchTerm.replace(/\s+/g, '-')}` : '';
+      const filename = `${reportType}-attendance${employeeStr}-${dateStr}.${exportFormat}`;
       
       // Download the file
       downloadFile(content, filename, mimeType, isBinary);
@@ -101,6 +115,7 @@ const ExportSection = () => {
         reportType,
         exportFormat,
         date: formattedDate,
+        employee: searchTerm || "All",
         employeesCount: filteredEmployees.length,
         recordsCount: formattedData.length
       });
@@ -138,6 +153,8 @@ const ExportSection = () => {
                   showFilters={showFilters}
                   selectedDate={selectedDate}
                   setSelectedDate={setSelectedDate}
+                  searchTerm={searchTerm}
+                  setSearchTerm={setSearchTerm}
                 />
               </div>
               

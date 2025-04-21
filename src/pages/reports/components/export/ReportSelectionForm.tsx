@@ -19,6 +19,8 @@ interface ReportSelectionFormProps {
   showFilters: boolean;
   selectedDate: Date;
   setSelectedDate: (date: Date) => void;
+  searchTerm: string;
+  setSearchTerm: (value: string) => void;
 }
 
 const ReportSelectionForm = ({
@@ -29,12 +31,13 @@ const ReportSelectionForm = ({
   currentDate,
   showFilters,
   selectedDate,
-  setSelectedDate
+  setSelectedDate,
+  searchTerm,
+  setSearchTerm
 }: ReportSelectionFormProps) => {
   const [selectedProject, setSelectedProject] = useState<string>("all");
   const [selectedLocation, setSelectedLocation] = useState<string>("all");
   const [selectedPaymentType, setSelectedPaymentType] = useState<string>("all");
-  const [searchTerm, setSearchTerm] = useState<string>("");
   const [includeInactive, setIncludeInactive] = useState(false);
   const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
   
