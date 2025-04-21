@@ -48,8 +48,13 @@ export const useStatistics = () => {
           const presentCount = (data || []).filter(record => record.present).length;
           const absentCount = (data || []).filter(record => !record.present).length;
 
+          // Calculate total employees count
+          const totalEmployees = filteredEmployees?.length || 0;
+
+          console.log(`useStatistics - Calculated stats: Present: ${presentCount}, Absent: ${absentCount}, Total: ${totalEmployees}`);
+
           setStats({
-            totalEmployees: filteredEmployees?.length || 0,
+            totalEmployees: totalEmployees,
             presentToday: presentCount,
             absentToday: absentCount,
           });
@@ -69,9 +74,18 @@ export const useStatistics = () => {
 
       // Fetch data when date changes
       fetchDirectFromDatabase();
+    } else {
+      // Even if we don't fetch new data, update the total employees count
+      // This ensures the count is current even if the date hasn't changed
+      if (filteredEmployees?.length !== stats.totalEmployees) {
+        setStats(prev => ({
+          ...prev,
+          totalEmployees: filteredEmployees?.length || 0,
+        }));
+      }
     }
     
-  }, [filteredEmployees, currentDate, lastFetchedDate]); // Include lastFetchedDate to prevent unnecessary fetches
+  }, [filteredEmployees, currentDate, lastFetchedDate, stats.totalEmployees]);
 
   return stats;
 };

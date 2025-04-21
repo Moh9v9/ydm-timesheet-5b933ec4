@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -10,7 +11,7 @@ import { AttendanceProvider } from "@/contexts/AttendanceContext";
 import { UsersProvider } from "@/contexts/UsersContext";
 
 import MainLayout from "@/components/layout/MainLayout";
-import Dashboard from "@/pages/dashboard/Dashboard";
+import Index from "@/pages/Index";
 import Login from "@/pages/auth/Login";
 import ForgotPassword from "@/pages/auth/ForgotPassword";
 import Employees from "@/pages/employees/Employees";
@@ -41,7 +42,7 @@ const App = () => (
                       {/* Protected Routes */}
                       <Route path="/" element={
                         <MainLayout>
-                          <Dashboard />
+                          <Index />
                         </MainLayout>
                       } />
                       

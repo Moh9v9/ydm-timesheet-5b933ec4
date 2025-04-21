@@ -5,6 +5,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { CardInformation } from "@/components/dashboard/CardInformation";
 import DailyAttendance from "@/components/dashboard/DailyAttendance";
 import { useStatistics } from "@/hooks/useStatistics";
+import { AttendanceChart } from "@/components/dashboard/AttendanceChart";
+import { RecentEmployees } from "@/components/dashboard/RecentEmployees";
 
 const Index = () => {
   const { user } = useAuth();
@@ -15,6 +17,8 @@ const Index = () => {
   
   // Get attendance statistics
   const stats = useStatistics();
+  
+  console.log("Dashboard rendering with stats:", stats);
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -42,6 +46,17 @@ const Index = () => {
           presentToday={stats.presentToday}
           absentToday={stats.absentToday}
         />
+      )}
+
+      {user && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <AttendanceChart 
+            presentToday={stats.presentToday}
+            absentToday={stats.absentToday}
+            activeEmployees={stats.totalEmployees}
+          />
+          <RecentEmployees />
+        </div>
       )}
 
       <div className="mt-6">

@@ -3,12 +3,12 @@ import { useState, useEffect } from "react";
 import Attendance from "@/pages/attendance/Attendance";
 
 const DailyAttendance = () => {
-  // Use state instead of ref to properly trigger renders when needed
   const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {
     // Only initialize once - this prevents multiple mounts of Attendance
     if (!initialized) {
+      console.log("DailyAttendance - Initializing component");
       setInitialized(true);
     }
     
