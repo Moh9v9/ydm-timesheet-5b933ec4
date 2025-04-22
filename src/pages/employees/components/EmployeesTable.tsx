@@ -3,6 +3,10 @@ import { Employee } from "@/lib/types";
 import { useTableSort } from "../hooks/useTableSort";
 import { TableHeader } from "./table/TableHeader";
 import { TableRow } from "./table/TableRow";
+import {
+  Table,
+  TableBody,
+} from "@/components/ui/table";
 
 interface EmployeesTableProps {
   employees: Employee[];
@@ -21,17 +25,17 @@ export const EmployeesTable = ({
 
   return (
     <div className="data-table-container">
-      <table className="data-table">
+      <Table className="data-table">
         <TableHeader 
           onSort={handleSort}
           sortField={sortField}
           sortDirection={sortDirection}
         />
-        <tbody>
+        <TableBody>
           {employees.length > 0 ? (
             getSortedData(employees).map(({ employee, originalIndex }) => (
               <TableRow
-                key={employee.id}
+                key={`${employee.id}-${originalIndex}`}
                 employee={employee}
                 onEdit={onEdit}
                 onDelete={onDelete}
@@ -44,8 +48,8 @@ export const EmployeesTable = ({
               </td>
             </tr>
           )}
-        </tbody>
-      </table>
+        </TableBody>
+      </Table>
     </div>
   );
 };
