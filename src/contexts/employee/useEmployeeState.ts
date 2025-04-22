@@ -98,12 +98,12 @@ export const useEmployeeState = (currentAttendanceDate?: string) => {
 
   // Function to refresh employees - modified to return a Promise
   const refreshEmployees = async (): Promise<void> => {
-    return await fetchEmployees();
+    return await readEmployees();
   };
 
   // Fetch employees on component mount
   useEffect(() => {
-    fetchEmployees();
+    readEmployees();
   }, []);
 
   return {
