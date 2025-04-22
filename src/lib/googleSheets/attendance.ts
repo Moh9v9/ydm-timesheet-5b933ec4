@@ -1,19 +1,12 @@
 
-import { google } from 'googleapis';
-import { auth, spreadsheetId } from './common';
+import { fetchSheetData, appendToSheet, updateSheetData, spreadsheetId } from './common';
 import { AttendanceRecord } from '@/lib/types';
 
 export async function readAttendanceByDate(date: string) {
   try {
-    const sheets = google.sheets({ version: 'v4' });
+    const response = await fetchSheetData('attendance!A1:Z1000');
     
-    const res = await sheets.spreadsheets.values.get({
-      spreadsheetId,
-      range: 'attendance!A1:Z1000',
-      auth,
-    });
-
-    const rows = res.data.values;
+    const rows = response.values;
     if (!rows || rows.length === 0) return [];
 
     const headers = rows[0];
@@ -30,8 +23,6 @@ export async function readAttendanceByDate(date: string) {
 
 export async function addAttendanceRecordToSheet(record: AttendanceRecord) {
   try {
-    const sheets = google.sheets({ version: 'v4' });
-    
     const newRow = [
       record.id,
       record.employeeId,
@@ -44,13 +35,7 @@ export async function addAttendanceRecordToSheet(record: AttendanceRecord) {
       record.note || '',
     ];
 
-    await sheets.spreadsheets.values.append({
-      spreadsheetId,
-      range: 'attendance',
-      valueInputOption: 'USER_ENTERED',
-      requestBody: { values: [newRow] },
-      auth,
-    });
+    await appendToSheet('attendance', [newRow]);
   } catch (error) {
     console.error('Error adding attendance record:', error);
     throw error;
@@ -62,15 +47,10 @@ export async function updateAttendanceRecordInSheet(updatedData: {
   [key: string]: any;
 }) {
   try {
-    const sheets = google.sheets({ version: 'v4' });
+    // First, get all data to find the row index
+    const response = await fetchSheetData('attendance!A1:Z1000');
     
-    const res = await sheets.spreadsheets.values.get({
-      spreadsheetId,
-      range: 'attendance!A1:Z1000',
-      auth,
-    });
-
-    const rows = res.data.values;
+    const rows = response.values;
     if (!rows || rows.length === 0) return;
 
     const headers = rows[0];
@@ -85,15 +65,8 @@ export async function updateAttendanceRecordInSheet(updatedData: {
       }
     });
 
-    await sheets.spreadsheets.values.update({
-      spreadsheetId,
-      range: `attendance!A${index + 2}:Z${index + 2}`,
-      valueInputOption: 'USER_ENTERED',
-      requestBody: {
-        values: [updatedRow],
-      },
-      auth,
-    });
+    // Update just the single row
+    await updateSheetData(`attendance!A${index + 2}:${String.fromCharCode(65 + headers.length - 1)}${index + 2}`, [updatedRow]);
   } catch (error) {
     console.error('Error updating attendance record:', error);
     throw error;
@@ -102,15 +75,10 @@ export async function updateAttendanceRecordInSheet(updatedData: {
 
 export async function deleteAttendanceRecordFromSheet(id: string) {
   try {
-    const sheets = google.sheets({ version: 'v4' });
+    // For delete, we'll actually just update the row with empty values
+    const response = await fetchSheetData('attendance!A1:Z1000');
     
-    const res = await sheets.spreadsheets.values.get({
-      spreadsheetId,
-      range: 'attendance!A1:Z1000',
-      auth,
-    });
-
-    const rows = res.data.values;
+    const rows = response.values;
     if (!rows || rows.length === 0) return;
 
     const headers = rows[0];
@@ -119,15 +87,9 @@ export async function deleteAttendanceRecordFromSheet(id: string) {
     if (index === -1) return;
 
     const emptyRow = new Array(headers.length).fill('');
-    await sheets.spreadsheets.values.update({
-      spreadsheetId,
-      range: `attendance!A${index + 2}:Z${index + 2}`,
-      valueInputOption: 'USER_ENTERED',
-      requestBody: {
-        values: [emptyRow],
-      },
-      auth,
-    });
+    
+    // Update the row with empty values
+    await updateSheetData(`attendance!A${index + 2}:${String.fromCharCode(65 + headers.length - 1)}${index + 2}`, [emptyRow]);
   } catch (error) {
     console.error('Error deleting attendance record:', error);
     throw error;

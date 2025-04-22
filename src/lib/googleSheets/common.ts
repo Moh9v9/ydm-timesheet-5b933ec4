@@ -1,18 +1,75 @@
 
-// Browser-compatible Google Sheets authentication and configuration
-import { google } from 'googleapis';
+// Browser-compatible Google Sheets access using the gapi client library
+// We'll define a simple fetch-based approach for accessing Google Sheets
 
-// Create a browser-compatible auth configuration using API key approach
-const credentials = {
-  client_email: "timesheet-accessor@n8n-project-451615.iam.gserviceaccount.com",
-  private_key: "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCt+ASDxYeEPlNU\nlmt5ZJIoOg1QinKE5K4ms5Lls8f4pTmcmqvkViroTW31NbUDMF+0Ii5wG6vJOmtg\nevtWU4jAvKviyEAapMVbxre9DbbnrbbeqfMsi/JfaG6YGmY820UPEieU7z+pKq0l\n+TqLJhlso0MipT5d+9X1wC4m4EHHHDQsghuda7PnsagyK94VNUpqfoyi/bj+SrZl\nogJzQ265GQHSRNqL7b4EA88BgKdvQ0Mjy1r4mQNHdp4TloiNgGHUBvtyQ5Jbf81Y\no+2dp9LZKlERduqdqKkHJ52VZ/ah56YqH1/XGlP6DIT4d9+hV1OmKY0TnJipJ3hf\nvV4rNeRbAgMBAAECggEADcnzPaiJ6brw6urzQM9uYD7dsE0Q76SagxnHompCBty9\nuMJvrm0AAKKmfQGRQ9vxMftll+AxmQUG3sJQqpJ7a99odlSt9A6sT+5rwNHV9f4I\nWRS6YAUFpHdIEMlC4j709dFYDs95ycRGrhRXhhDygfBc0WGslFFyL4TYg59Rx2C8\n86tEumZHMxjpgG89zGLWm3o9bx08t1R/RIALU1wZ1xyVHEGmqFhesafl50h51cyV\nYgheBn6QksdGekrjWZCFjUNXE6lwVEw6znxvTfrj0HbIAVDY/46s2tVIKvKWXg3Q\nNBT4UZP4ySgm4L6EJV/oZqA9/KzPzVIvd4Jvo4Th9QKBgQDTISLlST+Aa98krOq/\n0RcEBhyDSjqlGIuZB0DqVX25lUL0Mui7zoUcb3wP/tNR0qK5MEud6kLqL/MJVVjG\nGu8BXXdmB1e7K1dr2wEYwjlDWCV2/1R86tbGRm+q4ccfqe/vYspleLskHbijsHju\nQtDS6ygEzLIft42aVfBe0ldRDQKBgQDS8RfhW1fPxBDHHpxaoaA1q26Iub4I2tHi\n/kMjh69Swsb8gS+SlFrOLhELnJ4/frEWxXTYGDA+01z62pw0BbVSrK3G/wP9WJdo\n+JwQvXVSjFlsPTcJtUzThiObQzOQY3goO6faIqBraaZBMNzef9A3a6dKL0UhI8WK\n3SFvtuAhBwKBgQCqj4pxUMtMI9kQ9+BtNa0yQv2l0sGtvjaIWaPHq2j2E+8S+E2r\n6xr97dJ72ZE9+LwcfzeXSzjjl/jvAVPGNtv+blOWyTfGrSzipPot1joMfZlGmN7Y\nS59WbnCny93hZpe+/EAl2XLVqm0PT/FiCfhJbE/YEMWVeeObWvHkqGiBwQKBgF0t\nXCQSqi4/aD3cmqo6HL+4UyIYEgZtSisfr16BcAN5wFYHZpEz8QyEMslTTF+1wdnS\nLPPLc3w89yRj7n3YS6kSV8zAFu4Q9QjMUHvghHOLRXDXdXlXWXFSHmZV/+/20DvN\nZi6n/v6Tc3n2cInkIYBpkELnsHycBYV6emuTd1t/AoGAVxpEiqBgq1swH3/MA4N9\nbTAtcaWXGZuX4KZbfX1Z0gtnHb9KsfLD2GBg7/bpjkZ1j31yVP0Jstr2HdUd8h8K\ndO1hg6VaVhBnFi+NlsqKRF5IPO4FnhlsJy7zxAwyfHBAkWy54xaRVyyQZNHKJQ2n\ndfnA08GZ7q2PSzk1AgqNUTY=\n-----END PRIVATE KEY-----\n",
-};
-
-// Initialize the Google Sheets API client with JWT auth for service account
-export const auth = new google.auth.JWT({
-  email: credentials.client_email,
-  key: credentials.private_key,
-  scopes: ['https://www.googleapis.com/auth/spreadsheets'],
-});
-
+const API_KEY = "AIzaSyBtAJzqHZKTo4hTy-sgO2C0pCmsN369ZPY"; // This is a public API key for this specific spreadsheet
 export const spreadsheetId = '1ots1ltPxJGFRpNuvvu--8eAuE-gNtkZJSjcg-7e7E2I';
+
+// Helper function to make authenticated requests to Google Sheets API
+export async function fetchSheetData(range: string) {
+  try {
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${encodeURIComponent(range)}?key=${API_KEY}`;
+    const response = await fetch(url);
+    
+    if (!response.ok) {
+      throw new Error(`Google Sheets API error: ${response.status} ${response.statusText}`);
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching sheet data:', error);
+    throw error;
+  }
+}
+
+// Helper function to append data to a sheet
+export async function appendToSheet(range: string, values: any[][]) {
+  try {
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${encodeURIComponent(range)}:append?valueInputOption=USER_ENTERED&key=${API_KEY}`;
+    
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        values: values
+      })
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Google Sheets API error: ${response.status} ${response.statusText}`);
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error appending to sheet:', error);
+    throw error;
+  }
+}
+
+// Helper function to update data in a sheet
+export async function updateSheetData(range: string, values: any[][]) {
+  try {
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${encodeURIComponent(range)}?valueInputOption=USER_ENTERED&key=${API_KEY}`;
+    
+    const response = await fetch(url, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        values: values
+      })
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Google Sheets API error: ${response.status} ${response.statusText}`);
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error updating sheet data:', error);
+    throw error;
+  }
+}

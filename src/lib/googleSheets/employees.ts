@@ -1,21 +1,14 @@
 
-import { google } from 'googleapis';
-import { auth, spreadsheetId } from './common';
+import { fetchSheetData, appendToSheet, updateSheetData } from './common';
 
 const employeeRange = 'employees!A1:Z1000';
 const employeeAppendRange = 'employees';
 
 export async function readEmployees() {
   try {
-    const sheets = google.sheets({ version: 'v4' });
+    const response = await fetchSheetData(employeeRange);
     
-    const res = await sheets.spreadsheets.values.get({
-      spreadsheetId,
-      range: employeeRange,
-      auth,
-    });
-
-    const rows = res.data.values;
+    const rows = response.values;
     if (!rows || rows.length === 0) return [];
 
     const headers = rows[0];
@@ -41,8 +34,6 @@ export async function addEmployee(employeeData: {
   status: string;
 }) {
   try {
-    const sheets = google.sheets({ version: 'v4' });
-
     const now = new Date().toISOString();
 
     const newRow = [
@@ -60,15 +51,7 @@ export async function addEmployee(employeeData: {
       '',
     ];
 
-    await sheets.spreadsheets.values.append({
-      spreadsheetId,
-      range: employeeAppendRange,
-      valueInputOption: 'USER_ENTERED',
-      requestBody: {
-        values: [newRow],
-      },
-      auth,
-    });
+    await appendToSheet(employeeAppendRange, [newRow]);
   } catch (error) {
     console.error('Error adding employee:', error);
     throw error;
@@ -80,14 +63,9 @@ export async function updateEmployee(updatedData: {
   [key: string]: string | undefined;
 }) {
   try {
-    const sheets = google.sheets({ version: 'v4' });
-
-    const res = await sheets.spreadsheets.values.get({
-      spreadsheetId,
-      range: employeeRange,
-      auth,
-    });
-    const rows = res.data.values;
+    const response = await fetchSheetData(employeeRange);
+    
+    const rows = response.values;
     if (!rows || rows.length === 0) return;
 
     const headers = rows[0];
@@ -109,16 +87,8 @@ export async function updateEmployee(updatedData: {
       updatedRow[updatedAtIndex] = new Date().toISOString();
     }
 
-    const targetRange = `employees!A${index + 2}:Z${index + 2}`;
-    await sheets.spreadsheets.values.update({
-      spreadsheetId,
-      range: targetRange,
-      valueInputOption: 'USER_ENTERED',
-      requestBody: {
-        values: [updatedRow],
-      },
-      auth,
-    });
+    // Update the specific row
+    await updateSheetData(`employees!A${index + 2}:${String.fromCharCode(65 + headers.length - 1)}${index + 2}`, [updatedRow]);
   } catch (error) {
     console.error('Error updating employee:', error);
     throw error;
@@ -127,15 +97,9 @@ export async function updateEmployee(updatedData: {
 
 export async function deleteEmployee(id: string) {
   try {
-    const sheets = google.sheets({ version: 'v4' });
-
-    const res = await sheets.spreadsheets.values.get({
-      spreadsheetId,
-      range: employeeRange,
-      auth,
-    });
-
-    const rows = res.data.values;
+    const response = await fetchSheetData(employeeRange);
+    
+    const rows = response.values;
     if (!rows || rows.length === 0) return;
 
     const headers = rows[0];
@@ -144,16 +108,9 @@ export async function deleteEmployee(id: string) {
     if (index === -1) return;
 
     const emptyRow = new Array(headers.length).fill('');
-    const targetRange = `employees!A${index + 2}:Z${index + 2}`;
-    await sheets.spreadsheets.values.update({
-      spreadsheetId,
-      range: targetRange,
-      valueInputOption: 'USER_ENTERED',
-      requestBody: {
-        values: [emptyRow],
-      },
-      auth,
-    });
+    
+    // Update the row with empty values (soft delete)
+    await updateSheetData(`employees!A${index + 2}:${String.fromCharCode(65 + headers.length - 1)}${index + 2}`, [emptyRow]);
   } catch (error) {
     console.error('Error deleting employee:', error);
     throw error;
