@@ -1,7 +1,8 @@
+
 import { useAuth } from "@/contexts/AuthContext";
 import { useAttendance } from "@/contexts/AttendanceContext";
 import { useModernNotification } from "@/hooks/useModernNotification";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import DateNavigation from "./components/DateNavigation";
 import AttendanceTable from "./components/table/AttendanceTable";
 import AttendanceHeader from "./components/AttendanceHeader";
