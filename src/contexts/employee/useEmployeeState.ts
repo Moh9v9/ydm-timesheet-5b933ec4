@@ -1,8 +1,9 @@
+
 import { useState, useEffect } from "react";
 import { Employee, EmployeeFilters } from "@/lib/types";
 import { formatEmployee } from "./formatEmployee";
 import { employeeMatchesFilters } from "./employeeFilter";
-import { readEmployees } from "src/lib/googleSheets.ts";
+import { readEmployees } from "@/lib/googleSheets";
 
 export const useEmployeeState = (currentAttendanceDate?: string) => {
   const [employees, setEmployees] = useState<Employee[]>([]);
@@ -80,4 +81,3 @@ export const useEmployeeState = (currentAttendanceDate?: string) => {
     refreshEmployees,
   };
 };
-

@@ -1,5 +1,6 @@
+
 import { google } from 'googleapis';
-import credentials from 'src/lib/credentials.json';
+import credentials from '@/lib/credentials.json';
 import { AttendanceRecord } from '@/lib/types';
 
 const auth = new google.auth.GoogleAuth({
