@@ -3,7 +3,7 @@
 // This implementation uses a public API key for read-only access to Google Sheets
 
 // Using an API key specifically created for accessing this spreadsheet
-const API_KEY = "AIzaSyCoz1u4vbRHUgIBFn8Z9qmT4Y9gSYU0WjA"; // Updated API key
+const API_KEY = "AIzaSyBtsufoijolmQrzEs0NgQyGiNLJMi3YBDo"; // New working API key
 export const spreadsheetId = '1ots1ltPxJGFRpNuvvu--8eAuE-gNtkZJSjcg-7e7E2I';
 
 // Helper function to make authenticated requests to Google Sheets API
