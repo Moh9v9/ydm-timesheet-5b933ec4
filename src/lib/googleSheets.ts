@@ -17,7 +17,7 @@ import {
 
 // -------------------- Users --------------------
 import { User } from "@/lib/types";
-import { fetchSheetData } from './googleSheets/common';
+import { fetchSheetData, appendToSheet, updateSheetData, API_KEY, spreadsheetId } from './googleSheets/common';
 
 export async function readUsers() {
   try {
@@ -76,7 +76,7 @@ export async function addUser(user: {
   password: string;
   role: string;
 }) {
-  const url = `https://sheets.googleapis.com/v4/spreadsheets/1ots1ltPxJGFRpNuvvu--8eAuE-gNtkZJSjcg-7e7E2I/values/users:append?valueInputOption=USER_ENTERED&key=AIzaSyC7t-AYO6LnR38MMCI38uGt42R8I_BF4Ew`;
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/users:append?valueInputOption=USER_ENTERED&key=${API_KEY}`;
   
   const now = new Date().toISOString();
 
@@ -116,16 +116,8 @@ export async function addUser(user: {
 
 export async function updateUserRole(id: string, newRole: string) {
   try {
-    const response = await fetch(
-      `https://sheets.googleapis.com/v4/spreadsheets/1ots1ltPxJGFRpNuvvu--8eAuE-gNtkZJSjcg-7e7E2I/values/users!A1:Z1000?key=AIzaSyC7t-AYO6LnR38MMCI38uGt42R8I_BF4Ew`
-    );
-
-    if (!response.ok) {
-      throw new Error(`Google Sheets API error: ${response.status} ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    const rows = data.values;
+    const response = await fetchSheetData('users!A1:Z1000');
+    const rows = response.values;
     
     if (!rows || rows.length === 0) return;
 
@@ -144,25 +136,7 @@ export async function updateUserRole(id: string, newRole: string) {
 
     const targetRange = `users!A${index + 2}:${String.fromCharCode(65 + headers.length - 1)}${index + 2}`;
     
-    const updateUrl = `https://sheets.googleapis.com/v4/spreadsheets/1ots1ltPxJGFRpNuvvu--8eAuE-gNtkZJSjcg-7e7E2I/values/${encodeURIComponent(targetRange)}?valueInputOption=USER_ENTERED&key=AIzaSyC7t-AYO6LnR38MMCI38uGt42R8I_BF4Ew`;
-    
-    const updateResponse = await fetch(updateUrl, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        values: [updatedRow]
-      })
-    });
-
-    if (!updateResponse.ok) {
-      const errorText = await updateResponse.text();
-      console.error('API Response Error:', errorText);
-      throw new Error(`Google Sheets API error: ${updateResponse.status} ${updateResponse.statusText}`);
-    }
-
-    return await updateResponse.json();
+    return await updateSheetData(targetRange, [updatedRow]);
   } catch (error) {
     console.error('Error updating user role:', error);
     throw error;
