@@ -1,5 +1,6 @@
 import { google } from 'googleapis';
-import credentials from 'src/lib/credentials.json'; // تأكد أنك رفعت الملف في هذا المسار
+import credentials from 'src/lib/credentials.json';
+import { AttendanceRecord } from '@/lib/types';
 
 const auth = new google.auth.GoogleAuth({
   credentials,
@@ -7,8 +8,11 @@ const auth = new google.auth.GoogleAuth({
 });
 
 const spreadsheetId = '1ots1ltPxJGFRpNuvvu--8eAuE-gNtkZJSjcg-7e7E2I';
-const readRange = 'employees!A1:Z1000';
-const appendRange = 'employees';
+
+// -------------------- موظفين --------------------
+
+const employeeRange = 'employees!A1:Z1000';
+const employeeAppendRange = 'employees';
 
 export async function readEmployees() {
   const client = await auth.getClient();
@@ -16,7 +20,7 @@ export async function readEmployees() {
 
   const res = await sheets.spreadsheets.values.get({
     spreadsheetId,
-    range: readRange,
+    range: employeeRange,
   });
 
   const rows = res.data.values;
@@ -62,7 +66,7 @@ export async function addEmployee(employeeData: {
 
   await sheets.spreadsheets.values.append({
     spreadsheetId,
-    range: appendRange,
+    range: employeeAppendRange,
     valueInputOption: 'USER_ENTERED',
     requestBody: {
       values: [newRow],
@@ -79,7 +83,7 @@ export async function updateEmployee(updatedData: {
 
   const res = await sheets.spreadsheets.values.get({
     spreadsheetId,
-    range: readRange,
+    range: employeeRange,
   });
 
   const rows = res.data.values;
@@ -121,7 +125,7 @@ export async function deleteEmployee(id: string) {
 
   const res = await sheets.spreadsheets.values.get({
     spreadsheetId,
-    range: readRange,
+    range: employeeRange,
   });
 
   const rows = res.data.values;
@@ -140,6 +144,89 @@ export async function deleteEmployee(id: string) {
     valueInputOption: 'USER_ENTERED',
     requestBody: {
       values: [emptyRow],
+    },
+  });
+}
+
+// -------------------- حضور --------------------
+
+export async function readAttendanceByDate(date: string) {
+  const client = await auth.getClient();
+  const sheets = google.sheets({ version: 'v4', auth: client });
+
+  const res = await sheets.spreadsheets.values.get({
+    spreadsheetId,
+    range: 'attendance!A1:Z1000',
+  });
+
+  const rows = res.data.values;
+  if (!rows || rows.length === 0) return [];
+
+  const headers = rows[0];
+  const records = rows.slice(1).map((row) =>
+    Object.fromEntries(headers.map((key, i) => [key, row[i] || '']))
+  );
+
+  return records.filter((r) => r.date === date);
+}
+
+export async function addAttendanceRecordToSheet(record: AttendanceRecord) {
+  const client = await auth.getClient();
+  const sheets = google.sheets({ version: 'v4', auth: client });
+
+  const newRow = [
+    record.id,
+    record.employeeId,
+    record.employeeName,
+    record.date,
+    record.present,
+    record.startTime || '',
+    record.endTime || '',
+    record.overtimeHours || 0,
+    record.note || '',
+  ];
+
+  await sheets.spreadsheets.values.append({
+    spreadsheetId,
+    range: 'attendance',
+    valueInputOption: 'USER_ENTERED',
+    requestBody: { values: [newRow] },
+  });
+}
+
+export async function updateAttendanceRecordInSheet(updatedData: {
+  id: string;
+  [key: string]: any;
+}) {
+  const client = await auth.getClient();
+  const sheets = google.sheets({ version: 'v4', auth: client });
+
+  const res = await sheets.spreadsheets.values.get({
+    spreadsheetId,
+    range: 'attendance!A1:Z1000',
+  });
+
+  const rows = res.data.values;
+  if (!rows || rows.length === 0) return;
+
+  const headers = rows[0];
+  const body = rows.slice(1);
+  const index = body.findIndex((r) => r[0] === updatedData.id);
+  if (index === -1) return;
+
+  const updatedRow = [...body[index]];
+  headers.forEach((key, i) => {
+    if (updatedData[key] !== undefined) {
+      updatedRow[i] = updatedData[key];
+    }
+  });
+
+  await sheets.spreadsheets.values.update({
+    spreadsheetId,
+    range: `attendance!A${index + 2}:Z${index + 2}`,
+    valueInputOption: 'USER_ENTERED',
+    requestBody: {
+      values: [updatedRow],
     },
   });
 }
