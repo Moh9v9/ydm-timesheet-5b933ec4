@@ -1,6 +1,8 @@
+
 import { User } from "@/lib/types";
 import { v4 as uuidv4 } from "uuid";
 import { getUserByEmailAndPassword } from "@/lib/googleSheets";
+import { toast } from "sonner";
 
 export const useAuthOperations = () => {
   const login = async (email: string, password: string): Promise<User> => {
@@ -10,6 +12,7 @@ export const useAuthOperations = () => {
 
       if (!user) {
         console.warn("❌ Invalid email or password");
+        toast.error("Invalid email or password");
         throw new Error("Invalid email or password");
       }
 
@@ -38,15 +41,18 @@ export const useAuthOperations = () => {
       };
 
       console.log("✅ Login successful:", userData);
+      toast.success(`Welcome back, ${userData.fullName}`);
       return userData;
     } catch (error: any) {
       console.error("Login error:", error);
+      toast.error(error.message || "Failed to login");
       throw new Error(error.message || "Failed to login");
     }
   };
 
   const logout = async () => {
     console.log("🔓 Logging out...");
+    toast.success("Logged out successfully");
     window.location.href = "/login";
   };
 

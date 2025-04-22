@@ -32,7 +32,7 @@ export const EmployeesTable = ({
           sortDirection={sortDirection}
         />
         <TableBody>
-          {employees.length > 0 ? (
+          {!loading && employees.length > 0 ? (
             getSortedData(employees).map(({ employee, originalIndex }) => (
               <TableRow
                 key={`${employee.id}-${originalIndex}`}
@@ -42,9 +42,19 @@ export const EmployeesTable = ({
               />
             ))
           ) : (
-            <tr>
-              <td colSpan={10} className="text-center py-4">
-                {loading ? "Loading..." : "No employees found"}
+            <tr className="border-b dark:border-gray-700">
+              <td colSpan={10} className="text-center py-6">
+                {loading ? (
+                  <div className="flex justify-center items-center space-x-2">
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary"></div>
+                    <span className="text-muted-foreground">Loading employees...</span>
+                  </div>
+                ) : (
+                  <div className="text-muted-foreground">
+                    <p>No employees found</p>
+                    <p className="text-sm mt-1">Try adjusting your filters or adding new employees</p>
+                  </div>
+                )}
               </td>
             </tr>
           )}
