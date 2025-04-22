@@ -48,12 +48,18 @@ export const useEmployeeState = (currentAttendanceDate?: string) => {
     try {
       console.log("Applying filters:", filts);
       
-      if (filts.status === "Archived") {
+      if (filts.status === "All") {
+        console.log("All status filter active - should show both Active and Archived employees");
+      } else if (filts.status === "Archived") {
         console.log(`Archived status filter active - should show ${emps.filter(e => e.status === "Archived").length} employees`);
       } else if (filts.status) {
         console.log(`Status filter active: ${filts.status}`);
         console.log(`Employees before status filter: ${emps.length}`);
         console.log(`Employees with status ${filts.status}: ${emps.filter(e => e.status === filts.status).length}`);
+      } else {
+        console.log("No status filter active - defaulting to show Active employees only");
+        // By default, only show Active employees when no status filter is explicitly set
+        filts = { ...filts, status: "Active" };
       }
       
       // Map each employee through the filter function (now async)
@@ -73,6 +79,9 @@ export const useEmployeeState = (currentAttendanceDate?: string) => {
       
       if (filts.status) {
         console.log(`After filtering - employees with status ${filts.status}: ${filtered.filter(e => e.status === filts.status).length}`);
+        if (filts.status === "All") {
+          console.log(`After filtering with All - Active: ${filtered.filter(e => e.status === "Active").length}, Archived: ${filtered.filter(e => e.status === "Archived").length}`);
+        }
       }
     } catch (err) {
       console.error('Error applying filters:', err);

@@ -1,3 +1,4 @@
+
 import { Employee, EmployeeFilters } from "@/lib/types";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -21,7 +22,7 @@ export async function employeeMatchesFilters(
     }
   }
   
-  // Status filter handling - show all employees if no status filter or "All" is selected
+  // Status filter handling - if "All" is selected or no status filter is specified, skip status check
   if (filters.status && filters.status !== "All") {
     console.log(`Checking status filter for ${employee.fullName}: employee status=${employee.status}, filter status=${filters.status}`);
     
@@ -34,8 +35,9 @@ export async function employeeMatchesFilters(
   
   // For archived employees in attendance view, check if they have a record for the selected date
   // ONLY apply this check if we're in attendance view (currentAttendanceDate is provided)
-  if (employee.status === "Archived" && currentAttendanceDate && filters.status !== "Archived") {
-    // This check should only run in attendance view when we're not explicitly filtering for archived employees
+  // AND we're not explicitly showing all statuses or archived employees
+  if (employee.status === "Archived" && currentAttendanceDate && filters.status !== "Archived" && filters.status !== "All") {
+    // This check should only run in attendance view when we're not explicitly filtering for archived or all employees
     const { data } = await supabase
       .from('attendance_records')
       .select('id, present')
