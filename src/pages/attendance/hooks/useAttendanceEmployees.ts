@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { Employee } from "@/lib/types";
+import { Employee, PaymentType, SponsorshipType, EmployeeStatus } from "@/lib/types";
 import { supabase } from "@/integrations/supabase/client";
 
 /**
@@ -47,7 +47,7 @@ export const useAttendanceEmployees = (currentDate: string) => {
           return employee;
         }) || [];
 
-        // Format the employees data
+        // Format the employees data with proper type casting
         const formattedActiveEmployees = (activeEmployees || []).map(emp => ({
           id: emp.id,
           fullName: emp.full_name,
@@ -55,10 +55,10 @@ export const useAttendanceEmployees = (currentDate: string) => {
           project: emp.project,
           location: emp.location,
           jobTitle: emp.job_title,
-          paymentType: emp.payment_type,
+          paymentType: emp.payment_type as PaymentType,
           rateOfPayment: emp.rate_of_payment,
-          sponsorship: emp.sponsorship,
-          status: emp.status,
+          sponsorship: emp.sponsorship as SponsorshipType,
+          status: emp.status as EmployeeStatus,
           created_at: emp.created_at
         }));
 
@@ -69,10 +69,10 @@ export const useAttendanceEmployees = (currentDate: string) => {
           project: emp.project,
           location: emp.location,
           jobTitle: emp.job_title,
-          paymentType: emp.payment_type,
+          paymentType: emp.payment_type as PaymentType,
           rateOfPayment: emp.rate_of_payment,
-          sponsorship: emp.sponsorship,
-          status: emp.status,
+          sponsorship: emp.sponsorship as SponsorshipType,
+          status: emp.status as EmployeeStatus,
           created_at: emp.created_at
         }));
 
