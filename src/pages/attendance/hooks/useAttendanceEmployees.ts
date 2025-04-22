@@ -38,9 +38,8 @@ export const useAttendanceEmployees = (
       
       // Filter by payment type
       if (filters.paymentType && filters.paymentType !== "All Types") {
-        // Convert to camelCase for comparison with employee data
-        const paymentTypeValue = filters.paymentType === "Monthly" ? "monthly" : 
-                              filters.paymentType === "Daily" ? "daily" : null;
+        // Use correct capitalization to match the Employee type definition
+        const paymentTypeValue = filters.paymentType; // Already capitalized from the filter dropdown
         
         if (paymentTypeValue) {
           filtered = filtered.filter(emp => emp.paymentType === paymentTypeValue);
