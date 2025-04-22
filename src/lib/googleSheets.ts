@@ -17,24 +17,28 @@ import {
 
 // -------------------- Users --------------------
 import { User } from "@/lib/types";
+import { fetchSheetData } from './googleSheets/common';
 
 export async function readUsers() {
   try {
-    const response = await fetch(
-      `https://sheets.googleapis.com/v4/spreadsheets/1ots1ltPxJGFRpNuvvu--8eAuE-gNtkZJSjcg-7e7E2I/values/users!A1:Z1000?key=AIzaSyC7t-AYO6LnR38MMCI38uGt42R8I_BF4Ew`
-    );
+    console.log("Reading users from Google Sheets...");
+    const data = await fetchSheetData('users!A1:Z1000');
     
-    if (!response.ok) {
-      console.error('Error fetching users:', response.statusText);
+    if (!data || !data.values) {
+      console.error('Error fetching users: No data returned');
       return [];
     }
     
-    const data = await response.json();
-    
     const rows = data.values;
-    if (!rows || rows.length === 0) return [];
+    if (!rows || rows.length <= 1) {
+      console.log('No user data found in sheet');
+      return [];
+    }
 
     const headers = rows[0];
+    console.log("User headers found:", headers);
+    console.log("Found", rows.length - 1, "user records");
+    
     return rows.slice(1).map((row) =>
       Object.fromEntries(headers.map((key, i) => [key, row[i] || '']))
     );
@@ -46,8 +50,19 @@ export async function readUsers() {
 
 export async function getUserByEmailAndPassword(email: string, password: string) {
   try {
+    console.log("Fetching users to check credentials...");
     const users = await readUsers();
-    return users.find((u: any) => u.email === email && u.password === password);
+    console.log("Retrieved", users.length, "users for authentication check");
+    
+    const user = users.find((u: any) => u.email === email && u.password === password);
+    
+    if (user) {
+      console.log("User found:", user.email, "with role:", user.role);
+    } else {
+      console.log("No matching user found for the provided credentials");
+    }
+    
+    return user;
   } catch (error) {
     console.error('Error in getUserByEmailAndPassword:', error);
     return null;

@@ -1,3 +1,4 @@
+
 import { User } from "@/lib/types";
 import { v4 as uuidv4 } from "uuid";
 import { getUserByEmailAndPassword, updateUserRole, addUser } from "@/lib/googleSheets";
@@ -8,6 +9,13 @@ export const useAuthOperations = () => {
   const login = async (email: string, password: string): Promise<User> => {
     try {
       console.log("🔐 Attempting login via Google Sheets...", email);
+      
+      if (!email || !password) {
+        console.warn("❌ Email and password are required");
+        toast.error("Email and password are required");
+        throw new Error("Email and password are required");
+      }
+      
       const user = await getUserByEmailAndPassword(email, password);
 
       if (!user) {
