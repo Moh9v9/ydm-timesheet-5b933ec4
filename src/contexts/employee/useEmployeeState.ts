@@ -13,7 +13,7 @@ export const useEmployeeState = (currentAttendanceDate?: string) => {
   const [error, setError] = useState<string | null>(null);
   const [dataFetched, setDataFetched] = useState<boolean>(false);
 
-  // Function to fetch employees from Supabase
+  // Function to fetch employees from google
 import { readEmployees } from '@/lib/googleSheets'; // تأكد من أن هذا السطر موجود
 
 const fetchEmployees = async () => {
