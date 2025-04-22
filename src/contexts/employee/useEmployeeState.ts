@@ -14,33 +14,29 @@ export const useEmployeeState = (currentAttendanceDate?: string) => {
   const [dataFetched, setDataFetched] = useState<boolean>(false);
 
   // Function to fetch employees from Supabase
-  const fetchEmployees = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const { data, error } = await supabase
-        .from('employees')
-        .select('*')
-        .order('full_name');
+import { readEmployees } from '@/lib/googleSheets'; // تأكد من أن هذا السطر موجود
 
-      if (error) throw error;
+const fetchEmployees = async () => {
+  setLoading(true);
+  setError(null);
 
-      const formattedEmployees = data.map(formatEmployee);
-      setEmployees(formattedEmployees);
-      setDataFetched(true);
-      
-      console.log(`Fetched ${formattedEmployees.length} employees from database`);
-      console.log(`Active: ${formattedEmployees.filter(e => e.status === "Active").length}, Archived: ${formattedEmployees.filter(e => e.status === "Archived").length}`);
+  try {
+    const employeesFromSheet = await readEmployees();
+    const formattedEmployees = employeesFromSheet.map(formatEmployee);
 
-      // Apply filters to employees
-      await applyFilters(formattedEmployees, filters);
-    } catch (err) {
-      console.error('Error fetching employees:', err);
-      setError(err instanceof Error ? err.message : 'An unknown error occurred');
-    } finally {
-      setLoading(false);
-    }
-  };
+    setEmployees(formattedEmployees);
+    setDataFetched(true);
+
+    console.log(`Fetched ${formattedEmployees.length} employees from Google Sheets`);
+    await applyFilters(formattedEmployees, filters);
+  } catch (err) {
+    console.error('Error fetching employees:', err);
+    setError(err instanceof Error ? err.message : 'An unknown error occurred');
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   // Function to apply filters to employees
   const applyFilters = async (emps: Employee[], filts: EmployeeFilters) => {
