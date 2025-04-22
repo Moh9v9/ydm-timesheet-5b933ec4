@@ -52,6 +52,9 @@ export const useAttendanceEmployees = (
       }
     }
     
+    // Include archived employees with attendance records for the current date
+    // We now do this at the context level in employeeMatchesFilters
+    
     setAttendanceEmployees(filtered);
     console.log(`Final filtered employees: ${filtered.length}`);
   }, [employees, currentDate, filters]);

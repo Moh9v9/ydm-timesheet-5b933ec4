@@ -152,4 +152,3 @@ const AttendanceTable: React.FC<Props> = ({
 };
 
 export default AttendanceTable;
-
