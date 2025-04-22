@@ -29,10 +29,21 @@ const DatePicker = ({
         ...props
       }: any) => {
         return <div className="relative inline-flex items-center">
-            <select value={value} onChange={onChange} className="">
+            <select 
+              value={value} 
+              onChange={onChange} 
+              className="appearance-none pl-2 pr-6 py-1 rounded-md border
+                bg-background text-foreground
+                dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100
+                focus:outline-none focus:ring-2 focus:ring-primary"
+            >
               {children}
             </select>
-            <ChevronDown className={cn("w-4 h-4 absolute right-1.5", "text-muted-foreground/70 dark:text-gray-400", "pointer-events-none")} />
+            <ChevronDown className={cn(
+              "w-4 h-4 absolute right-1.5",
+              "text-muted-foreground/70 dark:text-gray-400",
+              "pointer-events-none"
+            )} />
           </div>;
       }
     }
