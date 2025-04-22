@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { AttendanceRecord } from "@/lib/types";
 import { useAttendance } from "@/contexts/AttendanceContext";
@@ -22,7 +21,7 @@ export const useAttendanceOperations = (canEdit: boolean) => {
       
       // Log notes specifically to debug
       attendanceData.forEach((record, index) => {
-        console.log(`Record ${index + 1} before save - ID: ${record.id}, Employee: ${record.employeeName}, Note: "${record.note}"`);
+        console.log(`Record ${index + 1} before save - ID: ${record.id}, Employee: ${record.employeeName}, Present: ${record.present}, Note: "${record.note}"`);
       });
       
       // Make sure we properly identify existing records with IDs
@@ -87,22 +86,28 @@ export const useAttendanceOperations = (canEdit: boolean) => {
             : record
         );
       } else {
-        // Update all
-        updatedRecords = attendanceData.map(record => ({
-          ...record,
-          present: data.present,
-          startTime: data.present ? data.startTime : "",
-          endTime: data.present ? data.endTime : "",
-          overtimeHours: data.present ? data.overtimeHours : 0,
-          note: data.note
-        }));
+        // Update all records - preserve existing notes for absent employees if data.note is empty
+        updatedRecords = attendanceData.map(record => {
+          // If employee is becoming absent and no new note is provided, keep their existing note
+          const shouldKeepExistingNote = !data.present && !data.note && record.note;
+          const noteToUse = shouldKeepExistingNote ? record.note : data.note;
+          
+          return {
+            ...record,
+            present: data.present,
+            startTime: data.present ? data.startTime : "",
+            endTime: data.present ? data.endTime : "",
+            overtimeHours: data.present ? data.overtimeHours : 0,
+            note: noteToUse
+          };
+        });
       }
 
       console.log("Bulk update - saving", updatedRecords.length, "records");
       
       // Log notes before saving
       updatedRecords.forEach((record, index) => {
-        console.log(`Record ${index + 1} before bulk save - ID: ${record.id}, Employee: ${record.employeeName}, Note: "${record.note}"`);
+        console.log(`Record ${index + 1} before bulk save - ID: ${record.id}, Employee: ${record.employeeName}, Present: ${record.present}, Note: "${record.note}"`);
       });
       
       const result = await bulkSaveAttendance(updatedRecords);

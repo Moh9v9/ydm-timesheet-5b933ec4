@@ -46,7 +46,7 @@ export const useBulkOperations = (
         // Skip temporary IDs
         const recordId = record.id && !record.id.toString().includes('temp-') ? record.id : undefined;
         
-        console.log(`Processing record: ${recordId || 'new'} - Note: "${record.note || ''}"`);
+        console.log(`Processing record: ${recordId || 'new'} - Employee: ${record.employeeName} - Present: ${record.present} - Note: "${record.note || ''}"`);
         
         return {
           id: recordId,
@@ -74,7 +74,7 @@ export const useBulkOperations = (
       // Handle existing records first (with IDs) - Process one by one to ensure updates work properly
       if (recordsWithIds.length > 0) {
         for (const record of recordsWithIds) {
-          console.log(`Updating record ID: ${record.id}, Note: "${record.note || ''}"`);
+          console.log(`Updating record ID: ${record.id}, Employee: ${record.employee_name}, Present: ${record.present}, Note: "${record.note || ''}"`);
           
           const updateData = {
             employee_name: record.employee_name,
