@@ -1,7 +1,7 @@
-
 import React, { useState } from "react";
 import { useTimeZone } from "@/contexts/TimeZoneContext";
 import { useModernNotification } from "@/hooks/useModernNotification";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 // A selection of common time zones for demonstration.
 const allTimeZones = [
@@ -22,15 +22,16 @@ const TimeZoneSettingsSection = () => {
   const { timeZone, setTimeZone } = useTimeZone();
   const { success } = useModernNotification();
   const [selectedTZ, setSelectedTZ] = useState(timeZone);
+  const { t } = useLanguage();
 
   const handleApply = () => {
     setTimeZone(selectedTZ);
-    success(`Time zone set to ${selectedTZ}`);
+    success(t('settingsSaved'));
   };
 
   return (
     <div className="mb-8">
-      <h3 className="text-lg font-medium mb-3">Application Time Zone</h3>
+      <h3 className="text-lg font-medium mb-3">{t('applicationTimeZone')}</h3>
       <div className="flex flex-col sm:flex-row items-center gap-3">
         <select
           value={selectedTZ}
@@ -45,11 +46,11 @@ const TimeZoneSettingsSection = () => {
           onClick={handleApply}
           className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 transition-colors"
         >
-          Apply
+          {t('apply')}
         </button>
       </div>
       <p className="text-sm text-muted-foreground mt-2">
-        This will affect date/time display throughout the application.
+        {t('timeZoneInfo')}
       </p>
     </div>
   );

@@ -1,4 +1,6 @@
 
+import { useLanguage } from "@/contexts/LanguageContext";
+
 interface FormActionsProps {
   onCancel: () => void;
   isSubmitting: boolean;
@@ -6,6 +8,8 @@ interface FormActionsProps {
 }
 
 export const FormActions = ({ onCancel, isSubmitting, isEditMode }: FormActionsProps) => {
+  const { t } = useLanguage();
+  
   return (
     <div className="flex justify-end space-x-3 pt-4">
       <button
@@ -14,7 +18,7 @@ export const FormActions = ({ onCancel, isSubmitting, isEditMode }: FormActionsP
         className="px-4 py-2 border border-input rounded-md"
         disabled={isSubmitting}
       >
-        Cancel
+        {t('cancel')}
       </button>
       <button
         type="submit"
@@ -23,11 +27,11 @@ export const FormActions = ({ onCancel, isSubmitting, isEditMode }: FormActionsP
       >
         {isSubmitting
           ? isEditMode
-            ? "Updating..."
-            : "Adding..."
+            ? t('updating')
+            : t('adding')
           : isEditMode
-          ? "Update"
-          : "Add"}
+          ? t('update')
+          : t('add')}
       </button>
     </div>
   );
