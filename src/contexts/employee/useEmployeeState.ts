@@ -12,7 +12,6 @@ export const useEmployeeState = (currentAttendanceDate?: string) => {
   const [error, setError] = useState<string | null>(null);
   const [dataFetched, setDataFetched] = useState<boolean>(false);
 
-  // ✅ تحميل الموظفين من Google Sheets
   const fetchEmployees = async () => {
     setLoading(true);
     setError(null);
@@ -34,7 +33,6 @@ export const useEmployeeState = (currentAttendanceDate?: string) => {
     }
   };
 
-  // ✅ تطبيق الفلاتر
   const applyFilters = async (emps: Employee[], filts: EmployeeFilters) => {
     setLoading(true);
     try {
@@ -55,19 +53,16 @@ export const useEmployeeState = (currentAttendanceDate?: string) => {
     }
   };
 
-  // ⚡ تشغيل الفلاتر عند تغيّر البيانات أو الفلاتر
   useEffect(() => {
     if (employees.length > 0) {
       applyFilters(employees, filters);
     }
   }, [employees, filters, currentAttendanceDate]);
 
-  // ✅ إعادة تحميل الموظفين
   const refreshEmployees = async (): Promise<void> => {
     await fetchEmployees();
   };
 
-  // 🚀 تحميل أولي عند تحميل الصفحة
   useEffect(() => {
     fetchEmployees();
   }, []);
@@ -85,3 +80,4 @@ export const useEmployeeState = (currentAttendanceDate?: string) => {
     refreshEmployees,
   };
 };
+
