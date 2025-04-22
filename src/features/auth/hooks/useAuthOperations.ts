@@ -1,4 +1,3 @@
-
 import { User } from "@/lib/types";
 import { v4 as uuidv4 } from "uuid";
 import { getUserByEmailAndPassword, updateUserRole, addUser } from "@/lib/googleSheets";
@@ -54,7 +53,9 @@ export const useAuthOperations = () => {
   const logout = async () => {
     console.log("🔓 Logging out...");
     toast.success("Logged out successfully");
-    window.location.href = "/login";
+    // Remove the auto-redirect, let AuthContext handle navigation
+    // window.location.href = "/login";
+    return Promise.resolve();
   };
 
   // Add the missing updateProfile function

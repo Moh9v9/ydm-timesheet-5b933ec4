@@ -39,12 +39,13 @@ const TopBar = ({ toggleSidebar, isSidebarOpen }: TopBarProps) => {
       setShowLogoutConfirm(false);
       toast.loading("Logging out...");
       await logout();
-      // Redirect is handled in the logout function
+      // After logout is complete, manually navigate to login page
+      navigate("/login", { replace: true });
     } catch (error) {
       console.error("Error during logout:", error);
       toast.error("Logout failed. Please try again.");
       // Fallback redirect if there's an error
-      navigate("/login");
+      navigate("/login", { replace: true });
     }
   };
 
