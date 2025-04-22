@@ -61,28 +61,67 @@ export const useBulkOperations = (
       
       console.log("Transformed DB records for saving:", dbRecords);
 
-      const { data, error } = await supabase
-        .from('attendance_records')
-        .upsert(dbRecords, { 
-          onConflict: 'employee_uuid, date',
-          ignoreDuplicates: false
-        })
-        .select();
-
-      if (error) {
-        console.error('❌ Error saving attendance records:', error);
-        throw error;
+      // First, handle records with IDs - we'll use update for these to ensure note changes are saved
+      const recordsWithIds = dbRecords.filter(record => record.id !== undefined);
+      const recordsWithoutIds = dbRecords.filter(record => record.id === undefined);
+      
+      console.log(`Processing ${recordsWithIds.length} records with IDs and ${recordsWithoutIds.length} new records`);
+      
+      let savedRecordsResults: any[] = [];
+      
+      // Handle existing records first (with IDs)
+      if (recordsWithIds.length > 0) {
+        for (const record of recordsWithIds) {
+          console.log(`Updating record ID: ${record.id}, Note: "${record.note}"`);
+          const { data, error } = await supabase
+            .from('attendance_records')
+            .update({
+              employee_name: record.employee_name,
+              present: record.present,
+              start_time: record.start_time,
+              end_time: record.end_time,
+              overtime_hours: record.overtime_hours,
+              note: record.note
+            })
+            .eq('id', record.id)
+            .select();
+            
+          if (error) {
+            console.error(`Error updating record ID ${record.id}:`, error);
+          } else if (data) {
+            console.log(`Successfully updated record ID ${record.id}:`, data);
+            savedRecordsResults = [...savedRecordsResults, ...data];
+          }
+        }
       }
+      
+      // Handle new records (without IDs)
+      if (recordsWithoutIds.length > 0) {
+        console.log(`Inserting ${recordsWithoutIds.length} new records`);
+        const { data, error } = await supabase
+          .from('attendance_records')
+          .insert(recordsWithoutIds)
+          .select();
+          
+        if (error) {
+          console.error('Error inserting new records:', error);
+        } else if (data) {
+          console.log(`Successfully inserted ${data.length} new records:`, data);
+          savedRecordsResults = [...savedRecordsResults, ...data];
+        }
+      }
+      
+      console.log(`Total saved records: ${savedRecordsResults.length}`);
 
-      if (!data) {
+      if (!savedRecordsResults || savedRecordsResults.length === 0) {
         console.warn('⚠️ No data returned after saving attendance records');
         return [];
       }
 
-      console.log(`✅ Successfully saved ${data.length} attendance records:`, data);
+      console.log(`✅ Successfully saved ${savedRecordsResults.length} attendance records:`, savedRecordsResults);
       
       // Convert DB records back to our UI format
-      const savedRecords: AttendanceRecord[] = data.map(record => ({
+      const savedRecords: AttendanceRecord[] = savedRecordsResults.map(record => ({
         id: record.id,
         employeeId: record.employee_uuid,
         employeeName: record.employee_name || '',

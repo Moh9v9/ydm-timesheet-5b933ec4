@@ -20,6 +20,11 @@ export const useAttendanceOperations = (canEdit: boolean) => {
     try {
       console.log("Starting save process with", attendanceData.length, "records");
       
+      // Log notes specifically to debug
+      attendanceData.forEach((record, index) => {
+        console.log(`Record ${index + 1} before save - ID: ${record.id}, Employee: ${record.employeeName}, Note: "${record.note}"`);
+      });
+      
       // Make sure we properly identify existing records with IDs
       const cleanData = attendanceData.map(record => {
         // Create a new object to avoid mutation
@@ -91,6 +96,12 @@ export const useAttendanceOperations = (canEdit: boolean) => {
       }
 
       console.log("Bulk update - saving", updatedRecords.length, "records");
+      
+      // Log notes before saving
+      updatedRecords.forEach((record, index) => {
+        console.log(`Record ${index + 1} before bulk save - ID: ${record.id}, Employee: ${record.employeeName}, Note: "${record.note}"`);
+      });
+      
       const result = await bulkSaveAttendance(updatedRecords);
       success("All attendance records updated successfully");
       return result;

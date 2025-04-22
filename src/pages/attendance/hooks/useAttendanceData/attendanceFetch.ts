@@ -46,6 +46,11 @@ export const useAttendanceFetch = (
           return;
         }
 
+        // Log each record's note field to debug
+        records.forEach(record => {
+          console.log(`Record ID ${record.id} - Employee: ${record.employee_name} - Note: "${record.note || ''}"`);
+        });
+
         const formattedRecords: AttendanceRecord[] = records.map(record => ({
           id: record.id,
           employeeId: record.employee_uuid,
