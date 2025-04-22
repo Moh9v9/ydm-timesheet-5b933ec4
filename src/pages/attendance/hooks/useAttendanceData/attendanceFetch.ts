@@ -1,7 +1,7 @@
 import { Dispatch, SetStateAction, useEffect } from "react";
 import { AttendanceRecord, Employee } from "@/lib/types";
 import { useAttendance } from "@/contexts/AttendanceContext";
-import { readAttendanceByDate } from "@/lib/googleSheets"; // تأكد من وجود الدالة في googleSheets.ts
+import { readAttendanceByDate } from "src/lib/googleSheets.ts"; // تأكد من وجود الدالة في googleSheets.ts
 
 export const useAttendanceFetch = (
   refreshTrigger: number,
