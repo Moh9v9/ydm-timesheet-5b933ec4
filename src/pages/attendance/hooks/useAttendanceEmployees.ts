@@ -29,35 +29,23 @@ export const useAttendanceEmployees = (currentDate: string) => {
           
         if (activeError) throw activeError;
 
-        // Next, get archived employees that have attendance records for the selected date
+        // Instead of using rpc, we'll use a join query to get archived employees with attendance records
         const { data: archivedWithRecords, error: archivedError } = await supabase
-          .rpc('get_archived_with_attendance', { selected_date: currentDate });
+          .from('employees')
+          .select(`
+            *,
+            attendance_records!inner(date)
+          `)
+          .eq('status', 'Archived')
+          .eq('attendance_records.date', currentDate);
         
-        // If the RPC function doesn't exist, fallback to a join query
-        let archivedEmployeesWithRecords: any[] = [];
+        if (archivedError) throw archivedError;
         
-        if (archivedError) {
-          console.warn("RPC function not available, falling back to join query");
-          // Fallback to manual join query to find archived employees with attendance records
-          const { data: fallbackData, error: fallbackError } = await supabase
-            .from('employees')
-            .select(`
-              *,
-              attendance_records!inner(date)
-            `)
-            .eq('status', 'Archived')
-            .eq('attendance_records.date', currentDate);
-          
-          if (fallbackError) throw fallbackError;
-          
-          // Remove the nested attendance_records data to match our Employee type
-          archivedEmployeesWithRecords = fallbackData?.map(item => {
-            const { attendance_records, ...employee } = item;
-            return employee;
-          }) || [];
-        } else {
-          archivedEmployeesWithRecords = archivedWithRecords || [];
-        }
+        // Remove the nested attendance_records data to match our Employee type
+        const archivedEmployeesWithRecords = archivedWithRecords?.map(item => {
+          const { attendance_records, ...employee } = item;
+          return employee;
+        }) || [];
 
         // Format the employees data
         const formattedActiveEmployees = (activeEmployees || []).map(emp => ({
