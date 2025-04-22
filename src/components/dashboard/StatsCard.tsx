@@ -1,7 +1,7 @@
 
 import { LucideIcon } from "lucide-react";
 import ValueUpdater from "./ValueUpdater";
-import { SponsorshipType } from "@/lib/types";
+import { SponsorshipType, PaymentType } from "@/lib/types";
 
 interface StatsCardProps {
   icon: LucideIcon;
@@ -10,6 +10,7 @@ interface StatsCardProps {
   colorClass: string;
   isLoading?: boolean;
   breakdown?: Record<SponsorshipType, number>;
+  paymentBreakdown?: Record<PaymentType, number>;
 }
 
 export const StatsCard = ({ 
@@ -18,7 +19,8 @@ export const StatsCard = ({
   value, 
   colorClass, 
   isLoading = false,
-  breakdown 
+  breakdown,
+  paymentBreakdown
 }: StatsCardProps) => {
   return (
     <div
@@ -42,16 +44,31 @@ export const StatsCard = ({
         </div>
       </div>
       
-      {breakdown && (
+      {(breakdown || paymentBreakdown) && (
         <div className="mt-2 pt-2 border-t border-gray-100 dark:border-gray-700">
-          <div className="grid grid-cols-1 gap-1 text-xs">
-            {Object.entries(breakdown).map(([type, count]) => (
-              <div key={type} className="flex justify-between items-center">
-                <span className="text-muted-foreground">{type}:</span>
-                <span className="font-medium">{count}</span>
-              </div>
-            ))}
-          </div>
+          {breakdown && (
+            <div className="grid grid-cols-1 gap-1 text-xs mb-2">
+              <div className="text-xs font-medium text-muted-foreground mb-1">By Sponsorship:</div>
+              {Object.entries(breakdown).map(([type, count]) => (
+                <div key={type} className="flex justify-between items-center">
+                  <span className="text-muted-foreground">{type}:</span>
+                  <span className="font-medium">{count}</span>
+                </div>
+              ))}
+            </div>
+          )}
+          
+          {paymentBreakdown && (
+            <div className="grid grid-cols-1 gap-1 text-xs">
+              <div className="text-xs font-medium text-muted-foreground mb-1">By Payment Type:</div>
+              {Object.entries(paymentBreakdown).map(([type, count]) => (
+                <div key={type} className="flex justify-between items-center">
+                  <span className="text-muted-foreground">{type}:</span>
+                  <span className="font-medium">{count}</span>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>

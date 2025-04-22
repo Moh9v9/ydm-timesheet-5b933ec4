@@ -2,15 +2,18 @@
 import { User, UserCheck, UserX } from "lucide-react";
 import { StatsCard } from "./StatsCard";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { SponsorshipType } from "@/lib/types";
+import { SponsorshipType, PaymentType } from "@/lib/types";
 
 interface CardInformationProps {
   totalEmployees: number;
   presentToday: number;
   absentToday: number;
   sponsorshipBreakdown: Record<SponsorshipType, number>;
+  paymentBreakdown: Record<PaymentType, number>;
   presentBreakdown: Record<SponsorshipType, number>;
   absentBreakdown: Record<SponsorshipType, number>;
+  presentPaymentBreakdown: Record<PaymentType, number>;
+  absentPaymentBreakdown: Record<PaymentType, number>;
   isLoading?: boolean;
 }
 
@@ -19,8 +22,11 @@ export const CardInformation = ({
   presentToday,
   absentToday,
   sponsorshipBreakdown,
+  paymentBreakdown,
   presentBreakdown,
   absentBreakdown,
+  presentPaymentBreakdown,
+  absentPaymentBreakdown,
   isLoading = false,
 }: CardInformationProps) => {
   const { t } = useLanguage();
@@ -40,6 +46,7 @@ export const CardInformation = ({
         colorClass="bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400"
         isLoading={isLoading}
         breakdown={sponsorshipBreakdown}
+        paymentBreakdown={paymentBreakdown}
       />
       <StatsCard
         icon={UserCheck}
@@ -48,6 +55,7 @@ export const CardInformation = ({
         colorClass="bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-400"
         isLoading={isLoading}
         breakdown={presentBreakdown}
+        paymentBreakdown={presentPaymentBreakdown}
       />
       <StatsCard
         icon={UserX}
@@ -56,6 +64,7 @@ export const CardInformation = ({
         colorClass="bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-400"
         isLoading={isLoading}
         breakdown={absentBreakdown}
+        paymentBreakdown={absentPaymentBreakdown}
       />
     </div>
   );
