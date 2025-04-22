@@ -62,10 +62,17 @@ export const useAttendanceFetch = (
           startTime: record.start_time || '',
           endTime: record.end_time || '',
           overtimeHours: record.overtime_hours || 0,
-          note: record.note || ''
+          // Ensure note is never undefined in our app state
+          note: record.note !== null ? record.note || '' : ''
         }));
 
         console.log(`✅ Formatted ${formattedRecords.length} records for UI display`);
+        
+        // Log specifically transformed notes
+        formattedRecords.forEach(record => {
+          console.log(`Transformed record - ID: ${record.id}, Employee: ${record.employeeName}, Present: ${record.present}, Note: "${record.note}"`);
+        });
+        
         setAttendanceData(formattedRecords);
         setLastFetchedDate(currentDate);
         setHasAttemptedFetch(true);

@@ -57,13 +57,14 @@ export const useBulkOperations = (
           start_time: record.startTime,
           end_time: record.endTime,
           overtime_hours: record.overtimeHours,
-          note: record.note
+          // Critical fix: Always pass the note value, even for absent employees
+          note: record.note !== undefined ? record.note : null
         };
       });
       
       console.log("Transformed DB records for saving:", dbRecords);
 
-      // First, handle records with IDs - we'll use update for these to ensure note changes are saved
+      // First, handle records with IDs - we'll process them individually to ensure updates work correctly
       const recordsWithIds = dbRecords.filter(record => record.id !== undefined);
       const recordsWithoutIds = dbRecords.filter(record => record.id === undefined);
       
@@ -71,25 +72,25 @@ export const useBulkOperations = (
       
       let savedRecordsResults: any[] = [];
       
-      // Handle existing records first (with IDs) - Process one by one to ensure updates work properly
+      // Handle existing records first (with IDs) - Process one by one for better error handling
       if (recordsWithIds.length > 0) {
         for (const record of recordsWithIds) {
           console.log(`Updating record ID: ${record.id}, Employee: ${record.employee_name}, Present: ${record.present}, Note: "${record.note || ''}"`);
           
-          // We want to ensure note is passed as is, even if it's empty string or null
-          // This prevents Supabase from ignoring fields
+          // Explicitly define all fields to ensure nothing is missed during updates
           const updateData = {
             employee_name: record.employee_name,
             present: record.present,
             start_time: record.start_time,
             end_time: record.end_time,
             overtime_hours: record.overtime_hours,
-            note: record.note !== undefined ? record.note : null // Ensure null is sent if undefined
+            // Always include note value in the update
+            note: record.note
           };
           
           console.log(`Update data for record ${record.id}:`, updateData);
           
-          // Use upsert to ensure record is created if it doesn't exist
+          // Try the update operation first
           const { data, error } = await supabase
             .from('attendance_records')
             .update(updateData)
@@ -98,21 +99,20 @@ export const useBulkOperations = (
             
           if (error) {
             console.error(`Error updating record ID ${record.id}:`, error);
-            console.log(`Will try alternate method for record ID ${record.id}`);
+            console.log(`Will try upsert as fallback for record ID ${record.id}`);
             
             // If update fails, try upsert as a fallback
             const upsertResult = await supabase
               .from('attendance_records')
               .upsert({
-                ...record, // Include the ID and all fields
-                note: record.note !== undefined ? record.note : null // Ensure null is sent if undefined
+                ...record // Include all fields with ID to force upsert
               })
               .select();
               
             if (upsertResult.error) {
               console.error(`Fallback upsert also failed for record ID ${record.id}:`, upsertResult.error);
             } else if (upsertResult.data) {
-              console.log(`Successfully used fallback upsert for record ID ${record.id}`);
+              console.log(`Successfully used fallback upsert for record ID ${record.id}:`, upsertResult.data);
               savedRecordsResults = [...savedRecordsResults, ...upsertResult.data];
             }
           } else if (data) {
@@ -126,11 +126,8 @@ export const useBulkOperations = (
       if (recordsWithoutIds.length > 0) {
         console.log(`Inserting ${recordsWithoutIds.length} new records`);
         
-        // Ensure notes are properly formatted for insertion
-        const preparedRecords = recordsWithoutIds.map(record => ({
-          ...record,
-          note: record.note !== undefined ? record.note : null
-        }));
+        // Ensure all fields are properly formatted before insertion
+        const preparedRecords = recordsWithoutIds;
         
         const { data, error } = await supabase
           .from('attendance_records')
@@ -164,7 +161,8 @@ export const useBulkOperations = (
         startTime: record.start_time || '',
         endTime: record.end_time || '',
         overtimeHours: record.overtime_hours || 0,
-        note: record.note || ''
+        // Ensure note is never undefined in the UI state
+        note: record.note !== null ? record.note || '' : ''
       }));
 
       return savedRecords;

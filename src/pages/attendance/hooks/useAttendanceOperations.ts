@@ -1,5 +1,3 @@
-
-import { useState } from "react";
 import { AttendanceRecord } from "@/lib/types";
 import { useAttendance } from "@/contexts/AttendanceContext";
 import { useNotification } from "@/components/ui/notification";
@@ -83,15 +81,16 @@ export const useAttendanceOperations = (canEdit: boolean) => {
                 startTime: data.startTime,
                 endTime: data.endTime,
                 overtimeHours: data.overtimeHours,
-                note: data.note
+                // Preserve note if no new note provided
+                note: data.note || record.note || ''
               }
             : record
         );
       } else {
         // Update all records - preserve existing notes for absent employees if data.note is empty
         updatedRecords = attendanceData.map(record => {
-          // If employee is becoming absent and no new note is provided, keep their existing note
-          const shouldKeepExistingNote = !data.present && !data.note && record.note;
+          // Always keep existing note if new note is empty, regardless of presence state
+          const shouldKeepExistingNote = !data.note && record.note;
           const noteToUse = shouldKeepExistingNote ? record.note : data.note;
           
           return {
@@ -100,12 +99,13 @@ export const useAttendanceOperations = (canEdit: boolean) => {
             startTime: data.present ? data.startTime : "",
             endTime: data.present ? data.endTime : "",
             overtimeHours: data.present ? data.overtimeHours : 0,
-            note: noteToUse
+            // Critical: Ensure note is preserved for absent employees
+            note: noteToUse || ''
           };
         });
       }
 
-      console.log("Bulk update - saving", updatedRecords.length, "records");
+      console.log("Bulk update - records to save:", updatedRecords.length);
       
       // Log notes before saving
       updatedRecords.forEach((record, index) => {
