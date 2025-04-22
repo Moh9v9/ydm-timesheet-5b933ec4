@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useEmployees } from "@/contexts/EmployeeContext";
 import { Employee } from "@/lib/types";
@@ -83,6 +84,16 @@ export const useEmployeePage = () => {
     setCurrentEmployee(null);
     refreshEmployees();
   };
+  
+  const handleRefresh = async () => {
+    try {
+      await refreshEmployees();
+      toast.success("Employee data refreshed");
+    } catch (err) {
+      toast.error("Failed to refresh employees");
+      console.error(err);
+    }
+  };
 
   return {
     filteredEmployees,
@@ -100,5 +111,6 @@ export const useEmployeePage = () => {
     handleDeleteClick,
     handleDeleteCancel,
     handleDeleteConfirm,
+    handleRefresh
   };
 };

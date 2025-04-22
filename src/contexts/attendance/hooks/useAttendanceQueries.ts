@@ -1,6 +1,6 @@
 
 import { AttendanceRecord } from "@/lib/types";
-import { supabase } from "@/integrations/supabase/client";
+import { readAttendanceByDate } from "@/lib/googleSheets";
 
 export const useAttendanceQueries = () => {
   // Get attendance record by ID
@@ -10,32 +10,32 @@ export const useAttendanceQueries = () => {
 
   // Get attendance record by employee ID and date
   const getRecordsByEmployeeAndDate = async (employeeId: string, date: string): Promise<AttendanceRecord | null> => {
-    const { data, error } = await supabase
-      .from('attendance_records')
-      .select('*')
-      .eq('employee_uuid', employeeId)
-      .eq('date', date)
-      .single();
-
-    if (error) {
-      if (error.code === 'PGRST116') {
+    try {
+      // Fetch attendance records for the specified date from Google Sheets
+      const records = await readAttendanceByDate(date);
+      
+      // Find the record matching the employee ID
+      const record = records.find(r => r.employeeId === employeeId);
+      
+      if (!record) {
         return null;
       }
+      
+      return {
+        id: record.id,
+        employeeId: record.employeeId,
+        employeeName: record.employeeName || '',
+        date: record.date,
+        present: record.present === 'true' || record.present === true,
+        startTime: record.startTime || '',
+        endTime: record.endTime || '',
+        overtimeHours: Number(record.overtimeHours) || 0,
+        note: record.note || ''
+      };
+    } catch (error) {
       console.error('Error fetching attendance record:', error);
       return null;
     }
-
-    return data ? {
-      id: data.id,
-      employeeId: data.employee_uuid,
-      employeeName: data.employee_name || '',
-      date: data.date,
-      present: data.present,
-      startTime: data.start_time || '',
-      endTime: data.end_time || '',
-      overtimeHours: data.overtime_hours || 0,
-      note: data.note || ''
-    } : null;
   };
 
   return {

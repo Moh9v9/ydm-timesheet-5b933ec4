@@ -1,3 +1,4 @@
+
 import { AttendanceRecord } from "@/lib/types";
 import {
   updateAttendanceRecordInSheet,
@@ -21,11 +22,14 @@ export const useBulkOperations = (
     }
   };
 
-  const bulkSaveAttendance = async (records: AttendanceRecord[]) => {
+  const bulkSaveAttendance = async (records: AttendanceRecord[]): Promise<AttendanceRecord[]> => {
     setLoading(true);
     try {
+      const updatedRecords: AttendanceRecord[] = [];
+      
       for (const record of records) {
         await updateAttendanceRecordInSheet(record);
+        updatedRecords.push(record);
       }
 
       const updatedIds = records.map((r) => r.id);
@@ -35,8 +39,10 @@ export const useBulkOperations = (
       });
 
       setAttendanceRecords(updatedData);
+      return updatedRecords;
     } catch (err) {
       console.error("❌ Error in bulk saving attendance records:", err);
+      return [];
     } finally {
       setLoading(false);
     }

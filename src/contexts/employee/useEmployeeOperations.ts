@@ -1,3 +1,4 @@
+
 import {
   Employee,
   PaymentType,
@@ -18,6 +19,12 @@ export const useEmployeeOperations = (
 ) => {
   const getEmployee = (id: string) => {
     return employees.find((emp) => emp.id === id);
+  };
+  
+  // Add getUniqueValues function
+  const getUniqueValues = (field: keyof Employee) => {
+    const values = employees.map(emp => emp[field]);
+    return [...new Set(values)].filter(Boolean).map(String);
   };
 
   const addEmployee = async (
@@ -49,7 +56,20 @@ export const useEmployeeOperations = (
         status: employee.status as EmployeeStatus,
       };
 
-      await addToSheet(newEmployee);
+      // Convert numeric properties to string for Google Sheets API
+      await addToSheet({
+        id: newEmployee.id,
+        fullName: newEmployee.fullName,
+        iqamaNo: newEmployee.iqamaNo.toString(),
+        project: newEmployee.project,
+        location: newEmployee.location,
+        jobTitle: newEmployee.jobTitle,
+        paymentType: newEmployee.paymentType,
+        rateOfPayment: newEmployee.rateOfPayment.toString(),
+        sponsorship: newEmployee.sponsorship,
+        status: newEmployee.status,
+      });
+      
       setEmployees([...employees, newEmployee]);
       toast.success("Employee added successfully");
       return newEmployee;
@@ -65,7 +85,7 @@ export const useEmployeeOperations = (
   const updateEmployee = async (
     id: string,
     updatedFields: Partial<Omit<Employee, "id">>
-  ) => {
+  ): Promise<Employee> => {
     setLoading(true);
     try {
       const existing = employees.find((e) => e.id === id);
@@ -73,15 +93,31 @@ export const useEmployeeOperations = (
 
       const updated = { ...existing, ...updatedFields };
 
-      await updateInSheet({ id, ...updatedFields });
+      // Convert numeric fields to strings for Google Sheets API
+      const updatedForSheet: { [key: string]: string; id: string } = {
+        id,
+        ...Object.entries(updatedFields).reduce((acc, [key, value]) => {
+          // Convert numbers to strings
+          if (typeof value === 'number') {
+            acc[key] = value.toString();
+          } else if (value !== undefined) {
+            acc[key] = String(value);
+          }
+          return acc;
+        }, {} as Record<string, string>)
+      };
+
+      await updateInSheet(updatedForSheet);
 
       setEmployees((prev) =>
         prev.map((e) => (e.id === id ? { ...e, ...updatedFields } : e))
       );
       toast.success("Employee updated successfully");
+      return updated;
     } catch (err) {
       console.error("Error updating employee:", err);
       toast.error("Failed to update employee");
+      throw err;
     } finally {
       setLoading(false);
     }
@@ -103,6 +139,7 @@ export const useEmployeeOperations = (
 
   return {
     getEmployee,
+    getUniqueValues,
     addEmployee,
     updateEmployee,
     deleteEmployee,
