@@ -1,5 +1,5 @@
 // Authentication & User Management Types
-export type UserRole = "admin" | "user";
+export type UserRole = "admin" | "user" | "manager";
 
 export interface AppUser {
   id: string;
