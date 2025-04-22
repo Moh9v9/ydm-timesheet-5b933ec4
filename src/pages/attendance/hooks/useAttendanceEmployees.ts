@@ -50,57 +50,70 @@ export const useAttendanceEmployees = (
         }
       }
 
-      // Get archived employees with attendance records for the current date
-      const { data: archivedWithRecords, error } = await supabase
-        .from('employees')
-        .select('*')
-        .eq('status', 'Archived')
-        .in('id', supabase
-          .from('attendance_records')
-          .select('employee_uuid')
-          .eq('date', currentDate)
-        );
-
-      if (error) {
-        console.error('Error fetching archived employees:', error);
+      // Fetch archived employees with attendance records for the current date
+      // First, get all attendance records for the current date
+      const { data: attendanceRecords, error: attendanceError } = await supabase
+        .from('attendance_records')
+        .select('employee_uuid')
+        .eq('date', currentDate);
+      
+      if (attendanceError) {
+        console.error('Error fetching attendance records:', attendanceError);
+        return;
       }
 
-      if (archivedWithRecords && archivedWithRecords.length > 0) {
-        console.log(`Found ${archivedWithRecords.length} archived employees with records for ${currentDate}`);
-        
-        // Map the returned database rows to Employee objects
-        const archivedEmployees = archivedWithRecords.map(record => ({
-          id: record.id,
-          fullName: record.full_name,
-          iqamaNo: record.iqama_no || 0,
-          project: record.project,
-          location: record.location,
-          jobTitle: record.job_title,
-          paymentType: record.payment_type,
-          rateOfPayment: record.rate_of_payment,
-          sponsorship: record.sponsorship,
-          status: record.status
-        } as Employee));
-        
-        // Filter archived employees based on the same filters
-        let filteredArchived = [...archivedEmployees];
-        if (filters) {
-          if (filters.project !== "All Projects") {
-            filteredArchived = filteredArchived.filter(emp => emp.project === filters.project);
-          }
-          if (filters.location !== "All Locations") {
-            filteredArchived = filteredArchived.filter(emp => emp.location === filters.location);
-          }
-          if (filters.paymentType !== "All Types") {
-            filteredArchived = filteredArchived.filter(emp => emp.paymentType === filters.paymentType);
-          }
-          if (filters.sponsorship !== "All Sponsorships") {
-            filteredArchived = filteredArchived.filter(emp => emp.sponsorship === filters.sponsorship);
-          }
+      // Extract employee UUIDs from attendance records
+      const employeeUuids = attendanceRecords?.map(record => record.employee_uuid) || [];
+      
+      if (employeeUuids.length > 0) {
+        // Fetch archived employees that have attendance records
+        const { data: archivedWithRecords, error } = await supabase
+          .from('employees')
+          .select('*')
+          .eq('status', 'Archived')
+          .in('id', employeeUuids);
+
+        if (error) {
+          console.error('Error fetching archived employees:', error);
         }
-        
-        // Add filtered archived employees to the result
-        filtered = [...filtered, ...filteredArchived];
+
+        if (archivedWithRecords && archivedWithRecords.length > 0) {
+          console.log(`Found ${archivedWithRecords.length} archived employees with records for ${currentDate}`);
+          
+          // Map the returned database rows to Employee objects
+          const archivedEmployees = archivedWithRecords.map(record => ({
+            id: record.id,
+            fullName: record.full_name,
+            iqamaNo: record.iqama_no || 0,
+            project: record.project,
+            location: record.location,
+            jobTitle: record.job_title,
+            paymentType: record.payment_type,
+            rateOfPayment: record.rate_of_payment,
+            sponsorship: record.sponsorship,
+            status: record.status
+          } as Employee));
+          
+          // Filter archived employees based on the same filters
+          let filteredArchived = [...archivedEmployees];
+          if (filters) {
+            if (filters.project !== "All Projects") {
+              filteredArchived = filteredArchived.filter(emp => emp.project === filters.project);
+            }
+            if (filters.location !== "All Locations") {
+              filteredArchived = filteredArchived.filter(emp => emp.location === filters.location);
+            }
+            if (filters.paymentType !== "All Types") {
+              filteredArchived = filteredArchived.filter(emp => emp.paymentType === filters.paymentType);
+            }
+            if (filters.sponsorship !== "All Sponsorships") {
+              filteredArchived = filteredArchived.filter(emp => emp.sponsorship === filters.sponsorship);
+            }
+          }
+          
+          // Add filtered archived employees to the result
+          filtered = [...filtered, ...filteredArchived];
+        }
       }
       
       setAttendanceEmployees(filtered);
