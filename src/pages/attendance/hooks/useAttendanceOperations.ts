@@ -35,6 +35,9 @@ export const useAttendanceOperations = (canEdit: boolean) => {
           delete (cleanRecord as any).id;
         }
         
+        // Ensure note is properly formatted for saving
+        cleanRecord.note = cleanRecord.note || '';
+        
         return cleanRecord;
       });
 
