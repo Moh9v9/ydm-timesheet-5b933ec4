@@ -29,8 +29,17 @@ const Attendance = () => {
   const [showSaveConfirm, setShowSaveConfirm] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Use our new hook instead of the general filteredEmployees
-  const { attendanceEmployees, loading: employeesLoading } = useAttendanceEmployees(currentDate);
+  // Add state for filters
+  const [filters, setFilters] = useState({
+    project: "All Projects",
+    location: "All Locations",
+    paymentType: "All Types",
+    sponsorship: "All Sponsorships",
+    status: "All Status"
+  });
+
+  // Use our hook with filters passed in
+  const { attendanceEmployees, loading: employeesLoading } = useAttendanceEmployees(currentDate, filters);
 
   const canEdit = user?.permissions.attendees.edit;
   const canViewAttendance = user?.permissions.attendees.view;
@@ -91,15 +100,8 @@ const Attendance = () => {
     success("Attendance saved successfully");
   };
 
-  const [filters, setFilters] = useState({
-    project: "All Projects",
-    location: "All Locations",
-    paymentType: "All Types",
-    sponsorship: "All Sponsorships",
-    status: "All Status"
-  });
-
   const handleFilterChange = (key: string, value: string) => {
+    console.log(`Filter changed: ${key} = ${value}`);
     setFilters(prev => ({ ...prev, [key]: value }));
   };
 
