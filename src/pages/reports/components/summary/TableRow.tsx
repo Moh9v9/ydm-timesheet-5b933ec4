@@ -2,6 +2,7 @@
 import { format } from "date-fns";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { AttendanceRecord } from "@/lib/types";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface SummaryTableRowProps {
   record: AttendanceRecord;
@@ -9,6 +10,8 @@ interface SummaryTableRowProps {
 }
 
 const SummaryTableRow = ({ record, getEmployeeName }: SummaryTableRowProps) => {
+  const { t } = useLanguage();
+  
   const formatDate = (dateString: string) => {
     try {
       return format(new Date(dateString), "MMM dd, yyyy");
@@ -29,7 +32,7 @@ const SummaryTableRow = ({ record, getEmployeeName }: SummaryTableRowProps) => {
               : "bg-red-100 text-red-800 dark:bg-red-950/30 dark:text-red-300"
           }`}
         >
-          {record.present ? "Present" : "Absent"}
+          {record.present ? t('present') : t('absent')}
         </span>
       </TableCell>
       <TableCell>

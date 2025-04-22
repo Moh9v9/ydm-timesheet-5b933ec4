@@ -6,9 +6,9 @@ const PageTitle = () => {
   
   return (
     <div>
-      <h1 className="text-2xl font-bold">{t('dashboard')}</h1>
+      <h1 className="text-2xl font-bold">{t('dailyAttendance')}</h1>
       <p className="text-muted-foreground">
-        {t('manageProfileSettings')}
+        {t('manageAttendance')}
       </p>
     </div>
   );

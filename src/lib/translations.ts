@@ -1,4 +1,3 @@
-
 // Language translations for the application
 export const translations = {
   en: {
@@ -40,11 +39,46 @@ export const translations = {
     // Languages
     english: "English",
     arabic: "Arabic",
+    
+    // Dashboard
+    welcome: "Welcome back",
+    totalEmployees: "Total Employees",
+    totalPresent: "Total Present",
+    totalAbsent: "Total Absent",
+    
+    // Reports
+    employeeDataExport: "Employee Data Export",
+    exportEmployeeInfo: "Export employee information based on filters",
+    
+    // 404 Page
+    pageNotFound: "Oops! Page not found",
+    returnHome: "Return to Home",
 
-    // New translations or missing terms
+    // Other Pages
+    dailyAttendance: "Daily Attendance",
+    manageAttendance: "Manage employee attendance records",
+    dailySummary: "Daily Summary",
+    weeklySummary: "Weekly Summary",
+    monthlySummary: "Monthly Summary",
+    
+    // Common terms
     project: "Project",
     timeZone: "Time Zone",
-    userRole: "User Role"
+    userRole: "User Role",
+    totalEmployeesCount: "Total employees:",
+    exportEmployeeData: "Export Employee Data",
+    generating: "Generating...",
+    hideFilters: "Hide Filters",
+    showFilters: "Show Filters",
+    
+    // Attendance 
+    totalHours: "Hours",
+    overtime: "Overtime",
+    status: "Status",
+    date: "Date",
+    present: "Present",
+    absent: "Absent",
+    employee: "Employee"
   },
   ar: {
     // Navigation and common elements
@@ -85,10 +119,45 @@ export const translations = {
     // Languages
     english: "الإنجليزية",
     arabic: "العربية",
+    
+    // Dashboard
+    welcome: "مرحباً بعودتك",
+    totalEmployees: "إجمالي الموظفين",
+    totalPresent: "إجمالي الحاضرين",
+    totalAbsent: "إجمالي الغائبين",
+    
+    // Reports
+    employeeDataExport: "تصدير بيانات الموظفين",
+    exportEmployeeInfo: "تصدير معلومات الموظفين بناء على المرشحات",
+    
+    // 404 Page
+    pageNotFound: "عفواً! الصفحة غير موجودة",
+    returnHome: "العودة إلى الرئيسية",
 
-    // Corresponding Arabic translations
+    // Other Pages
+    dailyAttendance: "الحضور اليومي",
+    manageAttendance: "إدارة سجلات حضور الموظفين",
+    dailySummary: "ملخص يومي",
+    weeklySummary: "ملخص أسبوعي",
+    monthlySummary: "ملخص شهري",
+    
+    // Common terms
     project: "مشروع",
     timeZone: "المنطقة الزمنية",
-    userRole: "دور المستخدم"
+    userRole: "دور المستخدم",
+    totalEmployeesCount: "إجمالي الموظفين:",
+    exportEmployeeData: "تصدير بيانات الموظفين",
+    generating: "جاري التوليد...",
+    hideFilters: "إخفاء المرشحات",
+    showFilters: "إظهار المرشحات",
+    
+    // Attendance 
+    totalHours: "الساعات",
+    overtime: "العمل الإضافي",
+    status: "الحالة",
+    date: "التاريخ",
+    present: "حاضر",
+    absent: "غائب",
+    employee: "موظف"
   }
 };

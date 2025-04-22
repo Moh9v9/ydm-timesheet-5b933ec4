@@ -1,3 +1,4 @@
+
 import { useAuth } from "@/contexts/AuthContext";
 import { format } from "date-fns";
 import { CardInformation } from "@/components/dashboard/CardInformation";
@@ -6,20 +7,23 @@ import { useStatistics } from "@/hooks/useStatistics";
 import { AttendanceProvider } from "@/contexts/AttendanceContext";
 import { EmployeeProvider } from "@/contexts/EmployeeContext";
 import { Suspense } from "react";
+import { useLanguage } from "@/contexts/LanguageContext";
+
 const Index = () => {
-  const {
-    user
-  } = useAuth();
+  const { user } = useAuth();
+  const { t } = useLanguage();
 
   // Use today's date for display
   const today = new Date();
   const formattedDate = format(today, "EEEE, MMMM d, yyyy");
-  return <div className="space-y-6 container py-10 max-w-7xl mx-auto min-h-[800px]">
+  
+  return (
+    <div className="space-y-6 container py-10 max-w-7xl mx-auto min-h-[800px]">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
         <div>
-          <h1 className="text-2xl font-bold">Dashboard</h1>
+          <h1 className="text-2xl font-bold">{t('dashboard')}</h1>
           <p className="text-muted-foreground">
-            Welcome back, {user?.fullName || "User"}
+            {t('welcome')}, {user?.fullName || "User"}
           </p>
         </div>
         <div className="mt-2 md:mt-0 text-sm font-medium text-muted-foreground">
@@ -31,30 +35,33 @@ const Index = () => {
           <DashboardStats />
 
           <div className="mt-8 min-h-[400px]">
-            
-            <Suspense fallback={<div>Loading attendance data...</div>}>
+            <Suspense fallback={<div>{t('loading')}...</div>}>
               <DailyAttendance />
             </Suspense>
           </div>
         </EmployeeProvider>
       </AttendanceProvider>
-    </div>;
+    </div>
+  );
 };
 
 // Separate component to load stats inside the providers
 const DashboardStats = () => {
-  const {
-    totalEmployees,
-    presentToday,
-    absentToday,
-    isLoading
-  } = useStatistics();
-  const {
-    user
-  } = useAuth();
+  const { totalEmployees, presentToday, absentToday, isLoading } = useStatistics();
+  const { user } = useAuth();
+  
   if (!user) {
     return null;
   }
-  return <CardInformation totalEmployees={totalEmployees} presentToday={presentToday} absentToday={absentToday} isLoading={isLoading} />;
+  
+  return (
+    <CardInformation 
+      totalEmployees={totalEmployees} 
+      presentToday={presentToday} 
+      absentToday={absentToday} 
+      isLoading={isLoading} 
+    />
+  );
 };
+
 export default Index;

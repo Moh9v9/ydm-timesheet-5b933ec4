@@ -1,17 +1,33 @@
 
 import { Download } from "lucide-react";
 import ReportTypeIcon from "./ReportTypeIcon";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface HeaderSectionProps {
   view: "daily" | "weekly" | "monthly";
 }
 
 const HeaderSection = ({ view }: HeaderSectionProps) => {
+  const { t } = useLanguage();
+  
+  const getTitle = () => {
+    switch (view) {
+      case "daily":
+        return t('dailySummary');
+      case "weekly":
+        return t('weeklySummary');
+      case "monthly":
+        return t('monthlySummary');
+      default:
+        return "";
+    }
+  };
+  
   return (
     <div className="flex items-center justify-between px-4 py-3 border-b dark:border-gray-700">
       <div className="flex items-center gap-2">
         <ReportTypeIcon view={view} />
-        <h3 className="text-sm font-medium capitalize">{view} Summary</h3>
+        <h3 className="text-sm font-medium">{getTitle()}</h3>
       </div>
       <button className="text-primary hover:text-primary/80 p-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
         <Download size={16} />

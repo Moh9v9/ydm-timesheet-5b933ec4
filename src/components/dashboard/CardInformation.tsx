@@ -1,7 +1,7 @@
 
 import { User, UserCheck, UserX } from "lucide-react";
 import { StatsCard } from "./StatsCard";
-import { Skeleton } from "@/components/ui/skeleton";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface CardInformationProps {
   totalEmployees: number;
@@ -16,8 +16,8 @@ export const CardInformation = ({
   absentToday,
   isLoading = false,
 }: CardInformationProps) => {
-  // Instead of using Skeleton which causes the gray flashing, 
-  // we'll just render the cards with zero values when loading
+  const { t } = useLanguage();
+
   return (
     <div
       className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mb-4"
@@ -28,21 +28,21 @@ export const CardInformation = ({
     >
       <StatsCard
         icon={User}
-        title="Total Employees"
+        title={t('totalEmployees')}
         value={totalEmployees}
         colorClass="bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400"
         isLoading={isLoading}
       />
       <StatsCard
         icon={UserCheck}
-        title="Total Present"
+        title={t('totalPresent')}
         value={presentToday}
         colorClass="bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-400"
         isLoading={isLoading}
       />
       <StatsCard
         icon={UserX}
-        title="Total Absent"
+        title={t('totalAbsent')}
         value={absentToday}
         colorClass="bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-400"
         isLoading={isLoading}

@@ -2,6 +2,7 @@
 import { Search } from "lucide-react";
 import { useEmployees } from "@/contexts/EmployeeContext";
 import { StyledSelect } from "@/components/ui/styled-select";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface SearchBarProps {
   searchTerm: string;
@@ -13,14 +14,17 @@ interface SearchBarProps {
 export const SearchBar = ({ 
   searchTerm, 
   onSearchChange, 
-  placeholder = "Search employees...",
+  placeholder,
   className = ""
 }: SearchBarProps) => {
   const { employees } = useEmployees();
+  const { t } = useLanguage();
+  
+  const defaultPlaceholder = t('search');
   
   // Create employee options for the select
   const employeeOptions = [
-    { value: "all", label: "All Employees" }, // Changed from empty string to "all"
+    { value: "all", label: t('employees') }, // Changed from empty string to "all"
     ...employees.map(emp => ({
       value: emp.fullName,
       label: emp.fullName
@@ -35,7 +39,7 @@ export const SearchBar = ({
           // Convert "all" back to empty string for compatibility with existing logic
           onSearchChange(value === "all" ? "" : value);
         }}
-        placeholder={placeholder}
+        placeholder={placeholder || defaultPlaceholder}
         options={employeeOptions}
       />
       <Search 

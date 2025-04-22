@@ -1,9 +1,9 @@
 
-import { useState } from "react";
 import { Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import EmployeeExportFormatSelect from "../EmployeeExportFormatSelect";
 import { ExportFormat } from "@/lib/types";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface EmployeeExportControlsProps {
   exportFormat: ExportFormat;
@@ -18,6 +18,8 @@ const EmployeeExportControls = ({
   showFilters,
   setShowFilters,
 }: EmployeeExportControlsProps) => {
+  const { t } = useLanguage();
+  
   return (
     <div className="flex justify-between items-center mb-4">
       <EmployeeExportFormatSelect
@@ -30,7 +32,7 @@ const EmployeeExportControls = ({
         onClick={() => setShowFilters(!showFilters)}
       >
         <Filter size={16} />
-        {showFilters ? "Hide Filters" : "Show Filters"}
+        {showFilters ? t('hideFilters') : t('showFilters')}
       </Button>
     </div>
   );
