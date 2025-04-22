@@ -1,3 +1,4 @@
+
 import { createContext, useContext, ReactNode } from "react";
 import { EmployeeContextType } from "./employee/types";
 import { useEmployeeState } from "./employee/useEmployeeState";
@@ -7,6 +8,8 @@ import { useAttendance } from "@/contexts/AttendanceContext"; // for attendance 
 const EmployeeContext = createContext<EmployeeContextType | undefined>(undefined);
 
 export const EmployeeProvider = ({ children }: { children: ReactNode }) => {
+  console.log("🟢 EmployeeProvider - Mounting provider");
+  
   // Get current attendance date from AttendanceContext if available
   let currentAttendanceDate: string | undefined = undefined;
 
@@ -33,6 +36,8 @@ export const EmployeeProvider = ({ children }: { children: ReactNode }) => {
 
   const operations = useEmployeeOperations(employees, setEmployees, setLoading);
 
+  console.log("🟢 EmployeeProvider - Provider ready with", employees.length, "employees");
+
   return (
     <EmployeeContext.Provider
       value={{
@@ -53,9 +58,12 @@ export const EmployeeProvider = ({ children }: { children: ReactNode }) => {
 };
 
 export const useEmployees = () => {
+  console.log("🔍 useEmployees - Attempting to access EmployeeContext");
   const context = useContext(EmployeeContext);
   if (context === undefined) {
+    console.error("❌ useEmployees - ERROR: Hook called outside of EmployeeProvider!");
     throw new Error("useEmployees must be used within an EmployeeProvider");
   }
+  console.log("✅ useEmployees - Successfully accessed EmployeeContext");
   return context;
 };

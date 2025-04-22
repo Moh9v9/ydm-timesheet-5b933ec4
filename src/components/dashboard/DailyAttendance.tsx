@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import Attendance from "@/pages/attendance/Attendance";
 
 const DailyAttendance = () => {
+  console.log("📅 DailyAttendance - Component rendering");
   const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {

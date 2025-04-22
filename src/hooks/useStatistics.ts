@@ -29,7 +29,10 @@ interface DashboardStats {
 }
 
 export const useStatistics = () => {
+  console.log("📊 useStatistics - Hook initializing");
   const { filteredEmployees } = useEmployees();
+  console.log("📊 useStatistics - Successfully got filteredEmployees:", filteredEmployees?.length);
+  
   const { currentDate } = useAttendance();
   const [stats, setStats] = useState<DashboardStats>({
     totalEmployees: 0,

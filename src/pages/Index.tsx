@@ -10,6 +10,7 @@ import { Suspense } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 const Index = () => {
+  console.log("🏠 Index - Rendering Index component");
   const { user } = useAuth();
   const { t } = useLanguage();
 
@@ -41,6 +42,7 @@ const Index = () => {
 
 // Move all provider-dependent content to a separate component
 const DashboardContents = () => {
+  console.log("📊 DashboardContents - Rendering inside providers");
   const { t } = useLanguage();
   
   return (
@@ -58,6 +60,8 @@ const DashboardContents = () => {
 
 // Separate component to load stats inside the providers
 const DashboardStats = () => {
+  console.log("📈 DashboardStats - About to call useStatistics");
+  
   const { 
     totalEmployees, 
     presentToday, 
@@ -70,6 +74,8 @@ const DashboardStats = () => {
     absentPaymentBreakdown,
     isLoading 
   } = useStatistics();
+  
+  console.log("📈 DashboardStats - After useStatistics, totalEmployees:", totalEmployees);
   
   const { user } = useAuth();
   
