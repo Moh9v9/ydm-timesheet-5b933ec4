@@ -19,7 +19,6 @@ export const useStatistics = () => {
     absentToday: 0,
   });
   
-  // State to track loading status
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -45,30 +44,31 @@ export const useStatistics = () => {
         const presentCount = (data || []).filter(record => record.present).length;
         const absentCount = (data || []).filter(record => !record.present).length;
 
-        // Calculate total employees count
-        const totalEmployees = filteredEmployees?.length || 0;
+        // Calculate total ACTIVE employees count only
+        const activeEmployees = filteredEmployees?.filter(emp => emp.status === "Active") || [];
+        const totalActiveEmployees = activeEmployees.length;
 
-        console.log(`useStatistics - Calculated stats: Present: ${presentCount}, Absent: ${absentCount}, Total: ${totalEmployees}`);
+        console.log(`useStatistics - Calculated stats: Present: ${presentCount}, Absent: ${absentCount}, Total Active: ${totalActiveEmployees}`);
 
         setStats({
-          totalEmployees: totalEmployees,
+          totalEmployees: totalActiveEmployees, // Now only counting active employees
           presentToday: presentCount,
           absentToday: absentCount,
         });
       } catch (error) {
         console.error("Error fetching attendance stats:", error);
         
-        // If database fetch fails, still show employees count
+        // If database fetch fails, still show active employees count
+        const activeEmployees = filteredEmployees?.filter(emp => emp.status === "Active") || [];
         setStats(prev => ({
           ...prev,
-          totalEmployees: filteredEmployees?.length || 0,
+          totalEmployees: activeEmployees.length,
         }));
       } finally {
         setIsLoading(false);
       }
     };
 
-    // Fetch data when component mounts or date changes
     fetchAttendanceStats();
     
   }, [filteredEmployees, currentDate]);
