@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useEmployees } from "@/contexts/EmployeeContext";
 import { Employee } from "@/lib/types";
@@ -32,14 +33,21 @@ export const useEmployeePage = () => {
     console.log(`Filter changed: ${key} = ${value}`);
     
     if (value === "All") {
-      const newFilters = { ...filters };
-      delete newFilters[key];
-      setFilters(newFilters);
+      if (key === "status") {
+        // For status filter, explicitly set "All" to show both Active and Archived
+        setFilters({ ...filters, [key]: "All" });
+        console.log(`Setting ${key} filter to explicit "All" value`);
+      } else {
+        // For other filters, remove them from the filters object when "All" is selected
+        const newFilters = { ...filters };
+        delete newFilters[key];
+        setFilters(newFilters);
+      }
     } else {
       setFilters({ ...filters, [key]: value });
     }
     
-    console.log("Updated filters:", { ...filters, [key]: value === "All" ? undefined : value });
+    console.log("Updated filters:", { ...filters, [key]: value === "All" && key !== "status" ? undefined : value });
   };
 
   const handleDeleteClick = (id: string) => {

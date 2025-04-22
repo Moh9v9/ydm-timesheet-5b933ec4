@@ -22,7 +22,7 @@ export async function employeeMatchesFilters(
     }
   }
   
-  // Status filter handling - if "All" is selected or no status filter is specified, skip status check
+  // Status filter handling - if status filter is "All", explicitly skip status check by returning true for this check
   if (filters.status && filters.status !== "All") {
     console.log(`Checking status filter for ${employee.fullName}: employee status=${employee.status}, filter status=${filters.status}`);
     
@@ -31,6 +31,9 @@ export async function employeeMatchesFilters(
       console.log(`Employee ${employee.id} (${employee.fullName}) filtered out - status doesn't match: ${employee.status} != ${filters.status}`);
       return false;
     }
+  } else if (filters.status === "All") {
+    // Explicitly log that we're including this employee because 'All' is selected
+    console.log(`Including employee ${employee.fullName} with status ${employee.status} because 'All' status filter is active`);
   }
   
   // For archived employees in attendance view, check if they have a record for the selected date

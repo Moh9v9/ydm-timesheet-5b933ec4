@@ -18,12 +18,17 @@ export const EmployeeFiltersSection = ({
   paymentTypes,
   sponsorshipTypes
 }: EmployeeFiltersProps) => {
+  // Helper function to get current filter value or default to "All"
+  const getFilterValue = (key: keyof EmployeeFilters) => {
+    return filters[key] || "All";
+  };
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
       <div>
         <label className="block text-sm font-medium mb-1">Project</label>
         <select
-          value={filters.project || "All"}
+          value={getFilterValue("project")}
           onChange={(e) => onFilterChange("project", e.target.value)}
           className="w-full border border-input rounded-md p-2 bg-background dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:focus:ring-primary"
         >
@@ -37,7 +42,7 @@ export const EmployeeFiltersSection = ({
       <div>
         <label className="block text-sm font-medium mb-1">Location</label>
         <select
-          value={filters.location || "All"}
+          value={getFilterValue("location")}
           onChange={(e) => onFilterChange("location", e.target.value)}
           className="w-full border border-input rounded-md p-2 bg-background dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:focus:ring-primary"
         >
@@ -51,7 +56,7 @@ export const EmployeeFiltersSection = ({
       <div>
         <label className="block text-sm font-medium mb-1">Payment Type</label>
         <select
-          value={filters.paymentType || "All"}
+          value={getFilterValue("paymentType")}
           onChange={(e) => onFilterChange("paymentType", e.target.value)}
           className="w-full border border-input rounded-md p-2 bg-background dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:focus:ring-primary"
         >
@@ -65,7 +70,7 @@ export const EmployeeFiltersSection = ({
       <div>
         <label className="block text-sm font-medium mb-1">Sponsorship</label>
         <select
-          value={filters.sponsorship || "All"}
+          value={getFilterValue("sponsorship")}
           onChange={(e) => onFilterChange("sponsorship", e.target.value)}
           className="w-full border border-input rounded-md p-2 bg-background dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:focus:ring-primary"
         >
@@ -79,7 +84,7 @@ export const EmployeeFiltersSection = ({
       <div>
         <label className="block text-sm font-medium mb-1">Status</label>
         <select
-          value={filters.status || "All"}
+          value={getFilterValue("status")}
           onChange={(e) => onFilterChange("status", e.target.value)}
           className="w-full border border-input rounded-md p-2 bg-background dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:focus:ring-primary"
         >

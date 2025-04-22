@@ -48,8 +48,10 @@ export const useEmployeeState = (currentAttendanceDate?: string) => {
     try {
       console.log("Applying filters:", filts);
       
+      // Handle the status filter specifically
       if (filts.status === "All") {
         console.log("All status filter active - should show both Active and Archived employees");
+        console.log(`Total employees before filtering: Active=${emps.filter(e => e.status === "Active").length}, Archived=${emps.filter(e => e.status === "Archived").length}`);
       } else if (filts.status === "Archived") {
         console.log(`Archived status filter active - should show ${emps.filter(e => e.status === "Archived").length} employees`);
       } else if (filts.status) {
