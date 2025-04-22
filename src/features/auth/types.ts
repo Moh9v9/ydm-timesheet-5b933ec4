@@ -1,6 +1,6 @@
 
 import { User as SupabaseUser, Session } from "@supabase/supabase-js";
-import { User } from "@/lib/types";
+import { User, UserRole, UserPermissions } from "@/lib/types";
 
 export interface AuthContextType {
   user: User | null;
@@ -21,7 +21,13 @@ export interface ProfileData {
   permissions: any;
 }
 
-// Add this new interface for updateProfile parameters
+// Updated UpdateProfileParams interface to include all necessary fields
 export interface UpdateProfileParams extends Partial<User> {
-  currentPassword?: string; // Add this property for password verification
+  id?: string;
+  email?: string;
+  fullName?: string;
+  role?: UserRole;
+  permissions?: UserPermissions;
+  password?: string;
+  currentPassword?: string;
 }

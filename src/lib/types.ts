@@ -3,6 +3,7 @@
 export type PaymentType = 'Monthly' | 'Daily';
 export type SponsorshipType = 'YDM co' | 'YDM est' | 'Outside';
 export type EmployeeStatus = 'Active' | 'Archived';
+export type ReportType = 'daily' | 'monthly';
 
 // Modify the existing AttendanceFilters interface
 export interface AttendanceFilters {
@@ -74,6 +75,7 @@ export interface User {
   fullName: string;
   role: UserRole;
   permissions: UserPermissions;
+  password?: string; // Added password as optional field to fix type errors
 }
 
 // Export format type
