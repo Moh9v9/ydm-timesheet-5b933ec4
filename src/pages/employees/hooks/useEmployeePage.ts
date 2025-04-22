@@ -34,7 +34,7 @@ export const useEmployeePage = () => {
     
     if (value === "All") {
       if (key === "status") {
-        // For status filter, explicitly set "All" to show both Active and Archived
+        // Always explicitly set "All" for status filter to show both Active and Archived
         setFilters({ ...filters, [key]: "All" });
         console.log(`Setting ${key} filter to explicit "All" value`);
       } else {

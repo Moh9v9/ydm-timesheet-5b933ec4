@@ -8,7 +8,7 @@ import { employeeMatchesFilters } from "./employeeFilter";
 export const useEmployeeState = (currentAttendanceDate?: string) => {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [filteredEmployees, setFilteredEmployees] = useState<Employee[]>([]);
-  const [filters, setFilters] = useState<EmployeeFilters>({});
+  const [filters, setFilters] = useState<EmployeeFilters>({ status: "All" }); // Set default status to "All"
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [dataFetched, setDataFetched] = useState<boolean>(false);
@@ -58,11 +58,8 @@ export const useEmployeeState = (currentAttendanceDate?: string) => {
         console.log(`Status filter active: ${filts.status}`);
         console.log(`Employees before status filter: ${emps.length}`);
         console.log(`Employees with status ${filts.status}: ${emps.filter(e => e.status === filts.status).length}`);
-      } else {
-        console.log("No status filter active - defaulting to show Active employees only");
-        // By default, only show Active employees when no status filter is explicitly set
-        filts = { ...filts, status: "Active" };
       }
+      // We're not setting a default status filter anymore - now the specific "All" value handles this
       
       // Map each employee through the filter function (now async)
       const filterPromises = emps.map(emp => 

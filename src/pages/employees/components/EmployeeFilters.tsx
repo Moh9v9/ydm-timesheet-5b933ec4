@@ -20,7 +20,7 @@ export const EmployeeFiltersSection = ({
 }: EmployeeFiltersProps) => {
   // Helper function to get current filter value or default to "All"
   const getFilterValue = (key: keyof EmployeeFilters) => {
-    return filters[key] || "All";
+    return filters[key] || (key === "status" ? "All" : "All");
   };
 
   return (

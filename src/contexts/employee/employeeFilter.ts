@@ -1,4 +1,3 @@
-
 import { Employee, EmployeeFilters } from "@/lib/types";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -22,7 +21,7 @@ export async function employeeMatchesFilters(
     }
   }
   
-  // Status filter handling - if status filter is "All", explicitly skip status check by returning true for this check
+  // Status filter handling - if status filter is "All", explicitly skip status check
   if (filters.status && filters.status !== "All") {
     console.log(`Checking status filter for ${employee.fullName}: employee status=${employee.status}, filter status=${filters.status}`);
     
