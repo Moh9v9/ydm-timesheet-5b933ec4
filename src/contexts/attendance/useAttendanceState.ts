@@ -1,29 +1,23 @@
-
 import { useState, useEffect, useCallback } from "react";
 import { AttendanceRecord, AttendanceFilters } from "@/lib/types";
-import { supabase } from "@/integrations/supabase/client";
+import { readAttendanceByDate } from "@/lib/googleSheets";
 
-// Function to always get a fresh today date
 const getTodayISODate = () => new Date().toISOString().split('T')[0];
 
 export const useAttendanceState = () => {
-  // Initialize with fresh date every time
   const freshDate = getTodayISODate();
+
   const [currentDate, setCurrentDate] = useState<string>(freshDate);
   const [attendanceRecords, setAttendanceRecords] = useState<AttendanceRecord[]>([]);
-  const [filters, setFilters] = useState<AttendanceFilters>({
-    date: currentDate
-  });
+  const [filters, setFilters] = useState<AttendanceFilters>({ date: currentDate });
   const [loading, setLoading] = useState(false);
-  const [refreshCounter, setRefreshCounter] = useState(0); // Add refresh counter
+  const [refreshCounter, setRefreshCounter] = useState(0);
 
-  // Function to force a refresh of the data
   const refreshData = useCallback(() => {
     console.log("useAttendanceState - Forcing data refresh");
     setRefreshCounter(prev => prev + 1);
   }, []);
 
-  // Update filters when currentDate changes
   useEffect(() => {
     console.log("useAttendanceState - Setting filters date to:", currentDate);
     setFilters(prevFilters => ({
@@ -32,56 +26,48 @@ export const useAttendanceState = () => {
     }));
   }, [currentDate]);
 
-  // Fetch attendance records from Supabase
   useEffect(() => {
     const fetchAttendanceRecords = async () => {
       setLoading(true);
       try {
         console.log("useAttendanceState - Fetching records with filters:", filters);
-        const query = supabase
-          .from('attendance_records')
-          .select('*');
 
-        if (filters.date) {
-          query.eq('date', filters.date);
-        }
+        const records = await readAttendanceByDate(filters.date || "");
+
+        let filtered = records;
+
         if (filters.employeeId) {
-          query.eq('employee_uuid', filters.employeeId);
+          filtered = filtered.filter(r => r.employeeId === filters.employeeId);
         }
+
         if (filters.present !== undefined) {
-          query.eq('present', filters.present);
+          filtered = filtered.filter(r => String(r.present) === String(filters.present));
         }
 
-        const { data, error } = await query;
-
-        if (error) throw error;
-
-        const formattedRecords: AttendanceRecord[] = (data || []).map(record => ({
+        const formattedRecords: AttendanceRecord[] = filtered.map(record => ({
           id: record.id,
-          employeeId: record.employee_uuid,
-          employeeName: record.employee_name || '',
+          employeeId: record.employeeId,
+          employeeName: record.employeeName || '',
           date: record.date,
           present: record.present,
-          startTime: record.start_time || '',
-          endTime: record.end_time || '',
-          overtimeHours: record.overtime_hours || 0,
+          startTime: record.startTime || '',
+          endTime: record.endTime || '',
+          overtimeHours: record.overtimeHours || 0,
           note: record.note || ''
         }));
 
         console.log(`useAttendanceState - Fetched ${formattedRecords.length} records for date ${filters.date}`);
         setAttendanceRecords(formattedRecords);
+
       } catch (error) {
-        console.error('Error fetching attendance records:', error);
+        console.error('❌ Error fetching attendance records from Google Sheets:', error);
       } finally {
         setLoading(false);
       }
     };
 
     fetchAttendanceRecords();
-  }, [filters, refreshCounter]); // Add refreshCounter as a dependency
-
-  // Filter attendance records based on current filters
-  const filteredRecords = attendanceRecords;
+  }, [filters, refreshCounter]);
 
   return {
     attendanceRecords,
@@ -92,7 +78,7 @@ export const useAttendanceState = () => {
     setFilters,
     loading,
     setLoading,
-    filteredRecords,
-    refreshData, // Expose the refresh function
+    filteredRecords: attendanceRecords,
+    refreshData,
   };
 };
