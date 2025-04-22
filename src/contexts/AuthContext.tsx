@@ -56,7 +56,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         console.error("Enhanced update profile error:", error);
         throw error;
       }
-    }
+    },
+    // Make sure forgotPassword and resetPassword are included
+    forgotPassword: operations.forgotPassword,
+    resetPassword: operations.resetPassword
   };
 
   const value: AuthContextType = {
