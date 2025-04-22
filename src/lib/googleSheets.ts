@@ -17,8 +17,10 @@ const employeeAppendRange = 'employees';
 
 export async function readEmployees() {
   const client = await auth.getClient();
-  // Fixed: Properly type the sheets initialization
-  const sheets = google.sheets({ version: 'v4', auth: client });
+  const sheets = google.sheets({ 
+    version: 'v4', 
+    auth: client as any // Use type assertion to bypass the type checking
+  });
 
   const res = await sheets.spreadsheets.values.get({
     spreadsheetId,
@@ -47,8 +49,10 @@ export async function addEmployee(employeeData: {
   status: string;
 }) {
   const client = await auth.getClient();
-  // Fixed: Properly type the sheets initialization
-  const sheets = google.sheets({ version: 'v4', auth: client });
+  const sheets = google.sheets({ 
+    version: 'v4', 
+    auth: client as any 
+  });
 
   const now = new Date().toISOString();
 
@@ -82,8 +86,10 @@ export async function updateEmployee(updatedData: {
   [key: string]: string | undefined;
 }) {
   const client = await auth.getClient();
-  // Fixed: Properly type the sheets initialization
-  const sheets = google.sheets({ version: 'v4', auth: client });
+  const sheets = google.sheets({ 
+    version: 'v4', 
+    auth: client as any 
+  });
 
   const res = await sheets.spreadsheets.values.get({
     spreadsheetId,
@@ -125,8 +131,10 @@ export async function updateEmployee(updatedData: {
 
 export async function deleteEmployee(id: string) {
   const client = await auth.getClient();
-  // Fixed: Properly type the sheets initialization
-  const sheets = google.sheets({ version: 'v4', auth: client });
+  const sheets = google.sheets({ 
+    version: 'v4', 
+    auth: client as any 
+  });
 
   const res = await sheets.spreadsheets.values.get({
     spreadsheetId,
@@ -157,8 +165,10 @@ export async function deleteEmployee(id: string) {
 
 export async function readAttendanceByDate(date: string) {
   const client = await auth.getClient();
-  // Fixed: Properly type the sheets initialization
-  const sheets = google.sheets({ version: 'v4', auth: client });
+  const sheets = google.sheets({ 
+    version: 'v4', 
+    auth: client as any 
+  });
 
   const res = await sheets.spreadsheets.values.get({
     spreadsheetId,
@@ -178,8 +188,10 @@ export async function readAttendanceByDate(date: string) {
 
 export async function addAttendanceRecordToSheet(record: AttendanceRecord) {
   const client = await auth.getClient();
-  // Fixed: Properly type the sheets initialization
-  const sheets = google.sheets({ version: 'v4', auth: client });
+  const sheets = google.sheets({ 
+    version: 'v4', 
+    auth: client as any 
+  });
 
   const newRow = [
     record.id,
@@ -206,8 +218,10 @@ export async function updateAttendanceRecordInSheet(updatedData: {
   [key: string]: any;
 }) {
   const client = await auth.getClient();
-  // Fixed: Properly type the sheets initialization
-  const sheets = google.sheets({ version: 'v4', auth: client });
+  const sheets = google.sheets({ 
+    version: 'v4', 
+    auth: client as any 
+  });
 
   const res = await sheets.spreadsheets.values.get({
     spreadsheetId,
@@ -241,8 +255,10 @@ export async function updateAttendanceRecordInSheet(updatedData: {
 
 export async function deleteAttendanceRecordFromSheet(id: string) {
   const client = await auth.getClient();
-  // Fixed: Properly type the sheets initialization
-  const sheets = google.sheets({ version: 'v4', auth: client });
+  const sheets = google.sheets({ 
+    version: 'v4', 
+    auth: client as any 
+  });
 
   const res = await sheets.spreadsheets.values.get({
     spreadsheetId,
