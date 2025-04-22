@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { AttendanceRecord } from "@/lib/types";
 import { useAttendance } from "@/contexts/AttendanceContext";
@@ -34,8 +35,9 @@ export const useAttendanceOperations = (canEdit: boolean) => {
           delete (cleanRecord as any).id;
         }
         
-        // Ensure note is properly formatted for saving
-        cleanRecord.note = cleanRecord.note || '';
+        // Ensure note is properly formatted for saving - NEVER set to undefined
+        // Use empty string instead of undefined to ensure updates work correctly
+        cleanRecord.note = cleanRecord.note !== undefined ? cleanRecord.note : '';
         
         return cleanRecord;
       });

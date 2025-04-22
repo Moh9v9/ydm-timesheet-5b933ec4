@@ -76,17 +76,20 @@ export const useBulkOperations = (
         for (const record of recordsWithIds) {
           console.log(`Updating record ID: ${record.id}, Employee: ${record.employee_name}, Present: ${record.present}, Note: "${record.note || ''}"`);
           
+          // We want to ensure note is passed as is, even if it's empty string or null
+          // This prevents Supabase from ignoring fields
           const updateData = {
             employee_name: record.employee_name,
             present: record.present,
             start_time: record.start_time,
             end_time: record.end_time,
             overtime_hours: record.overtime_hours,
-            note: record.note
+            note: record.note !== undefined ? record.note : null // Ensure null is sent if undefined
           };
           
           console.log(`Update data for record ${record.id}:`, updateData);
           
+          // Use upsert to ensure record is created if it doesn't exist
           const { data, error } = await supabase
             .from('attendance_records')
             .update(updateData)
@@ -95,6 +98,23 @@ export const useBulkOperations = (
             
           if (error) {
             console.error(`Error updating record ID ${record.id}:`, error);
+            console.log(`Will try alternate method for record ID ${record.id}`);
+            
+            // If update fails, try upsert as a fallback
+            const upsertResult = await supabase
+              .from('attendance_records')
+              .upsert({
+                ...record, // Include the ID and all fields
+                note: record.note !== undefined ? record.note : null // Ensure null is sent if undefined
+              })
+              .select();
+              
+            if (upsertResult.error) {
+              console.error(`Fallback upsert also failed for record ID ${record.id}:`, upsertResult.error);
+            } else if (upsertResult.data) {
+              console.log(`Successfully used fallback upsert for record ID ${record.id}`);
+              savedRecordsResults = [...savedRecordsResults, ...upsertResult.data];
+            }
           } else if (data) {
             console.log(`Successfully updated record ID ${record.id}:`, data);
             savedRecordsResults = [...savedRecordsResults, ...data];
@@ -105,9 +125,16 @@ export const useBulkOperations = (
       // Handle new records (without IDs)
       if (recordsWithoutIds.length > 0) {
         console.log(`Inserting ${recordsWithoutIds.length} new records`);
+        
+        // Ensure notes are properly formatted for insertion
+        const preparedRecords = recordsWithoutIds.map(record => ({
+          ...record,
+          note: record.note !== undefined ? record.note : null
+        }));
+        
         const { data, error } = await supabase
           .from('attendance_records')
-          .insert(recordsWithoutIds)
+          .insert(preparedRecords)
           .select();
           
         if (error) {

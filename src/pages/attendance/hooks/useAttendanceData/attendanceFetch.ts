@@ -26,6 +26,8 @@ export const useAttendanceFetch = (
       console.log(`📅 Fetching attendance records for ${currentDate} - Refresh trigger: ${refreshTrigger}`);
 
       try {
+        // Direct Supabase query with debugging
+        console.log(`Executing Supabase query for date: ${currentDate}`);
         const { data: records, error } = await supabase
           .from('attendance_records')
           .select('*')
@@ -48,7 +50,7 @@ export const useAttendanceFetch = (
 
         // Log each record's note field to debug
         records.forEach(record => {
-          console.log(`Record ID ${record.id} - Employee: ${record.employee_name} - Note: "${record.note || ''}"`);
+          console.log(`Record ID ${record.id} - Employee: ${record.employee_name} - Present: ${record.present} - Note: "${record.note || ''}" - Raw note value:`, record.note);
         });
 
         const formattedRecords: AttendanceRecord[] = records.map(record => ({
