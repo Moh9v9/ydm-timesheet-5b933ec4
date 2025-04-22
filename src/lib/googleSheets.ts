@@ -230,3 +230,31 @@ export async function updateAttendanceRecordInSheet(updatedData: {
     },
   });
 }
+
+export async function deleteAttendanceRecordFromSheet(id: string) {
+  const client = await auth.getClient();
+  const sheets = google.sheets({ version: 'v4', auth: client });
+
+  const res = await sheets.spreadsheets.values.get({
+    spreadsheetId,
+    range: 'attendance!A1:Z1000',
+  });
+
+  const rows = res.data.values;
+  if (!rows || rows.length === 0) return;
+
+  const headers = rows[0];
+  const body = rows.slice(1);
+  const index = body.findIndex((r) => r[0] === id);
+  if (index === -1) return;
+
+  const emptyRow = new Array(headers.length).fill('');
+  await sheets.spreadsheets.values.update({
+    spreadsheetId,
+    range: `attendance!A${index + 2}:Z${index + 2}`,
+    valueInputOption: 'USER_ENTERED',
+    requestBody: {
+      values: [emptyRow],
+    },
+  });
+}
