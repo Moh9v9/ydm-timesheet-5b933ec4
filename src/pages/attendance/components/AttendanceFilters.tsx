@@ -8,7 +8,6 @@ interface AttendanceFiltersProps {
     location: string;
     paymentType: string;
     sponsorship: string;
-    status: string;
   };
   onFilterChange: (key: string, value: string) => void;
 }
@@ -23,11 +22,10 @@ export const AttendanceFilters = ({
   const locations = ["All Locations", ...getUniqueValues("location")];
   const paymentTypes = ["All Types", "Monthly", "Daily"];
   const sponsorshipTypes = ["All Sponsorships", "YDM co", "YDM est", "Outside"];
-  const statusTypes = ["All Status", "Active", "Archived"];
 
   return (
     <div className="p-4 border-b dark:border-gray-800 bg-card dark:bg-gray-900/50">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <StyledSelect
           value={filters.project}
           onValueChange={(value) => onFilterChange("project", value)}
@@ -58,14 +56,6 @@ export const AttendanceFilters = ({
           placeholder="Select Sponsorship"
           options={sponsorshipTypes.map(s => ({ value: s, label: s }))}
           label="Sponsorship"
-        />
-        
-        <StyledSelect
-          value={filters.status}
-          onValueChange={(value) => onFilterChange("status", value)}
-          placeholder="Select Status"
-          options={statusTypes.map(s => ({ value: s, label: s }))}
-          label="Status"
         />
       </div>
     </div>

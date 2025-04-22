@@ -34,8 +34,7 @@ const Attendance = () => {
     project: "All Projects",
     location: "All Locations",
     paymentType: "All Types",
-    sponsorship: "All Sponsorships",
-    status: "All Status"
+    sponsorship: "All Sponsorships"
   });
 
   // Use our hook with filters passed in

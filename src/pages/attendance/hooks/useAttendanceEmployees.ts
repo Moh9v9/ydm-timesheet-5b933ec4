@@ -8,7 +8,6 @@ interface AttendanceFilters {
   location: string;
   paymentType: string;
   sponsorship: string;
-  status: string;
 }
 
 export const useAttendanceEmployees = (
@@ -38,8 +37,7 @@ export const useAttendanceEmployees = (
       
       // Filter by payment type
       if (filters.paymentType && filters.paymentType !== "All Types") {
-        // Use correct capitalization to match the Employee type definition
-        const paymentTypeValue = filters.paymentType; // Already capitalized from the filter dropdown
+        const paymentTypeValue = filters.paymentType;
         
         if (paymentTypeValue) {
           filtered = filtered.filter(emp => emp.paymentType === paymentTypeValue);
@@ -51,12 +49,6 @@ export const useAttendanceEmployees = (
       if (filters.sponsorship && filters.sponsorship !== "All Sponsorships") {
         filtered = filtered.filter(emp => emp.sponsorship === filters.sponsorship);
         console.log(`Filtered by sponsorship ${filters.sponsorship}: ${filtered.length} employees remain`);
-      }
-      
-      // Filter by status
-      if (filters.status && filters.status !== "All Status") {
-        filtered = filtered.filter(emp => emp.status === filters.status);
-        console.log(`Filtered by status ${filters.status}: ${filtered.length} employees remain`);
       }
     }
     
