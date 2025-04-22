@@ -2,48 +2,48 @@
 export const translations = {
   en: {
     // Navigation and common elements
-    dashboard: "Dashboard",
-    employees: "Employees",
-    reports: "Reports",
-    settings: "Settings",
-    logout: "Logout",
-    logoutConfirm: "Are you sure you want to log out?",
-    cancel: "Cancel",
-    save: "Save",
-    delete: "Delete",
-    edit: "Edit",
-    add: "Add",
-    search: "Search",
+    dashboard: "الصفحة الرئيسية",
+    employees: "الموظفين",
+    reports: "التقارير",
+    settings: "الاعدادات",
+    logout: "الخروج",
+    logoutConfirm: "هل فعلا تود الخروج من التطبيق؟?",
+    cancel: "إلغاء",
+    save: "حفظ",
+    delete: "حذف",
+    edit: "تعديل",
+    add: "اضافة",
+    search: "بحث",
     loading: "Loading...",
-    confirm: "Confirm",
+    confirm: "موافقة",
     
     // Settings page
-    profileSettings: "Profile Settings",
-    userManagement: "User Management",
-    addUser: "Add User",
-    profile: "Profile",
-    users: "Users",
-    manageProfileSettings: "Manage your profile and application settings",
+    profileSettings: "إعدادات المستخدم",
+    userManagement: "ادارة المستخدمين",
+    addUser: "اضافة مستخدم",
+    profile: "ملف المستخدم",
+    users: "مستخدم",
+    manageProfileSettings: "ادارة ملف المستخدم واعدادات التبيق",
     
     // User roles
-    admin: "Admin",
-    manager: "Manager",
-    user: "User",
+    admin: "المسؤول",
+    manager: "المدير",
+    user: "المستخدم",
     
     // Profile form
-    timeZoneSettings: "Time Zone Settings",
-    currentTimeZone: "Current Time Zone",
-    changeTimeZone: "Change Time Zone",
-    selectTimeZone: "Select Time Zone",
+    timeZoneSettings: "اعدادات المنطقة الزمنية",
+    currentTimeZone: "الوقت الحالي في المنطقة الزمنيةe",
+    changeTimeZone: "تعديل المنطقة الزمنية",
+    selectTimeZone: "اختيار المنطقة الزمنية",
     
     // Languages
     english: "English",
-    arabic: "Arabic",
+    arabic: "العربية",
 
     // New translations or missing terms
-    project: "Project",
-    timeZone: "Time Zone",
-    userRole: "User Role"
+    project: "المشروع",
+    timeZone: "المنطقة الزمنيه",
+    userRole: "دور المستخدم"
   },
   ar: {
     // Navigation and common elements
