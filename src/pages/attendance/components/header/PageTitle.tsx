@@ -1,10 +1,14 @@
 
+import { useLanguage } from "@/contexts/LanguageContext";
+
 const PageTitle = () => {
+  const { t } = useLanguage();
+  
   return (
     <div>
-      <h1 className="text-2xl font-bold">Daily Attendance</h1>
+      <h1 className="text-2xl font-bold">{t('dashboard')}</h1>
       <p className="text-muted-foreground">
-        Manage employee attendance records
+        {t('manageProfileSettings')}
       </p>
     </div>
   );

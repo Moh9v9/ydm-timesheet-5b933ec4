@@ -1,3 +1,4 @@
+
 import { NavLink, useNavigate } from "react-router-dom";
 import { 
   Users, 
@@ -7,6 +8,7 @@ import {
   FileSpreadsheet
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -16,6 +18,7 @@ interface SidebarProps {
 const Sidebar = ({ isOpen, toggleSidebar }: SidebarProps) => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   const handleNavigate = (path: string) => {
     navigate(path);
@@ -85,7 +88,7 @@ const Sidebar = ({ isOpen, toggleSidebar }: SidebarProps) => {
               } ${!isOpen && "md:justify-center"}`}
             >
               <BarChart3 size={20} className={isOpen ? "mr-3" : ""} />
-              {(isOpen || window.innerWidth < 768) && <span>Dashboard</span>}
+              {(isOpen || window.innerWidth < 768) && <span>{t('dashboard')}</span>}
             </button>
 
             <button
@@ -97,7 +100,7 @@ const Sidebar = ({ isOpen, toggleSidebar }: SidebarProps) => {
               } ${!isOpen && "md:justify-center"}`}
             >
               <Users size={20} className={isOpen ? "mr-3" : ""} />
-              {(isOpen || window.innerWidth < 768) && <span>Employees</span>}
+              {(isOpen || window.innerWidth < 768) && <span>{t('employees')}</span>}
             </button>
 
             <button
@@ -109,7 +112,7 @@ const Sidebar = ({ isOpen, toggleSidebar }: SidebarProps) => {
               } ${!isOpen && "md:justify-center"}`}
             >
               <FileSpreadsheet size={20} className={isOpen ? "mr-3" : ""} />
-              {(isOpen || window.innerWidth < 768) && <span>Reports</span>}
+              {(isOpen || window.innerWidth < 768) && <span>{t('reports')}</span>}
             </button>
 
             <button
@@ -121,7 +124,7 @@ const Sidebar = ({ isOpen, toggleSidebar }: SidebarProps) => {
               } ${!isOpen && "md:justify-center"}`}
             >
               <Settings size={20} className={isOpen ? "mr-3" : ""} />
-              {(isOpen || window.innerWidth < 768) && <span>Settings</span>}
+              {(isOpen || window.innerWidth < 768) && <span>{t('settings')}</span>}
             </button>
           </nav>
 
