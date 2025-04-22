@@ -1,10 +1,10 @@
-
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { Menu, Sun, Moon, LogOut } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { LanguageSelector } from "../LanguageSelector";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -71,7 +71,6 @@ const TopBar = ({ toggleSidebar, isSidebarOpen }: TopBarProps) => {
         </div>
 
         <div className="flex items-center gap-1">
-          {/* User info moved here from sidebar. Only show if logged in */}
           {user && (
             <div className="flex flex-col text-right mr-3 min-w-[80px]">
               <span className="font-medium text-sidebar-foreground dark:text-gray-50 text-sm leading-tight truncate max-w-[140px]">
@@ -82,6 +81,7 @@ const TopBar = ({ toggleSidebar, isSidebarOpen }: TopBarProps) => {
               </span>
             </div>
           )}
+          <LanguageSelector />
           <button
             onClick={toggleTheme}
             className="p-2 rounded-md hover:bg-accent transition-colors"
@@ -104,7 +104,6 @@ const TopBar = ({ toggleSidebar, isSidebarOpen }: TopBarProps) => {
         </div>
       </div>
 
-      {/* Using AlertDialog instead of custom modal for better accessibility */}
       <AlertDialog open={showLogoutConfirm} onOpenChange={setShowLogoutConfirm}>
         <AlertDialogContent>
           <AlertDialogHeader>
