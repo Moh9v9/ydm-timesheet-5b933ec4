@@ -1,6 +1,8 @@
-
 import { AttendanceRecord } from "@/lib/types";
-import { supabase } from "@/integrations/supabase/client";
+import {
+  addAttendanceRecordToSheet,
+  updateAttendanceRecordInSheet,
+} from "@/lib/googleSheets";
 
 export const useAttendanceMutations = (
   attendanceRecords: AttendanceRecord[],
@@ -8,44 +10,21 @@ export const useAttendanceMutations = (
   setLoading: (loading: boolean) => void
 ) => {
   // Add new attendance record
-  const addAttendanceRecord = async (record: Omit<AttendanceRecord, "id">): Promise<AttendanceRecord> => {
+  const addAttendanceRecord = async (
+    record: Omit<AttendanceRecord, "id">
+  ): Promise<AttendanceRecord> => {
     setLoading(true);
-    
     try {
-      const { data, error } = await supabase
-        .from('attendance_records')
-        .insert({
-          employee_uuid: record.employeeId,
-          employee_name: record.employeeName,
-          date: record.date,
-          present: record.present,
-          start_time: record.startTime || null,
-          end_time: record.endTime || null,
-          overtime_hours: record.overtimeHours || 0,
-          note: record.note || null
-        })
-        .select()
-        .single();
-
-      if (error) throw error;
-      if (!data) throw new Error('No data returned from insert');
-
       const newRecord: AttendanceRecord = {
-        id: data.id,
-        employeeId: data.employee_uuid,
-        employeeName: data.employee_name || '',
-        date: data.date,
-        present: data.present,
-        startTime: data.start_time || '',
-        endTime: data.end_time || '',
-        overtimeHours: data.overtime_hours || 0,
-        note: data.note || ''
+        ...record,
+        id: (Date.now() + Math.random()).toString(), // يمكنك استبداله بـ uuid
       };
 
+      await addAttendanceRecordToSheet(newRecord);
       setAttendanceRecords([...attendanceRecords, newRecord]);
       return newRecord;
     } catch (err) {
-      console.error('Error adding attendance record:', err);
+      console.error("Error adding attendance record:", err);
       throw err;
     } finally {
       setLoading(false);
@@ -58,46 +37,19 @@ export const useAttendanceMutations = (
     record: Partial<AttendanceRecord>
   ): Promise<AttendanceRecord> => {
     setLoading(true);
-    
     try {
-      const { data, error } = await supabase
-        .from('attendance_records')
-        .update({
-          employee_name: record.employeeName,
-          present: record.present,
-          start_time: record.startTime || null,
-          end_time: record.endTime || null,
-          overtime_hours: record.overtimeHours || 0,
-          note: record.note || null
-        })
-        .eq('id', id)
-        .select()
-        .single();
+      await updateAttendanceRecordInSheet({ id, ...record });
 
-      if (error) throw error;
-      if (!data) throw new Error('No data returned from update');
-
-      const updatedRecord: AttendanceRecord = {
-        id: data.id,
-        employeeId: data.employee_uuid,
-        employeeName: data.employee_name || '',
-        date: data.date,
-        present: data.present,
-        startTime: data.start_time || '',
-        endTime: data.end_time || '',
-        overtimeHours: data.overtime_hours || 0,
-        note: data.note || ''
-      };
-
-      setAttendanceRecords(
-        attendanceRecords.map(record => 
-          record.id === id ? updatedRecord : record
-        )
+      const updated = attendanceRecords.map((r) =>
+        r.id === id ? { ...r, ...record } : r
       );
-      
+
+      const updatedRecord = updated.find((r) => r.id === id)!;
+
+      setAttendanceRecords(updated);
       return updatedRecord;
     } catch (err) {
-      console.error('Error updating attendance record:', err);
+      console.error("Error updating attendance record:", err);
       throw err;
     } finally {
       setLoading(false);
@@ -106,6 +58,6 @@ export const useAttendanceMutations = (
 
   return {
     addAttendanceRecord,
-    updateAttendanceRecord
+    updateAttendanceRecord,
   };
 };
