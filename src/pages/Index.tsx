@@ -32,16 +32,27 @@ const Index = () => {
       </div>
       <AttendanceProvider>
         <EmployeeProvider>
-          <DashboardStats />
-
-          <div className="mt-8 min-h-[400px]">
-            <Suspense fallback={<div>{t('loading')}...</div>}>
-              <DailyAttendance />
-            </Suspense>
-          </div>
+          <DashboardContents />
         </EmployeeProvider>
       </AttendanceProvider>
     </div>
+  );
+};
+
+// Move all provider-dependent content to a separate component
+const DashboardContents = () => {
+  const { t } = useLanguage();
+  
+  return (
+    <>
+      <DashboardStats />
+
+      <div className="mt-8 min-h-[400px]">
+        <Suspense fallback={<div>{t('loading')}...</div>}>
+          <DailyAttendance />
+        </Suspense>
+      </div>
+    </>
   );
 };
 
