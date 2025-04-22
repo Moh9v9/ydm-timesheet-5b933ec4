@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Table, TableBody } from "@/components/ui/table";
 import { useAttendance } from "@/contexts/AttendanceContext";
 import { useEmployees } from "@/contexts/EmployeeContext";
@@ -15,9 +14,15 @@ interface AttendanceSummaryTableProps {
 
 const AttendanceSummaryTable = ({ view, currentDate }: AttendanceSummaryTableProps) => {
   const { filteredEmployees } = useEmployees();
-  const { attendanceRecords } = useAttendance();
+  const { attendanceRecords, refreshData } = useAttendance();
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
+
+  // Refresh data when the view or date changes
+  useEffect(() => {
+    console.log("AttendanceSummaryTable - View or date changed, refreshing data");
+    refreshData();
+  }, [view, currentDate, refreshData]);
 
   const getFilteredRecords = () => {
     return attendanceRecords.filter((record) => {

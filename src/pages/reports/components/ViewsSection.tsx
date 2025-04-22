@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Calendar, FileSpreadsheet, CalendarDays } from "lucide-react";
 import { TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -8,8 +8,14 @@ import { useAttendance } from "@/contexts/AttendanceContext";
 
 const ViewsSection = () => {
   const [viewMode, setViewMode] = useState<"daily" | "weekly" | "monthly">("daily");
-  const { currentDate } = useAttendance();
+  const { currentDate, refreshData } = useAttendance();
   const { t } = useLanguage();
+
+  // Effect to refresh data when currentDate changes
+  useEffect(() => {
+    console.log("ViewsSection - Date changed, refreshing data");
+    refreshData();
+  }, [currentDate, refreshData]);
 
   return (
     <div className="space-y-5">
