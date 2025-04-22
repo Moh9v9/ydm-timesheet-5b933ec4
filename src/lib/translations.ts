@@ -1,4 +1,3 @@
-
 // Language translations for the application
 export const translations = {
   en: {
@@ -39,7 +38,12 @@ export const translations = {
     
     // Languages
     english: "English",
-    arabic: "Arabic"
+    arabic: "Arabic",
+
+    // New translations or missing terms
+    project: "Project",
+    timeZone: "Time Zone",
+    userRole: "User Role"
   },
   ar: {
     // Navigation and common elements
@@ -79,6 +83,11 @@ export const translations = {
     
     // Languages
     english: "الإنجليزية",
-    arabic: "العربية"
+    arabic: "العربية",
+
+    // Corresponding Arabic translations
+    project: "مشروع",
+    timeZone: "المنطقة الزمنية",
+    userRole: "دور المستخدم"
   }
 };
