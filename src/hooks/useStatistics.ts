@@ -3,11 +3,21 @@ import { useState, useEffect } from "react";
 import { useEmployees } from "@/contexts/EmployeeContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useAttendance } from "@/contexts/AttendanceContext";
+import { SponsorshipType } from "@/lib/types";
+
+interface SponsorshipBreakdown {
+  'YDM co': number;
+  'YDM est': number;
+  'Outside': number;
+}
 
 interface DashboardStats {
   totalEmployees: number;
   presentToday: number;
   absentToday: number;
+  sponsorshipBreakdown: SponsorshipBreakdown;
+  presentBreakdown: SponsorshipBreakdown;
+  absentBreakdown: SponsorshipBreakdown;
 }
 
 export const useStatistics = () => {
@@ -17,6 +27,21 @@ export const useStatistics = () => {
     totalEmployees: 0,
     presentToday: 0,
     absentToday: 0,
+    sponsorshipBreakdown: {
+      'YDM co': 0,
+      'YDM est': 0,
+      'Outside': 0
+    },
+    presentBreakdown: {
+      'YDM co': 0,
+      'YDM est': 0,
+      'Outside': 0
+    },
+    absentBreakdown: {
+      'YDM co': 0,
+      'YDM est': 0,
+      'Outside': 0
+    }
   });
   
   const [isLoading, setIsLoading] = useState(true);
@@ -28,9 +53,9 @@ export const useStatistics = () => {
         console.log("useStatistics - Fetching data for selected date:", currentDate);
         
         // Get records directly from Supabase for the selected date
-        const { data, error } = await supabase
+        const { data: attendanceData, error } = await supabase
           .from('attendance_records')
-          .select('*')
+          .select('*, employees!inner(sponsorship)')
           .eq('date', currentDate);
         
         if (error) {
@@ -38,31 +63,69 @@ export const useStatistics = () => {
           throw error;
         }
 
-        console.log(`useStatistics - Retrieved ${data?.length || 0} records for ${currentDate}`);
-
-        // Calculate present and absent counts
-        const presentCount = (data || []).filter(record => record.present).length;
-        const absentCount = (data || []).filter(record => !record.present).length;
-
-        // Calculate total ACTIVE employees count only
+        // Calculate active employees and their sponsorship breakdown
         const activeEmployees = filteredEmployees?.filter(emp => emp.status === "Active") || [];
         const totalActiveEmployees = activeEmployees.length;
+
+        // Calculate sponsorship breakdown for total employees
+        const sponsorshipBreakdown: SponsorshipBreakdown = {
+          'YDM co': activeEmployees.filter(emp => emp.sponsorship === 'YDM co').length,
+          'YDM est': activeEmployees.filter(emp => emp.sponsorship === 'YDM est').length,
+          'Outside': activeEmployees.filter(emp => emp.sponsorship === 'Outside').length
+        };
+
+        // Initialize present/absent breakdowns
+        const presentBreakdown: SponsorshipBreakdown = {
+          'YDM co': 0,
+          'YDM est': 0,
+          'Outside': 0
+        };
+        const absentBreakdown: SponsorshipBreakdown = {
+          'YDM co': 0,
+          'YDM est': 0,
+          'Outside': 0
+        };
+
+        // Calculate present and absent counts with sponsorship breakdown
+        attendanceData?.forEach(record => {
+          const sponsorship = record.employees?.sponsorship as SponsorshipType;
+          if (record.present) {
+            presentBreakdown[sponsorship]++;
+          } else {
+            absentBreakdown[sponsorship]++;
+          }
+        });
+
+        const presentCount = Object.values(presentBreakdown).reduce((a, b) => a + b, 0);
+        const absentCount = Object.values(absentBreakdown).reduce((a, b) => a + b, 0);
 
         console.log(`useStatistics - Calculated stats: Present: ${presentCount}, Absent: ${absentCount}, Total Active: ${totalActiveEmployees}`);
 
         setStats({
-          totalEmployees: totalActiveEmployees, // Now only counting active employees
+          totalEmployees: totalActiveEmployees,
           presentToday: presentCount,
           absentToday: absentCount,
+          sponsorshipBreakdown,
+          presentBreakdown,
+          absentBreakdown
         });
       } catch (error) {
         console.error("Error fetching attendance stats:", error);
         
         // If database fetch fails, still show active employees count
         const activeEmployees = filteredEmployees?.filter(emp => emp.status === "Active") || [];
+        const sponsorshipBreakdown = {
+          'YDM co': activeEmployees.filter(emp => emp.sponsorship === 'YDM co').length,
+          'YDM est': activeEmployees.filter(emp => emp.sponsorship === 'YDM est').length,
+          'Outside': activeEmployees.filter(emp => emp.sponsorship === 'Outside').length
+        };
+        
         setStats(prev => ({
           ...prev,
           totalEmployees: activeEmployees.length,
+          sponsorshipBreakdown,
+          presentBreakdown: { 'YDM co': 0, 'YDM est': 0, 'Outside': 0 },
+          absentBreakdown: { 'YDM co': 0, 'YDM est': 0, 'Outside': 0 }
         }));
       } finally {
         setIsLoading(false);
