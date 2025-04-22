@@ -159,8 +159,7 @@ export const enTranslations = {
   absent: "Absent",
   employee: "Employee",
 
-  // Reports page specific
-  reports: "Reports",
+  // Reports page specific - consolidated reports section
   reportsAndExports: "Reports & Exports",
   generateInsights: "Generate attendance data and employee insights",
   attendanceReports: "Attendance Reports",

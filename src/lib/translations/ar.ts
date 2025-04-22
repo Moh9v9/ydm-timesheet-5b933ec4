@@ -1,3 +1,4 @@
+
 // Arabic translations for the application
 export const arTranslations = {
   // Navigation and common elements
@@ -159,8 +160,7 @@ export const arTranslations = {
   absent: "غائب",
   employee: "الموظف",
 
-  // Reports page specific
-  reports: "التقارير",
+  // Reports page specific - consolidated reports section
   reportsAndExports: "التقارير والتصدير",
   generateInsights: "إنشاء بيانات الحضور والرؤى",
   attendanceReports: "تقارير الحضور",
