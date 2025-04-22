@@ -1,4 +1,3 @@
-
 import { LucideIcon } from "lucide-react";
 import ValueUpdater from "./ValueUpdater";
 import { SponsorshipType, PaymentType } from "@/lib/types";
@@ -25,7 +24,7 @@ export const StatsCard = ({
 }: StatsCardProps) => {
   return (
     <div
-      className="rounded-lg p-4 border h-full min-h-[180px] flex flex-col"
+      className="rounded-lg p-6 border h-auto"
       style={{ 
         transition: "none", 
         backgroundColor: "transparent", 
@@ -33,11 +32,11 @@ export const StatsCard = ({
         background: "none" 
       }}
     >
-      <div className="flex items-center w-full mb-3">
+      <div className="flex items-center w-full mb-2">
         <div className={`p-2 rounded-full ${colorClass} flex-shrink-0`}>
-          <Icon className="h-5 w-5" />
+          <Icon className="h-6 w-6" />
         </div>
-        <div className="ml-3 flex-grow flex flex-col justify-center">
+        <div className="ml-4 flex-grow flex flex-col justify-center">
           <div className="text-sm font-medium text-muted-foreground">
             {title}
           </div>
@@ -46,44 +45,44 @@ export const StatsCard = ({
       </div>
       
       {(breakdown || paymentBreakdown) && (
-        <div className="mt-auto pt-3 border-t border-gray-100 dark:border-gray-700 flex-grow">
-          <div className="grid grid-cols-2 gap-2 items-start h-full">
+        <div className="mt-2 pt-2 border-t border-gray-100 dark:border-gray-700">
+          <div className="grid grid-cols-2 gap-4 items-start">
             {/* Left side - Sponsorship Breakdown */}
             {breakdown && (
-              <div className="grid grid-cols-1 gap-1 text-xs min-w-[120px]">
+              <div className="grid grid-cols-1 gap-1 text-xs">
                 <div className="text-xs font-medium text-muted-foreground mb-1">By Sponsorship:</div>
                 {Object.entries(breakdown).map(([type, count]) => (
                   <div key={type} className="flex justify-between items-center">
-                    <span className="text-muted-foreground truncate mr-2">{type}:</span>
+                    <span className="text-muted-foreground">{type}:</span>
                     <span className="font-medium">{count}</span>
                   </div>
                 ))}
               </div>
             )}
           
-            {/* Vertical Separator */}
-            {breakdown && paymentBreakdown && (
-              <Separator 
-                orientation="vertical" 
-                className="h-full mx-auto bg-gray-200 dark:bg-gray-700" 
-              />
-            )}
+          {/* Vertical Separator */}
+          {breakdown && paymentBreakdown && (
+            <Separator 
+              orientation="vertical" 
+              className="h-full mx-2 bg-gray-200 dark:bg-gray-700" 
+            />
+          )}
           
-            {/* Right side - Payment Type Breakdown */}
-            {paymentBreakdown && (
-              <div className="grid grid-cols-1 gap-1 text-xs min-w-[120px]">
-                <div className="text-xs font-medium text-muted-foreground mb-1">By Payment Type:</div>
-                {Object.entries(paymentBreakdown).map(([type, count]) => (
-                  <div key={type} className="flex justify-between items-center">
-                    <span className="text-muted-foreground truncate mr-2">{type}:</span>
-                    <span className="font-medium">{count}</span>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+          {/* Right side - Payment Type Breakdown */}
+          {paymentBreakdown && (
+            <div className="grid grid-cols-1 gap-1 text-xs">
+              <div className="text-xs font-medium text-muted-foreground mb-1">By Payment Type:</div>
+              {Object.entries(paymentBreakdown).map(([type, count]) => (
+                <div key={type} className="flex justify-between items-center">
+                  <span className="text-muted-foreground">{type}:</span>
+                  <span className="font-medium">{count}</span>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
-      )}
+      </div>
+    )}
     </div>
   );
 };
