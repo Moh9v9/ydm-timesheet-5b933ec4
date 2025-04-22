@@ -52,8 +52,11 @@ const DashboardStats = () => {
     presentToday, 
     absentToday, 
     sponsorshipBreakdown,
+    paymentBreakdown,
     presentBreakdown,
     absentBreakdown,
+    presentPaymentBreakdown,
+    absentPaymentBreakdown,
     isLoading 
   } = useStatistics();
   
@@ -69,8 +72,11 @@ const DashboardStats = () => {
       presentToday={presentToday} 
       absentToday={absentToday}
       sponsorshipBreakdown={sponsorshipBreakdown}
+      paymentBreakdown={paymentBreakdown}
       presentBreakdown={presentBreakdown}
-      absentBreakdown={absentBreakdown} 
+      absentBreakdown={absentBreakdown}
+      presentPaymentBreakdown={presentPaymentBreakdown}
+      absentPaymentBreakdown={absentPaymentBreakdown}
       isLoading={isLoading} 
     />
   );
