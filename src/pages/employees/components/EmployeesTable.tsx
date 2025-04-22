@@ -29,7 +29,7 @@ export const EmployeesTable = ({
         />
         <tbody>
           {employees.length > 0 ? (
-            getSortedData(employees).map(({ employee }) => (
+            getSortedData(employees).map(({ employee, index }) => (
               <TableRow
                 key={employee.id}
                 employee={employee}
