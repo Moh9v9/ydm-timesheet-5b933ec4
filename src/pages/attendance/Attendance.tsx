@@ -1,7 +1,7 @@
-
 import { useAuth } from "@/contexts/AuthContext";
 import { useAttendance } from "@/contexts/AttendanceContext";
 import { useModernNotification } from "@/hooks/useModernNotification";
+import { useState } from "react";
 import DateNavigation from "./components/DateNavigation";
 import AttendanceTable from "./components/table/AttendanceTable";
 import AttendanceHeader from "./components/AttendanceHeader";
@@ -11,9 +11,8 @@ import AttendanceLoadingSkeleton from "./components/AttendanceLoadingSkeleton";
 import AttendanceDialogsContainer from "./components/AttendanceDialogsContainer";
 import { useAttendanceLoading } from "./hooks/useAttendanceLoading";
 import { useAttendanceEmployees } from "./hooks/useAttendanceEmployees";
-import { useEffect, useRef, useState } from "react";
+import { AttendanceFilters } from "./components/AttendanceFilters";
 
-// Use ModernNotification instead of the old notification system
 const Attendance = () => {
   const { user } = useAuth();
   const { currentDate, setCurrentDate } = useAttendance();
@@ -91,6 +90,18 @@ const Attendance = () => {
     success("Attendance saved successfully");
   };
 
+  const [filters, setFilters] = useState({
+    project: "All Projects",
+    location: "All Locations",
+    paymentType: "All Types",
+    sponsorship: "All Sponsorships",
+    status: "All Status"
+  });
+
+  const handleFilterChange = (key: string, value: string) => {
+    setFilters(prev => ({ ...prev, [key]: value }));
+  };
+
   return (
     <div className="space-y-4 sm:space-y-6 animate-fade-in pb-20">
       <NotificationContainer />
@@ -112,17 +123,23 @@ const Attendance = () => {
       {!user ? (
         <AttendanceLoadingSkeleton />
       ) : (
-        <AttendanceTable
-          attendanceData={attendanceData}
-          filteredEmployees={attendanceEmployees}  // Use our specialized list instead
-          canEdit={canEdit}
-          onToggleAttendance={toggleAttendance}
-          onTimeChange={handleTimeChange}
-          onOvertimeChange={handleOvertimeChange}
-          onNoteChange={handleNoteChange}
-          isLoading={combinedLoading}
-          employeesLoaded={employeesLoaded}
-        />
+        <>
+          <AttendanceFilters 
+            filters={filters}
+            onFilterChange={handleFilterChange}
+          />
+          <AttendanceTable
+            attendanceData={attendanceData}
+            filteredEmployees={attendanceEmployees}
+            canEdit={canEdit}
+            onToggleAttendance={toggleAttendance}
+            onTimeChange={handleTimeChange}
+            onOvertimeChange={handleOvertimeChange}
+            onNoteChange={handleNoteChange}
+            isLoading={combinedLoading}
+            employeesLoaded={employeesLoaded}
+          />
+        </>
       )}
 
       <AttendanceDialogsContainer
