@@ -8,150 +8,83 @@ export const useBulkOperations = (
   setLoading: (loading: boolean) => void
 ) => {
   // Delete attendance record
-  const deleteAttendanceRecord = async (id: string): Promise<void> => {
+  const deleteAttendanceRecord = async (id: string): Promise<boolean> => {
     setLoading(true);
-    
     try {
+      console.log(`Deleting attendance record with ID: ${id}`);
       const { error } = await supabase
         .from('attendance_records')
         .delete()
-        .eq('id', id);
+        .match({ id });
 
-      if (error) throw error;
-      
-      setAttendanceRecords(attendanceRecords.filter(record => record.id !== id));
-    } catch (err) {
-      console.error('Error deleting attendance record:', err);
-      throw err;
+      if (error) {
+        console.error('Error deleting attendance record:', error);
+        return false;
+      }
+
+      // Update local state
+      const updatedRecords = attendanceRecords.filter(record => record.id !== id);
+      setAttendanceRecords(updatedRecords);
+      console.log(`Successfully deleted attendance record with ID: ${id}`);
+      return true;
+    } catch (error) {
+      console.error('Error deleting attendance record:', error);
+      return false;
     } finally {
       setLoading(false);
     }
   };
 
   // Bulk save attendance records
-  const bulkSaveAttendance = async (
-    records: (Omit<AttendanceRecord, "id"> | AttendanceRecord)[]
-  ): Promise<AttendanceRecord[]> => {
+  const bulkSaveAttendance = async (records: AttendanceRecord[]): Promise<AttendanceRecord[]> => {
     setLoading(true);
     
     try {
-      console.log("Starting bulk save operation with", records.length, "records");
+      console.log(`🔄 Bulk saving ${records.length} attendance records`);
+      console.log("Records to save:", records);
       
-      // Filter out any invalid records without employeeId or date
-      const validRecords = records.filter(record => record.employeeId && record.date);
+      // Create DB records from our UI records
+      const dbRecords = records.map(record => {
+        // Skip temporary IDs
+        const recordId = record.id && !record.id.toString().includes('temp-') ? record.id : undefined;
+        
+        return {
+          id: recordId,
+          employee_uuid: record.employeeId,
+          employee_name: record.employeeName,
+          date: record.date,
+          present: record.present,
+          start_time: record.startTime,
+          end_time: record.endTime,
+          overtime_hours: record.overtimeHours,
+          note: record.note
+        };
+      });
       
-      if (validRecords.length === 0) {
-        console.error("No valid records to save");
-        throw new Error("No valid records to save");
-      }
-      
-      // Separate records for insert and update to handle ID constraints correctly
-      const recordsToUpdate = [];
-      const recordsToInsert = [];
-      
-      for (const record of validRecords) {
-        // Check if the record has a valid ID (not temp ID)
-        if ('id' in record && record.id && !record.id.toString().includes('temp_')) {
-          // This is an existing record that should be updated
-          recordsToUpdate.push({
-            id: record.id,
-            employee_uuid: record.employeeId,
-            employee_name: record.employeeName,
-            date: record.date,
-            present: record.present,
-            start_time: record.startTime || null,
-            end_time: record.endTime || null,
-            overtime_hours: record.overtimeHours || 0,
-            note: record.note || null
-          });
-        } else {
-          // This is a new record that should be inserted
-          recordsToInsert.push({
-            employee_uuid: record.employeeId,
-            employee_name: record.employeeName,
-            date: record.date,
-            present: record.present,
-            start_time: record.startTime || null,
-            end_time: record.endTime || null,
-            overtime_hours: record.overtimeHours || 0,
-            note: record.note || null
-          });
-        }
+      console.log("Transformed DB records for saving:", dbRecords);
+
+      const { data, error } = await supabase
+        .from('attendance_records')
+        .upsert(dbRecords, { 
+          onConflict: 'employee_uuid, date',
+          ignoreDuplicates: false
+        })
+        .select();
+
+      if (error) {
+        console.error('❌ Error saving attendance records:', error);
+        throw error;
       }
 
-      console.log("Records separated - Updates:", recordsToUpdate.length, "Inserts:", recordsToInsert.length);
-      
-      // Variable to store all saved records
-      let resultData = [];
-      
-      // If we have records to update, update them
-      if (recordsToUpdate.length > 0) {
-        console.log("Updating existing records:", recordsToUpdate.length);
-        const { data: updatedData, error: updateError } = await supabase
-          .from('attendance_records')
-          .upsert(recordsToUpdate, {
-            onConflict: 'id',
-            ignoreDuplicates: false
-          })
-          .select();
-          
-        if (updateError) {
-          console.error("Error updating records:", updateError);
-          throw updateError;
-        }
-        
-        if (updatedData && updatedData.length > 0) {
-          resultData = [...resultData, ...updatedData];
-        }
-      }
-      
-      // If we have records to insert, insert them
-      if (recordsToInsert.length > 0) {
-        console.log("Inserting new records:", recordsToInsert.length);
-        const { data: insertedData, error: insertError } = await supabase
-          .from('attendance_records')
-          .insert(recordsToInsert)
-          .select();
-          
-        if (insertError) {
-          console.error("Error inserting records:", insertError);
-          throw insertError;
-        }
-        
-        if (insertedData && insertedData.length > 0) {
-          resultData = [...resultData, ...insertedData];
-        }
-      }
-      
-      // If no data returned, try to fetch all records for these dates
-      if (!resultData || resultData.length === 0) {
-        console.log("No data returned from operations, fetching current state");
-        
-        // Get a list of dates we were trying to update
-        const dates = Array.from(new Set(records.map(r => r.date)));
-        
-        // Fetch the current state for these dates
-        const { data: fetchedData, error: fetchError } = await supabase
-          .from('attendance_records')
-          .select('*')
-          .in('date', dates);
-          
-        if (fetchError) {
-          console.error("Error fetching records after operations:", fetchError);
-          throw fetchError;
-        }
-        
-        if (fetchedData && fetchedData.length > 0) {
-          resultData = fetchedData;
-        } else {
-          console.error("Failed to retrieve updated records");
-          throw new Error('Failed to retrieve updated records');
-        }
+      if (!data) {
+        console.warn('⚠️ No data returned after saving attendance records');
+        return [];
       }
 
-      console.log("Operations successful with", resultData.length, "records returned");
-
-      const savedRecords: AttendanceRecord[] = resultData.map(record => ({
+      console.log(`✅ Successfully saved ${data.length} attendance records:`, data);
+      
+      // Convert DB records back to our UI format
+      const savedRecords: AttendanceRecord[] = data.map(record => ({
         id: record.id,
         employeeId: record.employee_uuid,
         employeeName: record.employee_name || '',
@@ -163,12 +96,10 @@ export const useBulkOperations = (
         note: record.note || ''
       }));
 
-      console.log("Transformed records for state update:", savedRecords.length);
-      setAttendanceRecords(savedRecords);
       return savedRecords;
-    } catch (err) {
-      console.error('Error bulk saving attendance records:', err);
-      throw err;
+    } catch (error) {
+      console.error('❌ Error in bulkSaveAttendance:', error);
+      throw error;
     } finally {
       setLoading(false);
     }
@@ -176,6 +107,6 @@ export const useBulkOperations = (
 
   return {
     deleteAttendanceRecord,
-    bulkSaveAttendance
+    bulkSaveAttendance,
   };
 };

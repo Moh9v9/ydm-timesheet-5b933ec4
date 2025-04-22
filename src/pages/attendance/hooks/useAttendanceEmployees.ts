@@ -52,10 +52,11 @@ export const useAttendanceEmployees = (
       }
 
       try {
-        // First, get attendance records for the current date to find archived employees with records
+        // First, check what attendance records exist for the current date
+        console.log(`Checking for attendance records for date: ${currentDate}`);
         const { data: attendanceRecords, error: attendanceError } = await supabase
           .from('attendance_records')
-          .select('employee_uuid')
+          .select('*')
           .eq('date', currentDate);
 
         if (attendanceError) {
@@ -63,6 +64,9 @@ export const useAttendanceEmployees = (
           return;
         }
 
+        // Log the retrieved attendance records to verify if they exist
+        console.log(`Found ${attendanceRecords?.length || 0} attendance records for ${currentDate}:`, attendanceRecords);
+        
         // Extract employee UUIDs from attendance records
         const employeeUuids = attendanceRecords?.map(record => record.employee_uuid) || [];
 
