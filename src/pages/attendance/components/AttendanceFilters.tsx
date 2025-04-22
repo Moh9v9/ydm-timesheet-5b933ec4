@@ -1,6 +1,7 @@
 
 import { StyledSelect } from "@/components/ui/styled-select";
 import { useEmployees } from "@/contexts/EmployeeContext";
+import { AttendanceFilters as AttendanceFiltersType } from "@/lib/types";
 
 interface AttendanceFiltersProps {
   filters: {
