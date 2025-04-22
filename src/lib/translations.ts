@@ -82,12 +82,12 @@ export const translations = {
   },
   ar: {
     // Navigation and common elements
-    dashboard: "لوحة القيادة",
-    employees: "الموظفين",
+    dashboard: "لوحة التحكم",
+    employees: "الموظفون",
     reports: "التقارير",
     settings: "الإعدادات",
     logout: "تسجيل الخروج",
-    logoutConfirm: "هل أنت متأكد أنك تريد تسجيل الخروج؟",
+    logoutConfirm: "هل أنت متأكد من تسجيل الخروج؟",
     cancel: "إلغاء",
     save: "حفظ",
     delete: "حذف",
@@ -99,11 +99,11 @@ export const translations = {
     
     // Settings page
     profileSettings: "إعدادات الملف الشخصي",
-    userManagement: "إدارة المستخدمين",
-    addUser: "إضافة مستخدم",
+    userManagement: "إدارة حسابات المستخدمين",
+    addUser: "إضافة مستخدم جديد",
     profile: "الملف الشخصي",
     users: "المستخدمين",
-    manageProfileSettings: "إدارة الملف الشخصي وإعدادات التطبيق",
+    manageProfileSettings: "إعداد الملف الشخصي والتطبيق",
     
     // User roles
     admin: "مدير",
@@ -121,18 +121,18 @@ export const translations = {
     arabic: "العربية",
     
     // Dashboard
-    welcome: "مرحباً بعودتك",
+    welcome: "مرحبًا بعودتك",
     totalEmployees: "إجمالي الموظفين",
     totalPresent: "إجمالي الحاضرين",
     totalAbsent: "إجمالي الغائبين",
     
     // Reports
-    employeeDataExport: "تصدير بيانات الموظفين",
-    exportEmployeeInfo: "تصدير معلومات الموظفين بناء على المرشحات",
+    employeeDataExport: "تصدير بيانات الموظف",
+    exportEmployeeInfo: "تصدير معلومات الموظف حسب الفلاتر",
     
     // 404 Page
-    pageNotFound: "عفواً! الصفحة غير موجودة",
-    returnHome: "العودة إلى الرئيسية",
+    pageNotFound: "عذرًا! الصفحة غير موجودة",
+    returnHome: "العودة إلى الصفحة الرئيسية",
 
     // Other Pages
     dailyAttendance: "الحضور اليومي",
@@ -147,9 +147,9 @@ export const translations = {
     userRole: "دور المستخدم",
     totalEmployeesCount: "إجمالي الموظفين:",
     exportEmployeeData: "تصدير بيانات الموظفين",
-    generating: "جاري التوليد...",
-    hideFilters: "إخفاء المرشحات",
-    showFilters: "إظهار المرشحات",
+    generating: "جارٍ التوليد...",
+    hideFilters: "إخفاء الفلاتر",
+    showFilters: "إظهار الفلاتر",
     
     // Attendance 
     totalHours: "الساعات",
@@ -158,6 +158,6 @@ export const translations = {
     date: "التاريخ",
     present: "حاضر",
     absent: "غائب",
-    employee: "موظف"
+    employee: "الموظف"
   }
 };
