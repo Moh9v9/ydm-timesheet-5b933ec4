@@ -1,3 +1,4 @@
+
 import { LucideIcon } from "lucide-react";
 import ValueUpdater from "./ValueUpdater";
 import { SponsorshipType, PaymentType } from "@/lib/types";
@@ -46,10 +47,10 @@ export const StatsCard = ({
       
       {(breakdown || paymentBreakdown) && (
         <div className="mt-2 pt-2 border-t border-gray-100 dark:border-gray-700">
-          <div className="grid grid-cols-2 gap-4 items-start">
+          <div className="flex">
             {/* Left side - Sponsorship Breakdown */}
             {breakdown && (
-              <div className="grid grid-cols-1 gap-1 text-xs">
+              <div className="flex-1 grid grid-cols-1 gap-1 text-xs">
                 <div className="text-xs font-medium text-muted-foreground mb-1">By Sponsorship:</div>
                 {Object.entries(breakdown).map(([type, count]) => (
                   <div key={type} className="flex justify-between items-center">
@@ -60,29 +61,29 @@ export const StatsCard = ({
               </div>
             )}
           
-          {/* Vertical Separator */}
-          {breakdown && paymentBreakdown && (
-            <Separator 
-              orientation="vertical" 
-              className="h-full mx-2 bg-gray-200 dark:bg-gray-700" 
-            />
-          )}
+            {/* Vertical Separator */}
+            {breakdown && paymentBreakdown && (
+              <Separator 
+                orientation="vertical" 
+                className="h-auto mx-2 bg-gray-200 dark:bg-gray-700" 
+              />
+            )}
           
-          {/* Right side - Payment Type Breakdown */}
-          {paymentBreakdown && (
-            <div className="grid grid-cols-1 gap-1 text-xs">
-              <div className="text-xs font-medium text-muted-foreground mb-1">By Payment Type:</div>
-              {Object.entries(paymentBreakdown).map(([type, count]) => (
-                <div key={type} className="flex justify-between items-center">
-                  <span className="text-muted-foreground">{type}:</span>
-                  <span className="font-medium">{count}</span>
-                </div>
-              ))}
-            </div>
-          )}
+            {/* Right side - Payment Type Breakdown */}
+            {paymentBreakdown && (
+              <div className="flex-1 grid grid-cols-1 gap-1 text-xs">
+                <div className="text-xs font-medium text-muted-foreground mb-1">By Payment Type:</div>
+                {Object.entries(paymentBreakdown).map(([type, count]) => (
+                  <div key={type} className="flex justify-between items-center">
+                    <span className="text-muted-foreground">{type}:</span>
+                    <span className="font-medium">{count}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
-      </div>
-    )}
+      )}
     </div>
   );
 };
