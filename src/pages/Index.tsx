@@ -47,7 +47,16 @@ const Index = () => {
 
 // Separate component to load stats inside the providers
 const DashboardStats = () => {
-  const { totalEmployees, presentToday, absentToday, isLoading } = useStatistics();
+  const { 
+    totalEmployees, 
+    presentToday, 
+    absentToday, 
+    sponsorshipBreakdown,
+    presentBreakdown,
+    absentBreakdown,
+    isLoading 
+  } = useStatistics();
+  
   const { user } = useAuth();
   
   if (!user) {
@@ -58,7 +67,10 @@ const DashboardStats = () => {
     <CardInformation 
       totalEmployees={totalEmployees} 
       presentToday={presentToday} 
-      absentToday={absentToday} 
+      absentToday={absentToday}
+      sponsorshipBreakdown={sponsorshipBreakdown}
+      presentBreakdown={presentBreakdown}
+      absentBreakdown={absentBreakdown} 
       isLoading={isLoading} 
     />
   );
