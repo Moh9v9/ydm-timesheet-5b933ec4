@@ -5,12 +5,12 @@ import { AttendanceRecord } from '@/lib/types';
 
 export async function readAttendanceByDate(date: string) {
   try {
-    const sheets = google.sheets('v4');
+    const sheets = google.sheets({ version: 'v4' });
     
     const res = await sheets.spreadsheets.values.get({
       spreadsheetId,
       range: 'attendance!A1:Z1000',
-      auth: auth,
+      auth,
     });
 
     const rows = res.data.values;
@@ -30,7 +30,7 @@ export async function readAttendanceByDate(date: string) {
 
 export async function addAttendanceRecordToSheet(record: AttendanceRecord) {
   try {
-    const sheets = google.sheets('v4');
+    const sheets = google.sheets({ version: 'v4' });
     
     const newRow = [
       record.id,
@@ -49,7 +49,7 @@ export async function addAttendanceRecordToSheet(record: AttendanceRecord) {
       range: 'attendance',
       valueInputOption: 'USER_ENTERED',
       requestBody: { values: [newRow] },
-      auth: auth,
+      auth,
     });
   } catch (error) {
     console.error('Error adding attendance record:', error);
@@ -62,12 +62,12 @@ export async function updateAttendanceRecordInSheet(updatedData: {
   [key: string]: any;
 }) {
   try {
-    const sheets = google.sheets('v4');
+    const sheets = google.sheets({ version: 'v4' });
     
     const res = await sheets.spreadsheets.values.get({
       spreadsheetId,
       range: 'attendance!A1:Z1000',
-      auth: auth,
+      auth,
     });
 
     const rows = res.data.values;
@@ -92,7 +92,7 @@ export async function updateAttendanceRecordInSheet(updatedData: {
       requestBody: {
         values: [updatedRow],
       },
-      auth: auth,
+      auth,
     });
   } catch (error) {
     console.error('Error updating attendance record:', error);
@@ -102,12 +102,12 @@ export async function updateAttendanceRecordInSheet(updatedData: {
 
 export async function deleteAttendanceRecordFromSheet(id: string) {
   try {
-    const sheets = google.sheets('v4');
+    const sheets = google.sheets({ version: 'v4' });
     
     const res = await sheets.spreadsheets.values.get({
       spreadsheetId,
       range: 'attendance!A1:Z1000',
-      auth: auth,
+      auth,
     });
 
     const rows = res.data.values;
@@ -126,7 +126,7 @@ export async function deleteAttendanceRecordFromSheet(id: string) {
       requestBody: {
         values: [emptyRow],
       },
-      auth: auth,
+      auth,
     });
   } catch (error) {
     console.error('Error deleting attendance record:', error);

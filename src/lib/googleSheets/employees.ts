@@ -7,12 +7,12 @@ const employeeAppendRange = 'employees';
 
 export async function readEmployees() {
   try {
-    const sheets = google.sheets('v4');
+    const sheets = google.sheets({ version: 'v4' });
     
     const res = await sheets.spreadsheets.values.get({
       spreadsheetId,
       range: employeeRange,
-      auth: auth,
+      auth,
     });
 
     const rows = res.data.values;
@@ -41,7 +41,7 @@ export async function addEmployee(employeeData: {
   status: string;
 }) {
   try {
-    const sheets = google.sheets('v4');
+    const sheets = google.sheets({ version: 'v4' });
 
     const now = new Date().toISOString();
 
@@ -67,7 +67,7 @@ export async function addEmployee(employeeData: {
       requestBody: {
         values: [newRow],
       },
-      auth: auth,
+      auth,
     });
   } catch (error) {
     console.error('Error adding employee:', error);
@@ -80,12 +80,12 @@ export async function updateEmployee(updatedData: {
   [key: string]: string | undefined;
 }) {
   try {
-    const sheets = google.sheets('v4');
+    const sheets = google.sheets({ version: 'v4' });
 
     const res = await sheets.spreadsheets.values.get({
       spreadsheetId,
       range: employeeRange,
-      auth: auth,
+      auth,
     });
     const rows = res.data.values;
     if (!rows || rows.length === 0) return;
@@ -117,7 +117,7 @@ export async function updateEmployee(updatedData: {
       requestBody: {
         values: [updatedRow],
       },
-      auth: auth,
+      auth,
     });
   } catch (error) {
     console.error('Error updating employee:', error);
@@ -127,12 +127,12 @@ export async function updateEmployee(updatedData: {
 
 export async function deleteEmployee(id: string) {
   try {
-    const sheets = google.sheets('v4');
+    const sheets = google.sheets({ version: 'v4' });
 
     const res = await sheets.spreadsheets.values.get({
       spreadsheetId,
       range: employeeRange,
-      auth: auth,
+      auth,
     });
 
     const rows = res.data.values;
@@ -152,7 +152,7 @@ export async function deleteEmployee(id: string) {
       requestBody: {
         values: [emptyRow],
       },
-      auth: auth,
+      auth,
     });
   } catch (error) {
     console.error('Error deleting employee:', error);
