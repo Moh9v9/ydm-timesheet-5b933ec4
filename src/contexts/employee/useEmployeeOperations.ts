@@ -7,16 +7,13 @@ export const useEmployeeOperations = (
   setEmployees: React.Dispatch<React.SetStateAction<Employee[]>>,
   setLoading: React.Dispatch<React.SetStateAction<boolean>>
 ) => {
-  // Get employee by ID
   const getEmployee = (id: string) => {
     return employees.find(emp => emp.id === id);
   };
 
-  // Add new employee (Google Sheets)
   const addEmployee = async (employee: Omit<Employee, "id">): Promise<Employee> => {
     setLoading(true);
     try {
-      // Check for duplicate iqamaNo
       if (employee.iqamaNo && employee.iqamaNo !== 0) {
         const existingEmployee = employees.find(emp => emp.iqamaNo === employee.iqamaNo);
         if (existingEmployee) {
@@ -25,7 +22,7 @@ export const useEmployeeOperations = (
       }
 
       const newEmployee: Employee = {
-        id: (employees.length + 1).toString(), // أو استخدم UUID أو وقت timestamp
+        id: (employees.length + 1).toString(), // أو استخدم UUID أو timestamp
         fullName: employee.fullName,
         iqamaNo: employee.iqamaNo,
         project: employee.project,
