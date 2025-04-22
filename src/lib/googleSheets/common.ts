@@ -1,6 +1,6 @@
 
-// Browser-compatible Google Sheets access using the gapi client library
-// We'll define a simple fetch-based approach for accessing Google Sheets
+// Browser-compatible Google Sheets access using fetch API
+// This implementation uses a public API key for read-only access to Google Sheets
 
 const API_KEY = "AIzaSyBtAJzqHZKTo4hTy-sgO2C0pCmsN369ZPY"; // This is a public API key for this specific spreadsheet
 export const spreadsheetId = '1ots1ltPxJGFRpNuvvu--8eAuE-gNtkZJSjcg-7e7E2I';
