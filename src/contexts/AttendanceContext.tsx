@@ -1,25 +1,41 @@
-
 import { createContext, useContext, ReactNode, useEffect } from "react";
 import { AttendanceContextType } from "./attendance/types";
 import { useAttendanceState } from "./attendance/useAttendanceState";
 import { useAttendanceOperations } from "./attendance/useAttendanceOperations";
 
-// Function to always get a fresh today date
 const getTodayISODate = () => new Date().toISOString().split('T')[0];
 
-// Create a context with a default value to prevent the "must be used within Provider" error
 const AttendanceContext = createContext<AttendanceContextType>({
   attendanceRecords: [],
   filteredRecords: [],
-  currentDate: getTodayISODate(), // Always use fresh date
+  currentDate: getTodayISODate(),
   setCurrentDate: () => {},
-  filters: { date: getTodayISODate() }, // Always use fresh date
+  filters: { date: getTodayISODate() },
   setFilters: () => {},
   loading: false,
-  refreshData: () => {}, // Add this function to force a refresh
-  // Default implementations that will never be used but satisfy TypeScript
-  addAttendanceRecord: async () => ({ id: '', employeeId: '', employeeName: '', date: '', present: false, startTime: '', endTime: '', overtimeHours: 0, note: '' }),
-  updateAttendanceRecord: async () => ({ id: '', employeeId: '', employeeName: '', date: '', present: false, startTime: '', endTime: '', overtimeHours: 0, note: '' }),
+  refreshData: () => {},
+  addAttendanceRecord: async () => ({
+    id: '',
+    employeeId: '',
+    employeeName: '',
+    date: '',
+    present: false,
+    startTime: '',
+    endTime: '',
+    overtimeHours: 0,
+    note: '',
+  }),
+  updateAttendanceRecord: async () => ({
+    id: '',
+    employeeId: '',
+    employeeName: '',
+    date: '',
+    present: false,
+    startTime: '',
+    endTime: '',
+    overtimeHours: 0,
+    note: '',
+  }),
   deleteAttendanceRecord: async () => {},
   getAttendanceRecord: () => undefined,
   getRecordsByEmployeeAndDate: async () => null,
@@ -37,7 +53,7 @@ export const AttendanceProvider = ({ children }: { children: ReactNode }) => {
     loading,
     setLoading,
     filteredRecords,
-    refreshData, // Add this function to the state
+    refreshData,
   } = useAttendanceState();
 
   const operations = useAttendanceOperations(
@@ -45,20 +61,15 @@ export const AttendanceProvider = ({ children }: { children: ReactNode }) => {
     setAttendanceRecords,
     setLoading
   );
-  
-  // Ensure filters are updated with the current date whenever it changes
+
   useEffect(() => {
     console.log("AttendanceContext - Current date changed to:", currentDate);
     setFilters(prev => ({ ...prev, date: currentDate }));
   }, [currentDate, setFilters]);
 
-  // Add an effect to ensure date is always fresh on remount
   useEffect(() => {
     const freshDate = getTodayISODate();
     console.log("AttendanceContext - Initializing with fresh date on mount:", freshDate);
-    
-    // This ensures that when the provider mounts, we always start with today's date
-    // This is especially important after a page refresh
     setCurrentDate(freshDate);
   }, [setCurrentDate]);
 
@@ -72,8 +83,8 @@ export const AttendanceProvider = ({ children }: { children: ReactNode }) => {
         filters,
         setFilters,
         loading,
-        refreshData, // Expose the refresh function
-        ...operations
+        refreshData,
+        ...operations,
       }}
     >
       {children}
