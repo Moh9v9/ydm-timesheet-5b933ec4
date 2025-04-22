@@ -4,6 +4,7 @@ import { BrowserRouter as Router } from 'react-router-dom';
 import { AttendanceProvider } from "@/contexts/AttendanceContext";
 import { EmployeeProvider } from "@/contexts/EmployeeContext";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 import { Suspense } from 'react';
 import MainLayout from "@/components/layout/MainLayout";
 import { Routes, Route } from 'react-router-dom';
@@ -17,19 +18,21 @@ const App = () => {
   return (
     <Router>
       <AuthProvider>
-        <AttendanceProvider>
-          <EmployeeProvider>
-            <Suspense fallback={<div>Loading...</div>}>
-              <Routes>
-                <Route path="/" element={<MainLayout><Index /></MainLayout>} />
-                <Route path="/employees" element={<MainLayout><Employees /></MainLayout>} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/forgot-password" element={<ForgotPassword />} />
-                <Route path="*" element={<MainLayout><NotFound /></MainLayout>} />
-              </Routes>
-            </Suspense>
-          </EmployeeProvider>
-        </AttendanceProvider>
+        <ThemeProvider>
+          <AttendanceProvider>
+            <EmployeeProvider>
+              <Suspense fallback={<div>Loading...</div>}>
+                <Routes>
+                  <Route path="/" element={<MainLayout><Index /></MainLayout>} />
+                  <Route path="/employees" element={<MainLayout><Employees /></MainLayout>} />
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/forgot-password" element={<ForgotPassword />} />
+                  <Route path="*" element={<MainLayout><NotFound /></MainLayout>} />
+                </Routes>
+              </Suspense>
+            </EmployeeProvider>
+          </AttendanceProvider>
+        </ThemeProvider>
       </AuthProvider>
     </Router>
   );
