@@ -1,3 +1,4 @@
+
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { Menu, Sun, Moon, LogOut } from "lucide-react";
@@ -15,6 +16,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface TopBarProps {
   toggleSidebar: () => void;
@@ -26,6 +28,7 @@ const TopBar = ({ toggleSidebar, isSidebarOpen }: TopBarProps) => {
   const { theme, toggleTheme } = useTheme();
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   const handleLogout = () => {
     setShowLogoutConfirm(true);
@@ -77,7 +80,8 @@ const TopBar = ({ toggleSidebar, isSidebarOpen }: TopBarProps) => {
                 {user.fullName}
               </span>
               <span className="text-xs text-sidebar-foreground/70 dark:text-gray-300 leading-none truncate max-w-[140px]">
-                {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
+                {user.role === 'admin' ? t('admin') : 
+                 user.role === 'manager' ? t('manager') : t('user')}
               </span>
             </div>
           )}
@@ -107,14 +111,14 @@ const TopBar = ({ toggleSidebar, isSidebarOpen }: TopBarProps) => {
       <AlertDialog open={showLogoutConfirm} onOpenChange={setShowLogoutConfirm}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Confirm Logout</AlertDialogTitle>
+            <AlertDialogTitle>{t('logout')}</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to log out?
+              {t('logoutConfirm')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={cancelLogout}>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmLogout}>Logout</AlertDialogAction>
+            <AlertDialogCancel onClick={cancelLogout}>{t('cancel')}</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmLogout}>{t('logout')}</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

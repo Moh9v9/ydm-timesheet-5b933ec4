@@ -7,9 +7,11 @@ import { UserModal } from "./components/UserModal";
 import { UsersTable } from "./components/UsersTable";
 import { Button } from "@/components/ui/button";
 import { useModernNotification } from "@/hooks/useModernNotification";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const UsersSettings = () => {
   const { users, addUser, updateUser, deleteUser, loading } = useUsers();
+  const { t } = useLanguage();
 
   const {
     showNotification,
@@ -112,14 +114,14 @@ const UsersSettings = () => {
       {/* NotificationContainer at the top of this section so it shows above modals */}
       <NotificationContainer />
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-medium">User Management</h2>
+        <h2 className="text-xl font-medium">{t('userManagement')}</h2>
         <Button
           onClick={() => handleOpenModal()}
           className="flex items-center"
           variant="default"
         >
           <Plus size={16} className="mr-2" />
-          Add User
+          {t('addUser')}
         </Button>
       </div>
       
@@ -142,4 +144,3 @@ const UsersSettings = () => {
 };
 
 export default UsersSettings;
-

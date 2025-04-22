@@ -4,6 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { User, Settings as SettingsIcon } from "lucide-react";
 import ProfileSettings from "./ProfileSettings";
 import UsersSettings from "./UsersSettings";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 type TabType = "profile" | "users";
 
@@ -11,13 +12,14 @@ const Settings = () => {
   const [activeTab, setActiveTab] = useState<TabType>("profile");
   const { user } = useAuth();
   const isAdmin = user?.role === "admin";
+  const { t } = useLanguage();
 
   return (
     <div className="space-y-6 animate-fade-in">
       <div>
-        <h1 className="text-2xl font-bold">Settings</h1>
+        <h1 className="text-2xl font-bold">{t('settings')}</h1>
         <p className="text-muted-foreground">
-          Manage your profile and application settings
+          {t('manageProfileSettings')}
         </p>
       </div>
       
@@ -32,7 +34,7 @@ const Settings = () => {
             }`}
           >
             <User size={16} />
-            <span>Profile</span>
+            <span>{t('profile')}</span>
           </button>
           
           {isAdmin && (
@@ -45,7 +47,7 @@ const Settings = () => {
               }`}
             >
               <SettingsIcon size={16} />
-              <span>Users</span>
+              <span>{t('users')}</span>
             </button>
           )}
         </div>

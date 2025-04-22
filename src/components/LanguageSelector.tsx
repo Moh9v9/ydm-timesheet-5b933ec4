@@ -10,7 +10,7 @@ import {
 import { useLanguage } from '@/contexts/LanguageContext';
 
 export function LanguageSelector() {
-  const { language, setLanguage } = useLanguage();
+  const { language, setLanguage, t } = useLanguage();
 
   return (
     <DropdownMenu>
@@ -25,10 +25,14 @@ export function LanguageSelector() {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuItem onClick={() => setLanguage('en')}>
-          <span className={language === 'en' ? 'font-bold' : ''}>English</span>
+          <span className={language === 'en' ? 'font-bold' : ''}>
+            {t('english')}
+          </span>
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => setLanguage('ar')}>
-          <span className={language === 'ar' ? 'font-bold' : ''}>العربية</span>
+          <span className={language === 'ar' ? 'font-bold' : ''}>
+            {t('arabic')}
+          </span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
