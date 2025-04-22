@@ -2,11 +2,13 @@
 import { Download, Calendar, Users } from "lucide-react";
 import { useModernNotification } from "@/hooks/useModernNotification";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { useLanguage } from "@/contexts/LanguageContext";
 import ExportSection from "./components/ExportSection";
 import EmployeeExportSection from "./components/EmployeeExportSection";
 
 const Reports = () => {
   const { NotificationContainer } = useModernNotification();
+  const { t } = useLanguage();
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -14,9 +16,9 @@ const Reports = () => {
       
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-2">
         <div>
-          <h1 className="text-2xl font-bold dark:text-gray-100">Reports & Exports</h1>
+          <h1 className="text-2xl font-bold dark:text-gray-100">{t('reportsAndExports')}</h1>
           <p className="text-muted-foreground dark:text-gray-400">
-            Generate attendance data and employee insights
+            {t('generateInsights')}
           </p>
         </div>
       </div>
@@ -30,14 +32,14 @@ const Reports = () => {
                 className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-1 py-3 bg-transparent data-[state=active]:bg-transparent data-[state=active]:shadow-none gap-2"
               >
                 <Calendar size={16} />
-                <span>Attendance Reports</span>
+                <span>{t('attendanceReports')}</span>
               </TabsTrigger>
               <TabsTrigger 
                 value="employees" 
                 className="data-[state=active]:border-b-2 data-[state=active]:border-primary rounded-none px-1 py-3 bg-transparent data-[state=active]:bg-transparent data-[state=active]:shadow-none gap-2"
               >
                 <Users size={16} />
-                <span>Employee Reports</span>
+                <span>{t('employeeReports')}</span>
               </TabsTrigger>
             </TabsList>
           </div>

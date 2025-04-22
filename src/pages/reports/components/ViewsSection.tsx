@@ -2,20 +2,22 @@
 import { useState } from "react";
 import { Calendar, FileSpreadsheet, CalendarDays } from "lucide-react";
 import { TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useLanguage } from "@/contexts/LanguageContext";
 import AttendanceSummaryTable from "./AttendanceSummaryTable";
 import { useAttendance } from "@/contexts/AttendanceContext";
 
 const ViewsSection = () => {
   const [viewMode, setViewMode] = useState<"daily" | "weekly" | "monthly">("daily");
   const { currentDate } = useAttendance();
+  const { t } = useLanguage();
 
   return (
     <div className="space-y-5">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-2">
         <div>
-          <h2 className="text-lg font-medium dark:text-gray-200">Attendance Reports</h2>
+          <h2 className="text-lg font-medium dark:text-gray-200">{t('attendanceReports')}</h2>
           <p className="text-muted-foreground text-sm dark:text-gray-400">
-            View attendance records filtered by time period
+            {t('viewAttendanceRecords')}
           </p>
         </div>
         
@@ -27,7 +29,7 @@ const ViewsSection = () => {
               className={`px-3 py-1.5 text-xs rounded ${viewMode === "daily" ? "bg-white dark:bg-gray-700 shadow-sm" : ""}`}
             >
               <Calendar size={14} className="mr-1" />
-              Daily
+              {t('daily')}
             </TabsTrigger>
             <TabsTrigger 
               value="weekly" 
@@ -35,7 +37,7 @@ const ViewsSection = () => {
               className={`px-3 py-1.5 text-xs rounded ${viewMode === "weekly" ? "bg-white dark:bg-gray-700 shadow-sm" : ""}`}
             >
               <FileSpreadsheet size={14} className="mr-1" />
-              Weekly
+              {t('weekly')}
             </TabsTrigger>
             <TabsTrigger 
               value="monthly" 
@@ -43,7 +45,7 @@ const ViewsSection = () => {
               className={`px-3 py-1.5 text-xs rounded ${viewMode === "monthly" ? "bg-white dark:bg-gray-700 shadow-sm" : ""}`}
             >
               <CalendarDays size={14} className="mr-1" />
-              Monthly
+              {t('monthly')}
             </TabsTrigger>
           </TabsList>
         </div>
