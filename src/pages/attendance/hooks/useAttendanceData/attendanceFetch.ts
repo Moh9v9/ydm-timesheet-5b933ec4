@@ -2,16 +2,16 @@
 import { useEffect, useRef, useState } from "react";
 import { AttendanceRecord } from "@/lib/types";
 import { useAttendance } from "@/contexts/AttendanceContext";
-import { useEmployees } from "@/contexts/EmployeeContext";
 
 export function useAttendanceFetch(
   refreshTrigger: number,
+  attendanceEmployees: any[],
+  employeesLoading: boolean,
   setAttendanceData: (data: AttendanceRecord[]) => void,
   setLastFetchedDate: (date: string) => void,
   setIsLoading: (loading: boolean) => void,
   setHasAttemptedFetch: (b: boolean) => void
 ) {
-  const { filteredEmployees, loading: employeesLoading, dataFetched } = useEmployees();
   const { currentDate, getRecordsByEmployeeAndDate } = useAttendance();
   const [hasAttemptedFetch, _setHasAttemptedFetch] = useState(false);
   const [lastFetchedDate, _setLastFetchedDate] = useState<string>("");
@@ -27,17 +27,17 @@ export function useAttendanceFetch(
   }, [currentDate, lastFetchedDate]);
 
   useEffect(() => {
-    // ... splitting out fetching logic; rest of logic will be in handlers.ts
-    if (!employeesLoading && dataFetched && !initAttemptedRef.current) {
+    // If not loading and we haven't attempted a fetch yet
+    if (!employeesLoading && !initAttemptedRef.current) {
       initAttemptedRef.current = true;
-      if (filteredEmployees.length === 0) {
+      if (attendanceEmployees.length === 0) {
         setHasAttemptedFetch(true);
         setIsLoading(false);
         return;
       }
     }
 
-    if (filteredEmployees.length > 0 && !fetchingRef.current && dataFetched) {
+    if (attendanceEmployees.length > 0 && !fetchingRef.current) {
       const shouldFetch =
         currentDate !== lastFetchedDate || 
         refreshTrigger > 0 || 
@@ -48,18 +48,16 @@ export function useAttendanceFetch(
         const fetchAttendanceData = async () => {
           setIsLoading(true);
           try {
-            // Get attendance records for all employees (active and archived)
-            // The filtering was already done in employeeFilter.ts to include only
-            // archived employees with records for this date
-            const attendancePromises = filteredEmployees.map(async (employee) => {
+            // Get attendance records for all employees 
+            // (our attendanceEmployees list already contains only relevant employees)
+            const attendancePromises = attendanceEmployees.map(async (employee) => {
               const existingRecord = await getRecordsByEmployeeAndDate(employee.id, currentDate);
               
               if (existingRecord) {
                 console.log(`Found existing record for ${employee.fullName} (${employee.status}) with present=${existingRecord.present}`);
                 return existingRecord;
               } else {
-                // Create placeholder records only for active employees
-                // Archived employees should only be included if they have records (handled in employeeFilter.ts)
+                // Create placeholder records
                 return {
                   id: `temp_${employee.id}_${currentDate}`,
                   employeeId: employee.id,
@@ -87,18 +85,17 @@ export function useAttendanceFetch(
         };
         fetchAttendanceData();
       }
-    } else if (dataFetched && !employeesLoading && filteredEmployees.length === 0 && !hasAttemptedFetch) {
+    } else if (!employeesLoading && attendanceEmployees.length === 0 && !hasAttemptedFetch) {
       setHasAttemptedFetch(true);
       setIsLoading(false);
     }
     // eslint-disable-next-line
   }, [
-    filteredEmployees, 
+    attendanceEmployees, 
     currentDate, 
     getRecordsByEmployeeAndDate, 
     lastFetchedDate, 
     employeesLoading,
-    dataFetched,
     refreshTrigger,
     hasAttemptedFetch
   ]);

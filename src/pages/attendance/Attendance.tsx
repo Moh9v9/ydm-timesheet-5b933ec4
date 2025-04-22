@@ -1,7 +1,6 @@
 
 import { useAuth } from "@/contexts/AuthContext";
 import { useAttendance } from "@/contexts/AttendanceContext";
-import { useEmployees } from "@/contexts/EmployeeContext";
 import { useModernNotification } from "@/hooks/useModernNotification";
 import DateNavigation from "./components/DateNavigation";
 import AttendanceTable from "./components/table/AttendanceTable";
@@ -11,20 +10,16 @@ import AttendanceStatusMark from "./components/AttendanceStatusMark";
 import AttendanceLoadingSkeleton from "./components/AttendanceLoadingSkeleton";
 import AttendanceDialogsContainer from "./components/AttendanceDialogsContainer";
 import { useAttendanceLoading } from "./hooks/useAttendanceLoading";
+import { useAttendanceEmployees } from "./hooks/useAttendanceEmployees";
 import { useEffect, useRef, useState } from "react";
 
 // Use ModernNotification instead of the old notification system
 const Attendance = () => {
   const { user } = useAuth();
-  const { filteredEmployees, loading: employeesLoading, dataFetched, refreshEmployees } = useEmployees();
   const { currentDate, setCurrentDate } = useAttendance();
   const {
     NotificationContainer,
-    showNotification,
     success,
-    error,
-    info,
-    warning,
   } = useModernNotification();
   const hasRefreshedRef = useRef(false);
   const lastDateRef = useRef(currentDate);
@@ -34,10 +29,13 @@ const Attendance = () => {
   const [showSaveConfirm, setShowSaveConfirm] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Use our new hook instead of the general filteredEmployees
+  const { attendanceEmployees, loading: employeesLoading } = useAttendanceEmployees(currentDate);
+
   const canEdit = user?.permissions.attendees.edit;
   const canViewAttendance = user?.permissions.attendees.view;
 
-  // Custom hook for count/loading/trigger logic
+  // Custom hook for count/loading/trigger logic - updated to use attendanceEmployees
   const {
     actualRecordCount,
     recordsLoading,
@@ -45,26 +43,18 @@ const Attendance = () => {
     initialCheckDone,
     handleRefresh,
     setDataRefreshTrigger
-  } = useAttendanceLoading(currentDate, filteredEmployees.length, employeesLoading, dataFetched, user);
+  } = useAttendanceLoading(currentDate, attendanceEmployees.length, employeesLoading, true, user);
 
-  // Only refresh employee data once when component mounts
-  useEffect(() => {
-    if (!hasRefreshedRef.current && user) {
-      console.log("🔄 Attendance component mounted - refreshing employee data once");
-      hasRefreshedRef.current = true;
-      refreshEmployees();
-    }
-  }, [refreshEmployees, user]);
-  
-  // Also refresh employees when date changes
+  // We don't need to refresh employee data here anymore since useAttendanceEmployees
+  // handles its own data fetching
   useEffect(() => {
     if (lastDateRef.current !== currentDate) {
-      console.log(`🔄 Date changed from ${lastDateRef.current} to ${currentDate} - refreshing employee data`);
+      console.log(`🔄 Date changed from ${lastDateRef.current} to ${currentDate} - refreshing data`);
       lastDateRef.current = currentDate;
-      refreshEmployees();
+      // Just refresh attendance data when date changes
       handleRefresh();
     }
-  }, [currentDate, refreshEmployees, handleRefresh]);
+  }, [currentDate, handleRefresh]);
 
   const {
     attendanceData,
@@ -78,12 +68,10 @@ const Attendance = () => {
 
   const combinedLoading = isLoading || recordsLoading;
 
-  // Enhanced refresh function that also refreshes employee data
+  // Modified refresh function - no need to refresh employees separately
   const handleFullRefresh = () => {
     console.log("🔍 Performing full refresh");
-    // First refresh employees
-    refreshEmployees();
-    // Then refresh attendance data
+    // Just refresh attendance data
     handleRefresh();
     success("Data refreshed");
   };
@@ -126,7 +114,7 @@ const Attendance = () => {
       ) : (
         <AttendanceTable
           attendanceData={attendanceData}
-          filteredEmployees={filteredEmployees}
+          filteredEmployees={attendanceEmployees}  // Use our specialized list instead
           canEdit={canEdit}
           onToggleAttendance={toggleAttendance}
           onTimeChange={handleTimeChange}
