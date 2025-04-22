@@ -162,7 +162,6 @@ export const arTranslations = {
 
   // Reports page specific - consolidated reports section
   reportsAndExports: "التقارير والتصدير",
-  AttendanceReport: "تقارير الحضور",
   generateInsights: "إنشاء بيانات الحضور والرؤى",
   attendanceReports: "تقارير الحضور",
   employeeReports: "تقارير الموظفين",
