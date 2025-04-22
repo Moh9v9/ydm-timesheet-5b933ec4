@@ -8,7 +8,7 @@ export const useBulkOperations = (
   setLoading: (loading: boolean) => void
 ) => {
   // Delete attendance record
-  const deleteAttendanceRecord = async (id: string): Promise<boolean> => {
+  const deleteAttendanceRecord = async (id: string): Promise<void> => {
     setLoading(true);
     try {
       console.log(`Deleting attendance record with ID: ${id}`);
@@ -19,17 +19,15 @@ export const useBulkOperations = (
 
       if (error) {
         console.error('Error deleting attendance record:', error);
-        return false;
+        return;
       }
 
       // Update local state
       const updatedRecords = attendanceRecords.filter(record => record.id !== id);
       setAttendanceRecords(updatedRecords);
       console.log(`Successfully deleted attendance record with ID: ${id}`);
-      return true;
     } catch (error) {
       console.error('Error deleting attendance record:', error);
-      return false;
     } finally {
       setLoading(false);
     }
