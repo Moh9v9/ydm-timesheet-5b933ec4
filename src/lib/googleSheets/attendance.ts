@@ -1,10 +1,12 @@
-
 import { fetchSheetData, appendToSheet, updateSheetData, spreadsheetId } from './common';
 import { AttendanceRecord } from '@/lib/types';
 
 export async function readAttendanceByDate(date: string) {
   try {
     const response = await fetchSheetData('attendance!A1:Z1000');
+    
+    // If we get an empty response or error, return empty array
+    if (!response || !response.values) return [];
     
     const rows = response.values;
     if (!rows || rows.length === 0) return [];
@@ -17,7 +19,7 @@ export async function readAttendanceByDate(date: string) {
     return records.filter((r) => r.date === date);
   } catch (error) {
     console.error('Error reading attendance:', error);
-    throw error;
+    return []; // Return empty array instead of throwing
   }
 }
 

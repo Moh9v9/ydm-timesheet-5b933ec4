@@ -1,4 +1,3 @@
-
 import { fetchSheetData, appendToSheet, updateSheetData } from './common';
 
 const employeeRange = 'employees!A1:Z1000';
@@ -7,6 +6,9 @@ const employeeAppendRange = 'employees';
 export async function readEmployees() {
   try {
     const response = await fetchSheetData(employeeRange);
+    
+    // If we get an empty response or error, return empty array
+    if (!response || !response.values) return [];
     
     const rows = response.values;
     if (!rows || rows.length === 0) return [];
@@ -17,7 +19,7 @@ export async function readEmployees() {
     );
   } catch (error) {
     console.error('Error reading employees:', error);
-    throw error;
+    return []; // Return empty array instead of throwing
   }
 }
 
