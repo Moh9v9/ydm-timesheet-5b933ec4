@@ -80,7 +80,7 @@ const DailyPicker = ({
                 }
               }}
               initialFocus
-              captionLayout="dropdown-buttons"
+              captionLayout="dropdown"
               fromYear={2020}
               toYear={2030}
               className={cn(datePickerStyles.calendar.wrapper, "pointer-events-auto")}
