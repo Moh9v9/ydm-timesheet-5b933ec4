@@ -1,3 +1,5 @@
+
+import { useState } from "react";
 import { AttendanceRecord } from "@/lib/types";
 import { useAttendance } from "@/contexts/AttendanceContext";
 import { useNotification } from "@/components/ui/notification";
@@ -18,11 +20,6 @@ export const useAttendanceOperations = (canEdit: boolean) => {
     try {
       console.log("Starting save process with", attendanceData.length, "records");
       
-      // Log notes specifically to debug
-      attendanceData.forEach((record, index) => {
-        console.log(`Record ${index + 1} before save - ID: ${record.id}, Employee: ${record.employeeName}, Present: ${record.present}, Note: "${record.note}"`);
-      });
-      
       // Make sure we properly identify existing records with IDs
       const cleanData = attendanceData.map(record => {
         // Create a new object to avoid mutation
@@ -32,10 +29,6 @@ export const useAttendanceOperations = (canEdit: boolean) => {
         if (cleanRecord.id && cleanRecord.id.toString().includes('temp_')) {
           delete (cleanRecord as any).id;
         }
-        
-        // Ensure note is properly formatted for saving - NEVER set to undefined
-        // Use empty string instead of undefined to ensure updates work correctly
-        cleanRecord.note = cleanRecord.note !== undefined ? cleanRecord.note : '';
         
         return cleanRecord;
       });
@@ -81,37 +74,23 @@ export const useAttendanceOperations = (canEdit: boolean) => {
                 startTime: data.startTime,
                 endTime: data.endTime,
                 overtimeHours: data.overtimeHours,
-                // Preserve note if no new note provided
-                note: data.note || record.note || ''
+                note: data.note
               }
             : record
         );
       } else {
-        // Update all records - preserve existing notes for absent employees if data.note is empty
-        updatedRecords = attendanceData.map(record => {
-          // Always keep existing note if new note is empty, regardless of presence state
-          const shouldKeepExistingNote = !data.note && record.note;
-          const noteToUse = shouldKeepExistingNote ? record.note : data.note;
-          
-          return {
-            ...record,
-            present: data.present,
-            startTime: data.present ? data.startTime : "",
-            endTime: data.present ? data.endTime : "",
-            overtimeHours: data.present ? data.overtimeHours : 0,
-            // Critical: Ensure note is preserved for absent employees
-            note: noteToUse || ''
-          };
-        });
+        // Update all
+        updatedRecords = attendanceData.map(record => ({
+          ...record,
+          present: data.present,
+          startTime: data.present ? data.startTime : "",
+          endTime: data.present ? data.endTime : "",
+          overtimeHours: data.present ? data.overtimeHours : 0,
+          note: data.note
+        }));
       }
 
-      console.log("Bulk update - records to save:", updatedRecords.length);
-      
-      // Log notes before saving
-      updatedRecords.forEach((record, index) => {
-        console.log(`Record ${index + 1} before bulk save - ID: ${record.id}, Employee: ${record.employeeName}, Present: ${record.present}, Note: "${record.note}"`);
-      });
-      
+      console.log("Bulk update - saving", updatedRecords.length, "records");
       const result = await bulkSaveAttendance(updatedRecords);
       success("All attendance records updated successfully");
       return result;

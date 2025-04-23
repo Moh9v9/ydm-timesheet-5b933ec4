@@ -1,38 +1,95 @@
 
 import { useState, useEffect } from 'react';
 import { User } from "@/lib/types";
+import { Session } from '@supabase/supabase-js';
+import { supabase } from "@/integrations/supabase/client";
+import { createUserFromProfile } from '../utils';
+import { ProfileData } from '../types';
 
-// Google Sheets only: no more ProfileData or Supabase
 export const useAuthState = () => {
   const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<any | null>(null); // Session here can just be a simple object or null
+  const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const storedUser = sessionStorage.getItem('authUser');
-    const authSession = sessionStorage.getItem('authSession');
-
-    if (storedUser && authSession) {
-      try {
-        const parsedSession = JSON.parse(authSession);
-        const parsedUser = JSON.parse(storedUser);
-
-        if (parsedSession && parsedSession.authenticated === true) {
-          console.log("Found valid stored authentication session");
-          setUser(parsedUser);
+    // Set up auth state listener first
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, currentSession) => {
+        console.log("Auth state changed:", event);
+        setSession(currentSession);
+        
+        if (currentSession?.user) {
+          // Use setTimeout to avoid potential deadlocks with Supabase client
+          setTimeout(async () => {
+            try {
+              const { data: profile, error } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', currentSession.user.id)
+                .single();
+              
+              if (error) {
+                console.error("Error fetching user profile:", error);
+                return;
+              }
+              
+              if (profile) {
+                // Cast the profile to ProfileData to ensure type safety
+                const userData = createUserFromProfile(
+                  currentSession.user.id, 
+                  profile as unknown as ProfileData
+                );
+                setUser(userData);
+              }
+            } catch (error) {
+              console.error("Failed to fetch user profile:", error);
+            }
+          }, 0);
         } else {
-          sessionStorage.removeItem('authUser');
-          sessionStorage.removeItem('authSession');
+          setUser(null);
+        }
+      }
+    );
+
+    // Then check for existing session
+    const initializeAuth = async () => {
+      try {
+        const { data: { session: currentSession } } = await supabase.auth.getSession();
+        setSession(currentSession);
+        
+        if (currentSession?.user) {
+          const { data: profile, error } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', currentSession.user.id)
+            .single();
+            
+          if (error) {
+            console.error("Error fetching user profile:", error);
+            return;
+          }
+          
+          if (profile) {
+            // Cast the profile to ProfileData to ensure type safety
+            const userData = createUserFromProfile(
+              currentSession.user.id, 
+              profile as unknown as ProfileData
+            );
+            setUser(userData);
+          }
         }
       } catch (error) {
-        sessionStorage.removeItem('authUser');
-        sessionStorage.removeItem('authSession');
+        console.error("Error initializing auth:", error);
+      } finally {
+        setLoading(false);
       }
-    } else if (storedUser && !authSession) {
-      sessionStorage.removeItem('authUser');
-    }
+    };
 
-    setLoading(false);
+    initializeAuth();
+    
+    return () => {
+      subscription?.unsubscribe();
+    };
   }, []);
 
   return { user, session, loading, setUser, setSession };

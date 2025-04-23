@@ -10,7 +10,6 @@ import { Suspense } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 const Index = () => {
-  console.log("🏠 Index - Rendering Index component");
   const { user } = useAuth();
   const { t } = useLanguage();
 
@@ -33,35 +32,21 @@ const Index = () => {
       </div>
       <AttendanceProvider>
         <EmployeeProvider>
-          <DashboardContents />
+          <DashboardStats />
+
+          <div className="mt-8 min-h-[400px]">
+            <Suspense fallback={<div>{t('loading')}...</div>}>
+              <DailyAttendance />
+            </Suspense>
+          </div>
         </EmployeeProvider>
       </AttendanceProvider>
     </div>
   );
 };
 
-// Move all provider-dependent content to a separate component
-const DashboardContents = () => {
-  console.log("📊 DashboardContents - Rendering inside providers");
-  const { t } = useLanguage();
-  
-  return (
-    <>
-      <DashboardStats />
-
-      <div className="mt-8 min-h-[400px]">
-        <Suspense fallback={<div>{t('loading')}...</div>}>
-          <DailyAttendance />
-        </Suspense>
-      </div>
-    </>
-  );
-};
-
 // Separate component to load stats inside the providers
 const DashboardStats = () => {
-  console.log("📈 DashboardStats - About to call useStatistics");
-  
   const { 
     totalEmployees, 
     presentToday, 
@@ -74,8 +59,6 @@ const DashboardStats = () => {
     absentPaymentBreakdown,
     isLoading 
   } = useStatistics();
-  
-  console.log("📈 DashboardStats - After useStatistics, totalEmployees:", totalEmployees);
   
   const { user } = useAuth();
   

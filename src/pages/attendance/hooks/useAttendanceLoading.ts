@@ -1,9 +1,8 @@
 
 import { useEffect, useRef, useState } from "react";
-import { useAttendance } from "@/contexts/AttendanceContext";
+import { supabase } from "@/integrations/supabase/client";
 
 export function useAttendanceLoading(currentDate: string, filteredEmployeesLength: number, employeesLoading: boolean, dataFetched: boolean, user: any) {
-  const { attendanceRecords } = useAttendance();
   const [actualRecordCount, setActualRecordCount] = useState(0);
   const [recordsLoading, setRecordsLoading] = useState(false);
   const [dataRefreshTrigger, setDataRefreshTrigger] = useState(0);
@@ -20,16 +19,19 @@ export function useAttendanceLoading(currentDate: string, filteredEmployeesLengt
       const fetchActualRecordCount = async () => {
         setRecordsLoading(true);
         try {
-          // Instead of using Supabase, use the attendanceRecords from the AttendanceContext
-          const todayRecords = attendanceRecords.filter(record => record.date === currentDate);
-          const count = todayRecords.length;
-          
-          setActualRecordCount(count || 0);
-          if ((count && count > 0) || (filteredEmployeesLength > 0 && !employeesLoading)) {
-            setDataRefreshTrigger((prev) => prev + 1);
+          const { count, error } = await supabase
+            .from("attendance_records")
+            .select("*", { count: "exact", head: true })
+            .eq("date", currentDate);
+
+          if (!error) {
+            setActualRecordCount(count || 0);
+            if ((count && count > 0) || (filteredEmployeesLength > 0 && !employeesLoading)) {
+              setDataRefreshTrigger((prev) => prev + 1);
+            }
           }
-        } catch (error) {
-          console.error("Error fetching attendance count:", error);
+        } catch {
+          // ignore; handled in Attendance.tsx
         } finally {
           setRecordsLoading(false);
           setInitialCheckDone(true);
@@ -38,7 +40,7 @@ export function useAttendanceLoading(currentDate: string, filteredEmployeesLengt
 
       fetchActualRecordCount();
     }
-  }, [currentDate, filteredEmployeesLength, user, initialCheckDone, employeesLoading, dataFetched, attendanceRecords]);
+  }, [currentDate, filteredEmployeesLength, user, initialCheckDone, employeesLoading, dataFetched]);
 
   // This effect only runs when the date changes
   useEffect(() => {
@@ -49,13 +51,16 @@ export function useAttendanceLoading(currentDate: string, filteredEmployeesLengt
       const updateRecordCount = async () => {
         try {
           setRecordsLoading(true);
-          // Instead of using Supabase, use the attendanceRecords from the AttendanceContext
-          const todayRecords = attendanceRecords.filter(record => record.date === currentDate);
-          const count = todayRecords.length;
-          
-          setActualRecordCount(count || 0);
-        } catch (error) {
-          console.error("Error updating record count:", error);
+          const { count, error } = await supabase
+            .from("attendance_records")
+            .select("*", { count: "exact", head: true })
+            .eq("date", currentDate);
+
+          if (!error) {
+            setActualRecordCount(count || 0);
+          }
+        } catch {
+          // ignore
         } finally {
           setRecordsLoading(false);
         }
@@ -63,7 +68,7 @@ export function useAttendanceLoading(currentDate: string, filteredEmployeesLengt
 
       updateRecordCount();
     }
-  }, [currentDate, user, attendanceRecords]);
+  }, [currentDate, user]);
 
   const handleRefresh = () => {
     setRecordsLoading(true);
@@ -72,13 +77,16 @@ export function useAttendanceLoading(currentDate: string, filteredEmployeesLengt
     
     const updateRecordCount = async () => {
       try {
-        // Instead of using Supabase, use the attendanceRecords from the AttendanceContext
-        const todayRecords = attendanceRecords.filter(record => record.date === currentDate);
-        const count = todayRecords.length;
-        
-        setActualRecordCount(count || 0);
-      } catch (error) {
-        console.error("Error handling refresh:", error);
+        const { count, error } = await supabase
+          .from("attendance_records")
+          .select("*", { count: "exact", head: true })
+          .eq("date", currentDate);
+
+        if (!error) {
+          setActualRecordCount(count || 0);
+        }
+      } catch {
+        // ignore
       } finally {
         setRecordsLoading(false);
       }

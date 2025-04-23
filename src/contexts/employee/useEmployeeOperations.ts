@@ -1,15 +1,6 @@
 
-import {
-  Employee,
-  PaymentType,
-  SponsorshipType,
-  EmployeeStatus,
-} from "@/lib/types";
-import {
-  addEmployee as addToSheet,
-  updateEmployee as updateInSheet,
-  deleteEmployee as deleteFromSheet,
-} from "@/lib/googleSheets";
+import { Employee, PaymentType, SponsorshipType, EmployeeStatus } from "@/lib/types";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 export const useEmployeeOperations = (
@@ -17,131 +8,150 @@ export const useEmployeeOperations = (
   setEmployees: React.Dispatch<React.SetStateAction<Employee[]>>,
   setLoading: React.Dispatch<React.SetStateAction<boolean>>
 ) => {
+  // Get employee by ID
   const getEmployee = (id: string) => {
-    return employees.find((emp) => emp.id === id);
-  };
-  
-  // Add getUniqueValues function
-  const getUniqueValues = (field: keyof Employee) => {
-    const values = employees.map(emp => emp[field]);
-    return [...new Set(values)].filter(Boolean).map(String);
+    return employees.find(emp => emp.id === id);
   };
 
-  const addEmployee = async (
-    employee: Omit<Employee, "id">
-  ): Promise<Employee> => {
+  // Add new employee
+  const addEmployee = async (employee: Omit<Employee, "id">): Promise<Employee> => {
     setLoading(true);
     try {
+      // Check if iqamaNo already exists (if it's provided)
       if (employee.iqamaNo && employee.iqamaNo !== 0) {
-        const existingEmployee = employees.find(
-          (emp) => emp.iqamaNo === employee.iqamaNo
-        );
+        const existingEmployee = employees.find(emp => emp.iqamaNo === employee.iqamaNo);
         if (existingEmployee) {
-          throw new Error(
-            `An employee with Iqama No ${employee.iqamaNo} already exists`
-          );
+          throw new Error(`An employee with Iqama No ${employee.iqamaNo} already exists`);
         }
       }
 
+      const iqamaNo = employee.iqamaNo && employee.iqamaNo !== 0
+        ? employee.iqamaNo
+        : null;
+
+      const { data, error } = await supabase
+        .from('employees')
+        .insert({
+          full_name: employee.fullName,
+          iqama_no: iqamaNo,
+          project: employee.project,
+          location: employee.location,
+          job_title: employee.jobTitle,
+          payment_type: employee.paymentType,
+          rate_of_payment: employee.rateOfPayment,
+          sponsorship: employee.sponsorship,
+          status: employee.status,
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      if (!data) throw new Error('No data returned from insert');
+
       const newEmployee: Employee = {
-        id: (employees.length + 1).toString(),
-        fullName: employee.fullName,
-        iqamaNo: employee.iqamaNo,
-        project: employee.project,
-        location: employee.location,
-        jobTitle: employee.jobTitle,
-        paymentType: employee.paymentType as PaymentType,
-        rateOfPayment: employee.rateOfPayment,
-        sponsorship: employee.sponsorship as SponsorshipType,
-        status: employee.status as EmployeeStatus,
+        id: data.id,
+        fullName: data.full_name,
+        iqamaNo: data.iqama_no !== null ? Number(data.iqama_no) : 0,
+        project: data.project,
+        location: data.location,
+        jobTitle: data.job_title,
+        paymentType: data.payment_type as PaymentType,
+        rateOfPayment: data.rate_of_payment,
+        sponsorship: data.sponsorship as SponsorshipType,
+        status: data.status as EmployeeStatus,
       };
 
-      // Convert numeric properties to string for Google Sheets API
-      await addToSheet({
-        id: newEmployee.id,
-        fullName: newEmployee.fullName,
-        iqamaNo: newEmployee.iqamaNo.toString(),
-        project: newEmployee.project,
-        location: newEmployee.location,
-        jobTitle: newEmployee.jobTitle,
-        paymentType: newEmployee.paymentType,
-        rateOfPayment: newEmployee.rateOfPayment.toString(),
-        sponsorship: newEmployee.sponsorship,
-        status: newEmployee.status,
-      });
-      
       setEmployees([...employees, newEmployee]);
-      toast.success("Employee added successfully");
       return newEmployee;
     } catch (err) {
-      console.error("Error adding employee:", err);
-      toast.error("Failed to add employee");
+      console.error('Error adding employee:', err);
       throw err;
     } finally {
       setLoading(false);
     }
   };
 
-  const updateEmployee = async (
-    id: string,
-    updatedFields: Partial<Omit<Employee, "id">>
-  ): Promise<Employee> => {
+  // Update employee
+  const updateEmployee = async (id: string, employeeData: Partial<Employee>): Promise<Employee> => {
     setLoading(true);
     try {
-      const existing = employees.find((e) => e.id === id);
-      if (!existing) throw new Error("Employee not found");
+      const iqamaNo = employeeData.iqamaNo && employeeData.iqamaNo !== 0 
+        ? employeeData.iqamaNo 
+        : null;
 
-      const updated = { ...existing, ...updatedFields };
+      const { data, error } = await supabase
+        .from('employees')
+        .update({
+          full_name: employeeData.fullName,
+          iqama_no: iqamaNo,
+          project: employeeData.project,
+          location: employeeData.location,
+          job_title: employeeData.jobTitle,
+          payment_type: employeeData.paymentType,
+          rate_of_payment: employeeData.rateOfPayment,
+          sponsorship: employeeData.sponsorship,
+          status: employeeData.status,
+        })
+        .eq('id', id)
+        .select()
+        .single();
 
-      // Convert numeric fields to strings for Google Sheets API
-      const updatedForSheet: { [key: string]: string; id: string } = {
-        id,
-        ...Object.entries(updatedFields).reduce((acc, [key, value]) => {
-          // Convert numbers to strings
-          if (typeof value === 'number') {
-            acc[key] = value.toString();
-          } else if (value !== undefined) {
-            acc[key] = String(value);
-          }
-          return acc;
-        }, {} as Record<string, string>)
+      if (error) throw error;
+      if (!data) throw new Error('No data returned from update');
+
+      const updatedEmployee: Employee = {
+        id: data.id,
+        fullName: data.full_name,
+        iqamaNo: data.iqama_no !== null ? Number(data.iqama_no) : 0,
+        project: data.project,
+        location: data.location,
+        jobTitle: data.job_title,
+        paymentType: data.payment_type as PaymentType,
+        rateOfPayment: data.rate_of_payment,
+        sponsorship: data.sponsorship as SponsorshipType,
+        status: data.status as EmployeeStatus,
       };
 
-      await updateInSheet(updatedForSheet);
-
-      setEmployees((prev) =>
-        prev.map((e) => (e.id === id ? { ...e, ...updatedFields } : e))
-      );
-      toast.success("Employee updated successfully");
-      return updated;
+      setEmployees(employees.map(emp => emp.id === id ? updatedEmployee : emp));
+      return updatedEmployee;
     } catch (err) {
-      console.error("Error updating employee:", err);
-      toast.error("Failed to update employee");
+      console.error('Error updating employee:', err);
       throw err;
     } finally {
       setLoading(false);
     }
   };
 
-  const deleteEmployee = async (id: string) => {
+  // Delete employee
+  const deleteEmployee = async (id: string): Promise<void> => {
     setLoading(true);
     try {
-      await deleteFromSheet(id);
-      setEmployees((prev) => prev.filter((e) => e.id !== id));
-      toast.success("Employee deleted");
+      const { error } = await supabase
+        .from('employees')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+      setEmployees(employees.filter(emp => emp.id !== id));
     } catch (err) {
-      console.error("Error deleting employee:", err);
-      toast.error("Failed to delete employee");
+      console.error('Error deleting employee:', err);
+      throw err;
     } finally {
       setLoading(false);
     }
+  };
+
+  // Helper to get unique values for filter dropdowns
+  const getUniqueValues = (field: keyof Employee) => {
+    const values = employees.map(emp => String(emp[field] ?? ''));
+    return [...new Set(values)].sort();
   };
 
   return {
     getEmployee,
-    getUniqueValues,
     addEmployee,
     updateEmployee,
     deleteEmployee,
+    getUniqueValues,
   };
 };

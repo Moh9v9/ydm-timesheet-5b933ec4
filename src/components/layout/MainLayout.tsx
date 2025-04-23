@@ -36,7 +36,7 @@ const MainLayout = ({ children, requireAuth = true }: MainLayoutProps) => {
     
     if (!loading && requireAuth && !user) {
       console.log("No user found, redirecting to login");
-      navigate("/login", { replace: true });
+      navigate("/login");
     }
   }, [loading, user, requireAuth, navigate]);
 

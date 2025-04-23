@@ -5,15 +5,15 @@ import { Employee } from "@/lib/types";
 import { toast } from "sonner";
 
 export const useEmployeePage = () => {
-  const {
-    filteredEmployees,
-    filters,
-    setFilters,
+  const { 
+    filteredEmployees, 
+    filters, 
+    setFilters, 
     deleteEmployee,
     getUniqueValues,
     loading,
     error,
-    refreshEmployees,
+    refreshEmployees
   } = useEmployees();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -21,20 +21,24 @@ export const useEmployeePage = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [employeeToDelete, setEmployeeToDelete] = useState<string | null>(null);
 
+  // Filter unique values for dropdowns
   const filterOptions = {
     projects: getUniqueValues("project"),
     locations: getUniqueValues("location"),
     paymentTypes: ["Monthly", "Daily"],
-    sponsorshipTypes: ["YDM co", "YDM est", "Outside"],
+    sponsorshipTypes: ["YDM co", "YDM est", "Outside"]
   };
 
   const handleFilterChange = (key: keyof typeof filters, value: string) => {
     console.log(`Filter changed: ${key} = ${value}`);
-
+    
     if (value === "All") {
       if (key === "status") {
+        // Always explicitly set "All" for status filter to show both Active and Archived
         setFilters({ ...filters, [key]: "All" });
+        console.log(`Setting ${key} filter to explicit "All" value`);
       } else {
+        // For other filters, remove them from the filters object when "All" is selected
         const newFilters = { ...filters };
         delete newFilters[key];
         setFilters(newFilters);
@@ -42,6 +46,8 @@ export const useEmployeePage = () => {
     } else {
       setFilters({ ...filters, [key]: value });
     }
+    
+    console.log("Updated filters:", { ...filters, [key]: value === "All" && key !== "status" ? undefined : value });
   };
 
   const handleDeleteClick = (id: string) => {
@@ -84,33 +90,28 @@ export const useEmployeePage = () => {
     setCurrentEmployee(null);
     refreshEmployees();
   };
-  
-  const handleRefresh = async () => {
-    try {
-      await refreshEmployees();
-      toast.success("Employee data refreshed");
-    } catch (err) {
-      toast.error("Failed to refresh employees");
-      console.error(err);
-    }
+
+  const handleRefresh = () => {
+    refreshEmployees();
+    toast.success("Employee data refreshed");
   };
 
   return {
-    filteredEmployees,
-    filterOptions,
-    filters,
-    loading,
-    error,
     isModalOpen,
     currentEmployee,
     deleteDialogOpen,
+    loading,
+    error,
+    filterOptions,
+    filters,
+    filteredEmployees,
     handleFilterChange,
+    handleDeleteClick,
+    handleDeleteConfirm,
+    handleDeleteCancel,
     handleEdit,
     handleAddNew,
     closeModal,
-    handleDeleteClick,
-    handleDeleteCancel,
-    handleDeleteConfirm,
     handleRefresh
   };
 };

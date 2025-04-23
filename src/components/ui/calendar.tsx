@@ -67,13 +67,13 @@ function Calendar({
         ...classNames,
       }}
       components={{
-        ...(props.components || {}),
+        IconLeft: ({ ..._props }) => <ChevronLeft className="h-4 w-4 dark:text-gray-100" />,
+        IconRight: ({ ..._props }) => <ChevronRight className="h-4 w-4 dark:text-gray-100" />,
       }}
       {...props}
     />
   );
 }
-
 Calendar.displayName = "Calendar";
 
 export { Calendar };

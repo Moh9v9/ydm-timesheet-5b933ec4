@@ -1,5 +1,5 @@
 import { Employee, EmployeeFilters } from "@/lib/types";
-import { fetchSheetData } from "@/lib/googleSheets/common";
+import { supabase } from "@/integrations/supabase/client";
 
 /**
  * Returns true if employee passes all filters, including creation date vs. attendance date.
@@ -39,35 +39,20 @@ export async function employeeMatchesFilters(
   // ONLY apply this check if we're in attendance view (currentAttendanceDate is provided)
   // AND we're not explicitly showing all statuses or archived employees
   if (employee.status === "Archived" && currentAttendanceDate && filters.status !== "Archived" && filters.status !== "All") {
-    try {
-      // Use Google Sheets to fetch attendance records instead of Supabase
-      const attendanceRange = 'attendance_records!A1:Z1000';
-      const response = await fetchSheetData(attendanceRange);
-      
-      if (!response || !response.values) {
-        console.log(`No attendance records found for employee ${employee.id}`);
-        return false;
-      }
-
-      const headers = response.values[0];
-      const records = response.values.slice(1);
-
-      const employeeAttendanceRecord = records.find(row => {
-        const employeeIdIndex = headers.indexOf('employee_uuid');
-        const dateIndex = headers.indexOf('date');
-        return row[employeeIdIndex] === employee.id && row[dateIndex] === currentAttendanceDate;
-      });
-
-      if (!employeeAttendanceRecord) {
-        console.log(`Archived employee ${employee.id} (${employee.fullName}) filtered out - no record for date: ${currentAttendanceDate}`);
-        return false;
-      }
-      
-      console.log(`Archived employee ${employee.id} (${employee.fullName}) included - has record for date: ${currentAttendanceDate}`);
-    } catch (error) {
-      console.error('Error checking attendance records:', error);
+    // This check should only run in attendance view when we're not explicitly filtering for archived or all employees
+    const { data } = await supabase
+      .from('attendance_records')
+      .select('id, present')
+      .eq('employee_uuid', employee.id)
+      .eq('date', currentAttendanceDate)
+      .maybeSingle();
+    
+    if (!data) {
+      console.log(`Archived employee ${employee.id} (${employee.fullName}) filtered out - no record for date: ${currentAttendanceDate}`);
       return false;
     }
+    
+    console.log(`Archived employee ${employee.id} (${employee.fullName}) included - has record for date: ${currentAttendanceDate} with present=${data.present}`);
   }
   
   // Other filters remain unchanged

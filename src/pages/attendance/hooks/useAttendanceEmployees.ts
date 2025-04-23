@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { Employee } from "@/lib/types";
 import { useEmployees } from "@/contexts/EmployeeContext";
-import { readAttendanceByDate } from "@/lib/googleSheets";
+import { supabase } from "@/integrations/supabase/client";
 
 interface AttendanceFilters {
   project: string;
@@ -52,27 +52,48 @@ export const useAttendanceEmployees = (
       }
 
       try {
-        // Check what attendance records exist for the current date using Google Sheets API
-        console.log(`Checking for attendance records for date: ${currentDate}`);
-        const attendanceRecords = await readAttendanceByDate(currentDate);
+        // First, get attendance records for the current date to find archived employees with records
+        const { data: attendanceRecords, error: attendanceError } = await supabase
+          .from('attendance_records')
+          .select('employee_uuid')
+          .eq('date', currentDate);
 
-        // Log the retrieved attendance records to verify if they exist
-        console.log(`Found ${attendanceRecords?.length || 0} attendance records for ${currentDate}:`, attendanceRecords);
-        
-        // Extract employee IDs from attendance records
-        const employeeIds = attendanceRecords?.map(record => record.employeeId) || [];
+        if (attendanceError) {
+          console.error('Error fetching attendance records:', attendanceError);
+          return;
+        }
 
-        if (employeeIds.length > 0) {
-          // Find archived employees that have attendance records for this date
-          const archivedEmployees = employees
-            .filter(emp => emp.status === "Archived" && employeeIds.includes(emp.id));
+        // Extract employee UUIDs from attendance records
+        const employeeUuids = attendanceRecords?.map(record => record.employee_uuid) || [];
 
-          if (archivedEmployees && archivedEmployees.length > 0) {
+        if (employeeUuids.length > 0) {
+          // Fetch archived employees that have attendance records
+          const { data: archivedEmployees, error: archivedError } = await supabase
+            .from('employees')
+            .select('*')
+            .eq('status', 'Archived')
+            .in('id', employeeUuids);
+
+          if (archivedError) {
+            console.error('Error fetching archived employees:', archivedError);
+          } else if (archivedEmployees && archivedEmployees.length > 0) {
             console.log(`Found ${archivedEmployees.length} archived employees with records for ${currentDate}`);
 
+            // Map the DB rows to Employee objects
+            let archivedWithRecords = archivedEmployees.map(record => ({
+              id: record.id,
+              fullName: record.full_name,
+              iqamaNo: record.iqama_no || 0,
+              project: record.project,
+              location: record.location,
+              jobTitle: record.job_title,
+              paymentType: record.payment_type,
+              rateOfPayment: record.rate_of_payment,
+              sponsorship: record.sponsorship,
+              status: record.status
+            } as Employee));
+
             // Apply the same filters to archived employees
-            let archivedWithRecords = [...archivedEmployees];
-            
             if (filters) {
               if (filters.project !== "All Projects") {
                 archivedWithRecords = archivedWithRecords.filter(emp => emp.project === filters.project);
