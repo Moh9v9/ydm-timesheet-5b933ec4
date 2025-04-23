@@ -1,4 +1,3 @@
-
 // This file now uses the browser-compatible implementation from the googleSheets folder
 
 import {
@@ -140,6 +139,26 @@ export async function updateUserRole(id: string, newRole: string) {
   } catch (error) {
     console.error('Error updating user role:', error);
     throw error;
+  }
+}
+
+/**
+ * Debug utility: Fetches all users from the Google Sheet and logs them.
+ * Call debugLogAllUsers() in the browser devtools or at app startup to verify Google Sheets connectivity.
+ */
+export async function debugLogAllUsers() {
+  try {
+    console.log("⏬ [Debug] Fetching all users from Google Sheets...");
+    const users = await readUsers();
+    if (users.length === 0) {
+      console.warn("[Debug] No users found, or sheet is empty.");
+    } else {
+      console.log(`[Debug] Successfully fetched ${users.length} users:`, users);
+    }
+    return users;
+  } catch (error) {
+    console.error("[Debug] Error fetching users:", error);
+    return [];
   }
 }
 
