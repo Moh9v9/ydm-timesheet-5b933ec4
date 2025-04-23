@@ -16,37 +16,28 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     login: async (email: string, password: string) => {
       try {
         const userData = await operations.login(email, password);
-        // Update local state immediately for faster UI feedback
         setUser(userData);
-        // Store session information
         const sessionInfo = { authenticated: true, timestamp: new Date().toISOString() };
         sessionStorage.setItem('authSession', JSON.stringify(sessionInfo));
         return userData;
       } catch (error) {
-        console.error("Enhanced login error:", error);
         throw error;
       }
     },
     logout: async () => {
       try {
-        // First clear local state
         setUser(null);
         setSession(null);
-        
-        // Clear all authentication data from storage
+
         sessionStorage.removeItem('authUser');
         sessionStorage.removeItem('authSession');
         localStorage.removeItem('authUser');
         localStorage.removeItem('authSession');
-        
-        // Then call the original logout
+
         return await operations.logout();
       } catch (error) {
-        console.error("Enhanced logout error:", error);
-        // Still clear state even if logout fails
         setUser(null);
         setSession(null);
-        // Clear storage as well
         sessionStorage.removeItem('authUser');
         sessionStorage.removeItem('authSession');
         throw error;
@@ -55,17 +46,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     updateProfile: async (userData: UpdateProfileParams) => {
       try {
         await operations.updateProfile(userData);
-        
-        // Update local state to reflect changes
+
         if (user) {
           setUser({
             ...user,
             ...userData,
-            // Don't update password in local state
             password: user.password
           });
-          
-          // Update stored user data if it exists
+
           const storedUser = sessionStorage.getItem('authUser');
           if (storedUser) {
             const parsedUser = JSON.parse(storedUser);
@@ -74,11 +62,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           }
         }
       } catch (error) {
-        console.error("Enhanced update profile error:", error);
         throw error;
       }
     },
-    // Make sure forgotPassword and resetPassword are included
     forgotPassword: operations.forgotPassword,
     resetPassword: operations.resetPassword
   };
