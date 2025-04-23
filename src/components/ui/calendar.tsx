@@ -67,28 +67,37 @@ function Calendar({
         ...classNames,
       }}
       components={{
-        ...props.components,
+        ...(props.components || {}),
         Navigation: ({ onPreviousClick, onNextClick, ...navProps }) => (
           <div className="flex justify-between">
-            <button onClick={onPreviousClick} className={cn(
-              buttonVariants({ variant: "outline" }),
-              "h-8 w-8 bg-transparent p-0 opacity-50 hover:opacity-100 dark:text-gray-100 dark:border-gray-700"
-            )}>
+            <button 
+              type="button"
+              onClick={onPreviousClick} 
+              className={cn(
+                buttonVariants({ variant: "outline" }),
+                "h-8 w-8 bg-transparent p-0 opacity-50 hover:opacity-100 dark:text-gray-100 dark:border-gray-700"
+              )}
+            >
               <ChevronLeft className="h-4 w-4 dark:text-gray-100" />
             </button>
-            <button onClick={onNextClick} className={cn(
-              buttonVariants({ variant: "outline" }),
-              "h-8 w-8 bg-transparent p-0 opacity-50 hover:opacity-100 dark:text-gray-100 dark:border-gray-700"
-            )}>
+            <button 
+              type="button"
+              onClick={onNextClick} 
+              className={cn(
+                buttonVariants({ variant: "outline" }),
+                "h-8 w-8 bg-transparent p-0 opacity-50 hover:opacity-100 dark:text-gray-100 dark:border-gray-700"
+              )}
+            >
               <ChevronRight className="h-4 w-4 dark:text-gray-100" />
             </button>
           </div>
-        ),
+        )
       }}
       {...props}
     />
   );
 }
+
 Calendar.displayName = "Calendar";
 
 export { Calendar };
