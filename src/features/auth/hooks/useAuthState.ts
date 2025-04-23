@@ -12,7 +12,20 @@ export const useAuthState = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Set up auth state listener first
+    // First check if we have a stored user from Google Sheets authentication
+    const storedUser = sessionStorage.getItem('authUser');
+    if (storedUser) {
+      try {
+        const parsedUser = JSON.parse(storedUser);
+        setUser(parsedUser);
+      } catch (error) {
+        console.error("Error parsing stored user:", error);
+        // Clear invalid stored data
+        sessionStorage.removeItem('authUser');
+      }
+    }
+    
+    // Then proceed with Supabase authentication setup
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, currentSession) => {
         console.log("Auth state changed:", event);
@@ -45,13 +58,11 @@ export const useAuthState = () => {
               console.error("Failed to fetch user profile:", error);
             }
           }, 0);
-        } else {
-          setUser(null);
         }
       }
     );
 
-    // Then check for existing session
+    // Then check for existing Supabase session
     const initializeAuth = async () => {
       try {
         const { data: { session: currentSession } } = await supabase.auth.getSession();

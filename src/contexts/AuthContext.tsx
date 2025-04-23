@@ -18,6 +18,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         const userData = await operations.login(email, password);
         // Update local state immediately for faster UI feedback
         setUser(userData);
+        // Store session information
+        const sessionInfo = { authenticated: true, timestamp: new Date().toISOString() };
+        sessionStorage.setItem('authSession', JSON.stringify(sessionInfo));
         return userData;
       } catch (error) {
         console.error("Enhanced login error:", error);
@@ -29,6 +32,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         // First clear local state
         setUser(null);
         setSession(null);
+        
+        // Clear all authentication data from storage
+        sessionStorage.removeItem('authUser');
+        sessionStorage.removeItem('authSession');
+        localStorage.removeItem('authUser');
+        localStorage.removeItem('authSession');
+        
         // Then call the original logout
         return await operations.logout();
       } catch (error) {
@@ -36,6 +46,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         // Still clear state even if logout fails
         setUser(null);
         setSession(null);
+        // Clear storage as well
+        sessionStorage.removeItem('authUser');
+        sessionStorage.removeItem('authSession');
         throw error;
       }
     },
@@ -51,6 +64,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             // Don't update password in local state
             password: user.password
           });
+          
+          // Update stored user data if it exists
+          const storedUser = sessionStorage.getItem('authUser');
+          if (storedUser) {
+            const parsedUser = JSON.parse(storedUser);
+            const updatedUser = { ...parsedUser, ...userData, password: parsedUser.password };
+            sessionStorage.setItem('authUser', JSON.stringify(updatedUser));
+          }
         }
       } catch (error) {
         console.error("Enhanced update profile error:", error);

@@ -48,6 +48,9 @@ export const useAuthOperations = () => {
         permissions,
       };
 
+      // Store authentication state in sessionStorage
+      sessionStorage.setItem('authUser', JSON.stringify(userData));
+      
       console.log("✅ Login successful:", userData);
       toast.success(`Welcome back, ${userData.fullName}`);
       return userData;
@@ -60,9 +63,16 @@ export const useAuthOperations = () => {
 
   const logout = async () => {
     console.log("🔓 Logging out...");
+    
+    // Clear all authentication data from sessionStorage
+    sessionStorage.removeItem('authUser');
+    sessionStorage.removeItem('authSession');
+    
+    // Clear any other auth-related storage
+    localStorage.removeItem('authUser');
+    localStorage.removeItem('authSession');
+    
     toast.success("Logged out successfully");
-    // Remove the auto-redirect, let AuthContext handle navigation
-    // window.location.href = "/login";
     return Promise.resolve();
   };
 
@@ -74,6 +84,15 @@ export const useAuthOperations = () => {
       // For now, only support updating the role if that's what was provided
       if (userData.role && userData.id) {
         await updateUserRole(userData.id, userData.role);
+        
+        // Update stored authentication data if it exists
+        const storedUser = sessionStorage.getItem('authUser');
+        if (storedUser) {
+          const parsedUser = JSON.parse(storedUser);
+          parsedUser.role = userData.role;
+          sessionStorage.setItem('authUser', JSON.stringify(parsedUser));
+        }
+        
         toast.success("Profile updated successfully");
         return;
       }
