@@ -5,7 +5,6 @@ import { useEmployees } from "@/contexts/EmployeeContext";
 import { ExportFormat, ReportType } from "@/lib/types";
 import { formatAttendanceForExport } from "@/lib/reportUtils";
 import { format } from "date-fns";
-import { supabase } from "@/integrations/supabase/client";
 import { useReportFilters } from "./report-generation/useReportFilters";
 import { useReportGenerator } from "./report-generation/useReportGenerator";
 
@@ -60,40 +59,21 @@ export const useReportGeneration = ({
       let allRecords = [...attendanceRecords];
       
       if (reportType === 'monthly') {
-        // Build the query
-        let query = supabase
-          .from('attendance_records')
-          .select('*')
-          .eq('present', true);
-        
-        query = await applyMonthlyFilters(query, {
+        // Get filtered records using the report filters
+        const filterParams = {
           selectedDate,
           searchTerm,
           selectedProject,
           selectedLocation,
           selectedPaymentType,
           includeInactive
-        });
-          
-        const { data, error: fetchError } = await query;
+        };
         
-        if (fetchError) {
-          throw fetchError;
-        }
+        const filteredRecords = await applyMonthlyFilters(filterParams);
         
-        if (data) {
-          console.log(`Fetched ${data.length} total attendance records from database`);
-          allRecords = data.map(record => ({
-            id: record.id,
-            employeeId: record.employee_uuid,
-            employeeName: record.employee_name || '',
-            date: record.date,
-            present: record.present,
-            startTime: record.start_time || '',
-            endTime: record.end_time || '',
-            overtimeHours: record.overtime_hours || 0,
-            note: record.note || ''
-          }));
+        if (filteredRecords) {
+          console.log(`Fetched ${filteredRecords.length} total attendance records`);
+          allRecords = filteredRecords;
         }
       } else if (searchTerm && searchTerm !== "") {
         allRecords = allRecords.filter(record => 

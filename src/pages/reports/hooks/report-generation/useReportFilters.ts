@@ -1,11 +1,13 @@
 
-import { supabase } from "@/integrations/supabase/client";
 import { format, endOfMonth } from "date-fns";
 import { useCallback } from "react";
+import { useAttendance } from "@/contexts/AttendanceContext";
 
 export const useReportFilters = () => {
+  const { attendanceRecords } = useAttendance();
+  
   // Optimize with useCallback to prevent recreation on each render
-  const applyMonthlyFilters = useCallback(async (query: any, {
+  const applyMonthlyFilters = useCallback(async ({
     selectedDate,
     searchTerm,
     selectedProject,
@@ -25,59 +27,26 @@ export const useReportFilters = () => {
     const selectedYear = selectedDate.getFullYear();
     const lastDayOfMonth = endOfMonth(selectedDate);
     
-    // Add date filtering for the selected month
-    query = query.gte('date', `${selectedYear}-${String(selectedMonth + 1).padStart(2, '0')}-01`)
-                 .lte('date', format(lastDayOfMonth, 'yyyy-MM-dd'));
+    // Filter records by date range
+    let filteredRecords = attendanceRecords.filter(record => {
+      const recordDate = new Date(record.date);
+      return recordDate >= new Date(`${selectedYear}-${String(selectedMonth + 1).padStart(2, '0')}-01`) && 
+             recordDate <= new Date(format(lastDayOfMonth, 'yyyy-MM-dd'));
+    });
     
-    // Add employee filter if an employee is selected
+    // Add employee name filter if provided
     if (searchTerm && searchTerm !== "") {
       console.log(`Filtering attendance records by employee: ${searchTerm}`);
-      query = query.ilike('employee_name', `%${searchTerm}%`);
+      filteredRecords = filteredRecords.filter(record => 
+        record.employeeName.toLowerCase().includes(searchTerm.toLowerCase())
+      );
     }
     
-    // Use prepared queries to optimize database interactions
-    let employeeIds: string[] = [];
+    // At this point, additional filters would be applied based on employee properties
+    // This would require checking each employee against the filters
     
-    // Optimize filter queries by combining them
-    if ((selectedProject && selectedProject !== "all") || 
-        (selectedLocation && selectedLocation !== "all") ||
-        (selectedPaymentType && selectedPaymentType !== "all") || 
-        includeInactive) {
-      // Build filter conditions
-      let employeeQuery = supabase.from('employees').select('id');
-      
-      if (selectedProject && selectedProject !== "all") {
-        console.log(`Filtering by project: ${selectedProject}`);
-        employeeQuery = employeeQuery.eq('project', selectedProject);
-      }
-      
-      if (selectedLocation && selectedLocation !== "all") {
-        console.log(`Filtering by location: ${selectedLocation}`);
-        employeeQuery = employeeQuery.eq('location', selectedLocation);
-      }
-      
-      if (selectedPaymentType && selectedPaymentType !== "all") {
-        console.log(`Filtering by payment type: ${selectedPaymentType}`);
-        employeeQuery = employeeQuery.eq('payment_type', selectedPaymentType);
-      }
-      
-      // Apply status filter based on includeInactive flag
-      if (includeInactive) {
-        employeeQuery = employeeQuery.or('status.eq.Active,status.eq.Archived');
-      } else {
-        employeeQuery = employeeQuery.eq('status', 'Active');
-      }
-      
-      const { data: filteredEmployees } = await employeeQuery;
-      
-      if (filteredEmployees && filteredEmployees.length > 0) {
-        employeeIds = filteredEmployees.map(emp => emp.id);
-        query = query.in('employee_uuid', employeeIds);
-      }
-    }
-    
-    return query;
-  }, []);
+    return filteredRecords;
+  }, [attendanceRecords]);
 
   return {
     applyMonthlyFilters

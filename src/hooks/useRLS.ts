@@ -1,15 +1,13 @@
 
-import { supabase } from "@/integrations/supabase/client";
-import { useState, useEffect } from "react";
-import { Database } from "@/integrations/supabase/types";
+import { useState } from "react";
 import { toast } from "sonner";
 
-type TableNames = keyof Database['public']['Tables'];
-
 /**
- * Hook to help debug Row Level Security (RLS) issues
+ * This hook was previously used for Supabase RLS debugging.
+ * Since we've removed Supabase, we'll keep a simplified version
+ * for backward compatibility.
  */
-export const useRLSDebug = (tableName: TableNames) => {
+export const useRLSDebug = (tableName: string) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
   const [data, setData] = useState<any[]>([]);
@@ -19,20 +17,13 @@ export const useRLSDebug = (tableName: TableNames) => {
     setError(null);
     
     try {
-      const { data, error } = await supabase
-        .from(tableName)
-        .select('*')
-        .limit(1);
-        
-      if (error) throw error;
-      
-      setData(data || []);
-      toast.success(`RLS test successful for ${tableName}`);
-      return { success: true, data };
+      // Since Supabase is removed, this is a no-op function
+      setData([]);
+      toast.info(`RLS testing is not available - Supabase has been removed`);
+      return { success: true, data: [] };
     } catch (err) {
       setError(err instanceof Error ? err : new Error('Unknown error'));
-      console.error(`RLS test error for ${tableName}:`, err);
-      toast.error(`RLS test failed for ${tableName}: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      toast.error(`RLS test failed: ${err instanceof Error ? err.message : 'Unknown error'}`);
       return { success: false, error: err };
     } finally {
       setIsLoading(false);

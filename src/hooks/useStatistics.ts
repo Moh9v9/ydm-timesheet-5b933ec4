@@ -1,7 +1,6 @@
 
 import { useState, useEffect } from "react";
 import { useEmployees } from "@/contexts/EmployeeContext";
-import { supabase } from "@/integrations/supabase/client";
 import { useAttendance } from "@/contexts/AttendanceContext";
 import { SponsorshipType, PaymentType } from "@/lib/types";
 
@@ -33,7 +32,7 @@ export const useStatistics = () => {
   const { filteredEmployees } = useEmployees();
   console.log("📊 useStatistics - Successfully got filteredEmployees:", filteredEmployees?.length);
   
-  const { currentDate } = useAttendance();
+  const { currentDate, attendanceRecords } = useAttendance();
   const [stats, setStats] = useState<DashboardStats>({
     totalEmployees: 0,
     presentToday: 0,
@@ -75,17 +74,6 @@ export const useStatistics = () => {
         setIsLoading(true);
         console.log("useStatistics - Fetching data for selected date:", currentDate);
         
-        // Get records directly from Supabase for the selected date
-        const { data: attendanceData, error } = await supabase
-          .from('attendance_records')
-          .select('*, employees!inner(sponsorship, payment_type)')
-          .eq('date', currentDate);
-        
-        if (error) {
-          console.error("Error fetching attendance stats:", error);
-          throw error;
-        }
-
         // Calculate active employees and their breakdowns
         const activeEmployees = filteredEmployees?.filter(emp => emp.status === "Active") || [];
         const totalActiveEmployees = activeEmployees.length;
@@ -123,19 +111,22 @@ export const useStatistics = () => {
           'Daily': 0
         };
 
+        // Instead of using Supabase, use the attendanceRecords from the AttendanceContext
+        const todayRecords = attendanceRecords.filter(record => record.date === currentDate);
+        
         // Calculate present and absent counts with breakdowns
-        attendanceData?.forEach(record => {
-          const sponsorship = record.employees?.sponsorship as SponsorshipType;
-          const paymentType = record.employees?.payment_type as PaymentType;
+        for (const employee of activeEmployees) {
+          const record = todayRecords.find(rec => rec.employeeId === employee.id);
+          const isPresent = record?.present || false;
           
-          if (record.present) {
-            presentBreakdown[sponsorship]++;
-            presentPaymentBreakdown[paymentType]++;
+          if (isPresent) {
+            presentBreakdown[employee.sponsorship as SponsorshipType]++;
+            presentPaymentBreakdown[employee.paymentType as PaymentType]++;
           } else {
-            absentBreakdown[sponsorship]++;
-            absentPaymentBreakdown[paymentType]++;
+            absentBreakdown[employee.sponsorship as SponsorshipType]++;
+            absentPaymentBreakdown[employee.paymentType as PaymentType]++;
           }
-        });
+        }
 
         const presentCount = Object.values(presentBreakdown).reduce((a, b) => a + b, 0);
         const absentCount = Object.values(absentBreakdown).reduce((a, b) => a + b, 0);
@@ -154,7 +145,7 @@ export const useStatistics = () => {
       } catch (error) {
         console.error("Error fetching attendance stats:", error);
         
-        // If database fetch fails, still show active employees count
+        // If fetch fails, still show active employees count
         const activeEmployees = filteredEmployees?.filter(emp => emp.status === "Active") || [];
         const sponsorshipBreakdown = {
           'YDM co': activeEmployees.filter(emp => emp.sponsorship === 'YDM co').length,
@@ -183,7 +174,7 @@ export const useStatistics = () => {
 
     fetchAttendanceStats();
     
-  }, [filteredEmployees, currentDate]);
+  }, [filteredEmployees, currentDate, attendanceRecords]);
 
   return { ...stats, isLoading };
 };

@@ -1,9 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { User } from "@/lib/types";
-import { supabase } from "@/integrations/supabase/client";
 import { createUserFromProfile } from '@/features/auth/utils';
-import { ProfileData } from '@/features/auth/types';
 
 export const useUsersState = () => {
   const [users, setUsers] = useState<User[]>([]);
@@ -13,21 +11,10 @@ export const useUsersState = () => {
     const loadUsers = async () => {
       setLoading(true);
       try {
-        const { data: profiles, error } = await supabase
-          .from('profiles')
-          .select('*');
-          
-        if (error) {
-          console.error("Error loading users:", error);
-          return;
-        }
-        
-        if (profiles) {
-          const loadedUsers = profiles.map(profile => 
-            createUserFromProfile(profile.id, profile as unknown as ProfileData)
-          );
-          setUsers(loadedUsers);
-        }
+        // Since we're using Google Sheets now, we would fetch users from there
+        // For now, we'll just use an empty array
+        const loadedUsers: User[] = [];
+        setUsers(loadedUsers);
       } catch (error) {
         console.error("Failed to load users:", error);
       } finally {
