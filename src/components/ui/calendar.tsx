@@ -68,11 +68,11 @@ function Calendar({
       }}
       components={{
         ...(props.components || {}),
-        Navigation: ({ onPreviousClick, onNextClick, ...navProps }) => (
+        Navigation: (navProps) => (
           <div className="flex justify-between">
             <button 
               type="button"
-              onClick={onPreviousClick} 
+              onClick={navProps.onPreviousClick} 
               className={cn(
                 buttonVariants({ variant: "outline" }),
                 "h-8 w-8 bg-transparent p-0 opacity-50 hover:opacity-100 dark:text-gray-100 dark:border-gray-700"
@@ -82,7 +82,7 @@ function Calendar({
             </button>
             <button 
               type="button"
-              onClick={onNextClick} 
+              onClick={navProps.onNextClick} 
               className={cn(
                 buttonVariants({ variant: "outline" }),
                 "h-8 w-8 bg-transparent p-0 opacity-50 hover:opacity-100 dark:text-gray-100 dark:border-gray-700"
@@ -91,7 +91,7 @@ function Calendar({
               <ChevronRight className="h-4 w-4 dark:text-gray-100" />
             </button>
           </div>
-        )
+        ),
       }}
       {...props}
     />
