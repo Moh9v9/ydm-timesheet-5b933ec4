@@ -1,7 +1,7 @@
 
 import * as React from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { DayPicker, type CustomComponents } from "react-day-picker";
+import { DayPicker } from "react-day-picker";
 
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
@@ -67,31 +67,9 @@ function Calendar({
         ...classNames,
       }}
       components={{
+        IconLeft: () => <ChevronLeft className="h-4 w-4 dark:text-gray-100" />,
+        IconRight: () => <ChevronRight className="h-4 w-4 dark:text-gray-100" />,
         ...(props.components || {}),
-        Navigation: (navProps) => (
-          <div className="flex justify-between">
-            <button 
-              type="button"
-              onClick={navProps.onPreviousClick} 
-              className={cn(
-                buttonVariants({ variant: "outline" }),
-                "h-8 w-8 bg-transparent p-0 opacity-50 hover:opacity-100 dark:text-gray-100 dark:border-gray-700"
-              )}
-            >
-              <ChevronLeft className="h-4 w-4 dark:text-gray-100" />
-            </button>
-            <button 
-              type="button"
-              onClick={navProps.onNextClick} 
-              className={cn(
-                buttonVariants({ variant: "outline" }),
-                "h-8 w-8 bg-transparent p-0 opacity-50 hover:opacity-100 dark:text-gray-100 dark:border-gray-700"
-              )}
-            >
-              <ChevronRight className="h-4 w-4 dark:text-gray-100" />
-            </button>
-          </div>
-        ),
       }}
       {...props}
     />
