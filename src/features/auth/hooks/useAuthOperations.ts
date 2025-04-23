@@ -51,6 +51,13 @@ export const useAuthOperations = () => {
       // Store authentication state in sessionStorage
       sessionStorage.setItem('authUser', JSON.stringify(userData));
       
+      // Create a session entry with explicit authentication state
+      const sessionInfo = { 
+        authenticated: true, 
+        timestamp: new Date().toISOString() 
+      };
+      sessionStorage.setItem('authSession', JSON.stringify(sessionInfo));
+      
       console.log("✅ Login successful:", userData);
       toast.success(`Welcome back, ${userData.fullName}`);
       return userData;
@@ -63,6 +70,17 @@ export const useAuthOperations = () => {
 
   const logout = async () => {
     console.log("🔓 Logging out...");
+    
+    // Explicitly mark the session as logged out before removing it
+    try {
+      const sessionInfo = { 
+        authenticated: false, 
+        timestamp: new Date().toISOString() 
+      };
+      sessionStorage.setItem('authSession', JSON.stringify(sessionInfo));
+    } catch (e) {
+      console.error("Error updating session before logout:", e);
+    }
     
     // Clear all authentication data from sessionStorage
     sessionStorage.removeItem('authUser');

@@ -14,15 +14,35 @@ export const useAuthState = () => {
   useEffect(() => {
     // First check if we have a stored user from Google Sheets authentication
     const storedUser = sessionStorage.getItem('authUser');
-    if (storedUser) {
+    const authSession = sessionStorage.getItem('authSession');
+    
+    // Only use stored user if we also have a valid session
+    if (storedUser && authSession) {
       try {
+        // Check if the session is valid (not explicitly logged out)
+        const parsedSession = JSON.parse(authSession);
         const parsedUser = JSON.parse(storedUser);
-        setUser(parsedUser);
+        
+        // Use the stored user data if session exists and is valid
+        if (parsedSession && parsedSession.authenticated === true) {
+          console.log("Found valid stored authentication session");
+          setUser(parsedUser);
+        } else {
+          console.log("Found stored user but session is invalid or expired");
+          // Clear any residual auth data
+          sessionStorage.removeItem('authUser');
+          sessionStorage.removeItem('authSession');
+        }
       } catch (error) {
-        console.error("Error parsing stored user:", error);
+        console.error("Error parsing stored auth data:", error);
         // Clear invalid stored data
         sessionStorage.removeItem('authUser');
+        sessionStorage.removeItem('authSession');
       }
+    } else if (storedUser && !authSession) {
+      // If we have user data but no session, clear the user data
+      console.log("Found orphaned user data without session, clearing");
+      sessionStorage.removeItem('authUser');
     }
     
     // Then proceed with Supabase authentication setup
