@@ -68,8 +68,22 @@ function Calendar({
       }}
       components={{
         ...props.components,
-        IconLeft: () => <ChevronLeft className="h-4 w-4 dark:text-gray-100" />,
-        IconRight: () => <ChevronRight className="h-4 w-4 dark:text-gray-100" />,
+        Navigation: ({ onPreviousClick, onNextClick, ...navProps }) => (
+          <div className="flex justify-between">
+            <button onClick={onPreviousClick} className={cn(
+              buttonVariants({ variant: "outline" }),
+              "h-8 w-8 bg-transparent p-0 opacity-50 hover:opacity-100 dark:text-gray-100 dark:border-gray-700"
+            )}>
+              <ChevronLeft className="h-4 w-4 dark:text-gray-100" />
+            </button>
+            <button onClick={onNextClick} className={cn(
+              buttonVariants({ variant: "outline" }),
+              "h-8 w-8 bg-transparent p-0 opacity-50 hover:opacity-100 dark:text-gray-100 dark:border-gray-700"
+            )}>
+              <ChevronRight className="h-4 w-4 dark:text-gray-100" />
+            </button>
+          </div>
+        ),
       }}
       {...props}
     />
